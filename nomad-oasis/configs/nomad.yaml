@@ -25,8 +25,11 @@ elastic:
     materials_index: nomad_oasis_materials_v1
 
 plugins:
+  include:
+    - 'schemas/ikz_pld'
+    - 'parsers/nomad_measurements/xrd'
   options:
-    parsers/XRD:
+    parsers/nomad_measurements/xrd:
       python_package: nomad_measurements.xrd
     schemas/nomad_measurements:
       python_package: nomad_measurements
