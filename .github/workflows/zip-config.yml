@@ -19,3 +19,7 @@ jobs:
         with:
           files: nomad-oasis/
           dest: nomad-oasis.zip
+      - uses: actions/upload-artifact@v1.1
+        with:
+          name: my-artifact
+          path: ${{ github.workspace }}/result.zip
