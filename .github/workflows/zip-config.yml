@@ -17,5 +17,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: vimtor/action-zip@v1.1
         with:
-          files: nomad-oasis
+          files: nomad-oasis/
           dest: nomad-oasis.zip
