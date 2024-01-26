@@ -1,3 +1,4 @@
+![docker image](https://github.com/hampusnasstrom/nomad-example-image/actions/workflows/docker-publish.yml/badge.svg)
 # nomad-example-image
 An example repository for creating a nomad image with custom plugins.
 
