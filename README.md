@@ -57,3 +57,9 @@ git+https://github.com/FAIRmat-NFDI/AreaA-data_modeling_and_schemas.git@30fc9084
 ```
 
 Once the changes have been committed to the main branch, the new image will automatically be generated.
+
+## Create your own image
+
+To create your own custom NOMAD Oasis image you can fork this repository and publish your own docker image.
+1. Fork repository
+2. Enable the GitHub workflow action
