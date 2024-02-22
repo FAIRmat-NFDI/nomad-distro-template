@@ -1,2 +1,3 @@
 git+https://github.com/FAIRmat-NFDI/nomad-material-processing.git@55918771f1191ac31ae5e0d06a579b513886f3b2
 git+https://github.com/FAIRmat-NFDI/AreaA-data_modeling_and_schemas.git@bb8422d5aefe114ae7e4e677262e99fecf26dcaf#subdirectory=PVD/PLD/jeremy_ikz/ikz_pld_plugin
+git+https://github.com/FAIRmat-NFDI/nomad-measurements.git@50f199830517ae9753c5fccea1efe2983ed7781f
