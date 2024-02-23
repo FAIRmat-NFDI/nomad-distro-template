@@ -5,3 +5,4 @@ RUN apt-get -y install git
 USER nomad
 COPY plugins.txt plugins.txt
 RUN pip install -r plugins.txt
+COPY nomad.yaml nomad.yaml
