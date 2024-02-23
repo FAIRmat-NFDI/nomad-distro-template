@@ -14,7 +14,7 @@ Remember to also update the `nomad.yaml` config file to include the new plugins.
 - Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
 Docker nowadays comes with `docker compose` build in. Prior, you needed to
 install the stand alone [docker-compose](https://docs.docker.com/compose/install/).
-- Download the modified configuration files [nomad-oasis.zip](https://github.com/hampusnasstrom/nomad-example-image/raw/main/nomad-oasis.zip) from this repository.
+- Download the modified configuration files [nomad-oasis.zip](nomad-oasis.zip) from this repository.
 - Run the following commands (skip `chown` on MacOS and Windows computers)
 
 
