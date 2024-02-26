@@ -23,6 +23,18 @@ env:
 
 
 jobs:
+  compress:
+  
+    name: Compress nomad-oasis configs
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Updated and compress the nomad-oasis directory
+        run:  bash ${PWD}/nomad-oasis_files/scripts/update_nomad_oasis_dir.sh ${{ github.repository }}
+
   build:
 
     runs-on: ubuntu-latest
