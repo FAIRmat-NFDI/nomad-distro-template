@@ -1,21 +1,9 @@
-name: Docker
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+name: Template Repository Initialization
 
 on:
-  schedule:
-    - cron: '00 03 * * 0'
-  push:
-    branches: [ "main" ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "main" ]
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  # Triggers the workflow on creation of repository
+  create:
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -23,11 +11,46 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
+permissions:
+  contents: write
 
 jobs:
+  initialize_repository:
+    if: github.repository != 'FAIRmat-NFDI/nomad-distribution-template'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Replaces the template repository name in the README with the new one
+      - name: Update README
+        run: |
+          sed -i "s|GITHUB_REPOSITORY_OWNER|${{ github.repository_owner }}|g" template_README.md
+          sed -i "s|GITHUB_REPOSITORY|${{ github.repository }}|g" template_README.md
+          mv template_README.md README.md
+          
+      # Replaces the template repository name in the docker config file with the new one
+      - name: Update docker-compose.yml
+        run: |
+          cd nomad-oasis_files
+          sed -i "s|FAIRMAT_NFDI/nomad-distribution-template|${{ github.repository }}|g" docker-compose.yml
+          zip -r nomad-oasis.zip nomad-oasis
+          cd ..
+
+      # Deletes this workflow file to prevent it from running on branch creation
+      - name: Delete initialization workflow
+        run: rm .github/workflows/initialize.yml
+
+      # Commits all changes
+      - name: Commit repository initialization
+        run: |
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
+          git commit -am "Repository initialization"
+          git push
 
   build:
-
+    if: github.repository != 'FAIRmat-NFDI/nomad-distribution-template'
     runs-on: ubuntu-latest
     permissions:
       contents: read

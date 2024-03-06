@@ -1,10 +1,18 @@
-![docker image](https://github.com/hampusnasstrom/nomad-example-image/actions/workflows/docker-publish.yml/badge.svg)
-# nomad-example-image
-An example repository for creating a nomad image with custom plugins.
+![docker image](https://github.com/FAIRmat-NFDI/nomad-distribution-template/actions/workflows/docker-publish.yml/badge.svg)
+
+> [!IMPORTANT] 
+> The templated repository will run a GitHub action on creation which might take a few momements.
+> After the workflow finishes you should refresh the page and this message should disappear.
+
+# NOMAD Oasis Distribution *Template*
+This repository is a template for creating your own custom NOMAD Oasis distribution image.
+Click [here](https://github.com/new?template_name=nomad-distribution-template&template_owner=FAIRmat-NFDI)
+to use this template, or click the `Use this template` button in the upper right corner of
+the main GitHub page for this template.
 
 ## Deploying the image
 
-To deploy this NOMAD Oasis image you should follow the instructions on [nomad-lab.eu/prod/v1/docs/oasis/install.html](https://nomad-lab.eu/prod/v1/docs/oasis/install.html) but replace the Docker image in `docker-compose.yaml` with `ghcr.io/hampusnasstrom/nomad-example-image:main` for the services `worker`, `app`, `north`, and `logtransfer`.
+To deploy this NOMAD Oasis image you should follow the instructions on [nomad-lab.eu/prod/v1/docs/oasis/install.html](https://nomad-lab.eu/prod/v1/docs/oasis/install.html) but replace the Docker image in `docker-compose.yaml` with `ghcr.io/FAIRmat-NFDI/nomad-distribution-template:main` for the services `worker`, `app`, `north`, and `logtransfer`.
 
 Remember to also update the `nomad.yaml` config file to include the new plugins.
 
@@ -34,32 +42,3 @@ the container has to be run under the docker group. You need to replace the defa
 id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker group id.
 Run `id` if you are a docker user, or `getent group | grep docker` to find our your
 systems docker gid. The user id 1000 is used as the nomad user inside all containers.
-
-## Adding a plugin
-
-To add a new plugin to the docker image you should add it to the [plugins.txt](plugins.txt) file.
-
-Here you can put either plugins distributed to PyPI, e.g.
-```
-nomad-material-processing
-```
-or plugins in a git repository with either the commit hash
-```
-git+https://github.com/FAIRmat-NFDI/nomad-measurements.git@71b7e8c9bb376ce9e8610aba9a20be0b5bce6775
-```
-or with a tag
-```
-git+https://github.com/FAIRmat-NFDI/nomad-measurements.git@v0.0.4
-```
-To add a plugin in a subdirectory of a git repository you can use the `subdirectory` option, e.g.
-```
-git+https://github.com/FAIRmat-NFDI/AreaA-data_modeling_and_schemas.git@30fc90843428d1b36a1d222874803abae8b1cb42#subdirectory=PVD/PLD/jeremy_ikz/ikz_pld_plugin
-```
-
-Once the changes have been committed to the main branch, the new image will automatically be generated.
-
-## Create your own image
-
-To create your own custom NOMAD Oasis image you can fork this repository and publish your own docker image.
-1. Fork repository
-2. Enable the GitHub workflow action
