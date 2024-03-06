@@ -13,6 +13,11 @@ customize it through [adding plugins](#adding-a-plugin).
 > packages and after that set this package public.
 > You can read more about this in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
 
+> [!TIP]
+> In order for you others to find and learn from your distribution we in FAIRmat would
+> greatly appreciate it if you would add the topic `nomad-distribution` by clicking the
+> ⚙️ next to "About" on the main GitHub page for this repository.
+
 ## Deploying the image
 
 To deploy this NOMAD Oasis image you should follow the instructions on

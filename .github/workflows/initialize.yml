@@ -30,10 +30,10 @@ jobs:
           mv template_README.md README.md
           
       # Replaces the template repository name in the docker config file with the new one
-      - name: Update docker-compose.yml
+      - name: Update docker-compose.yaml
         working-directory: ./nomad-oasis_files
         run: |
-          sed -i "s|FAIRMAT_NFDI/nomad-distribution-template|${{ github.repository }}|g" nomad-oasis/docker-compose.yaml
+          sed -i "s|FAIRmat_NFDI/nomad-distribution-template|${{ github.repository }}|g" nomad-oasis/docker-compose.yaml
           zip -r nomad-oasis.zip nomad-oasis
 
       # Deletes this workflow file to prevent it from running on branch creation
