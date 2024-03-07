@@ -25,10 +25,10 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 ### For a new Oasis
 
-- Find a linux computer.
+- Find a Linux computer.
 - Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
-Docker nowadays comes with `docker compose` build in. Prior, you needed to
-install the stand alone [docker-compose](https://docs.docker.com/compose/install/).
+Docker nowadays comes with `docker compose` built in. Prior, you needed to
+install the stand-alone [docker-compose](https://docs.docker.com/compose/install/).
 - Download the modified configuration files [nomad-oasis.zip](nomad-oasis.zip) from this repository.
 - Run the following commands (skip `chown` on MacOS and Windows computers)
 
@@ -47,7 +47,7 @@ curl localhost/nomad-oasis/alive
 To run NORTH (the NOMAD Remote Tools Hub), the `hub` container needs to run docker and
 the container has to be run under the docker group. You need to replace the default group
 id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker group id.
-Run `id` if you are a docker user, or `getent group | grep docker` to find our your
+Run `id` if you are a docker user, or `getent group | grep docker` to find your
 systems docker gid. The user id 1000 is used as the nomad user inside all containers.
 
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
