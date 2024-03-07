@@ -10,19 +10,18 @@ Click [here](https://github.com/new?template_name=nomad-distribution-template&te
 to use this template, or click the `Use this template` button in the upper right corner of
 the main GitHub page for this template.
 
-## Deploying the image
+## Deploying the distribution
 
-To deploy this NOMAD Oasis image you should follow the instructions on [nomad-lab.eu/prod/v1/docs/oasis/install.html](https://nomad-lab.eu/prod/v1/docs/oasis/install.html) but replace the Docker image in `docker-compose.yaml` with `ghcr.io/FAIRmat-NFDI/nomad-distribution-template:main` for the services `worker`, `app`, `north`, and `logtransfer`.
+Below are instructions for how to deploy this NOMAD Oasis distribution
+[for a new Oasis](#for-a-new-oasis) and [for an existing Oasis](#for-an-existing-oasis)
 
-Remember to also update the `nomad.yaml` config file to include the new plugins.
-
-### Quick-start
+### For a new Oasis
 
 - Find a linux computer.
 - Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
 Docker nowadays comes with `docker compose` build in. Prior, you needed to
 install the stand alone [docker-compose](https://docs.docker.com/compose/install/).
-- Download the modified configuration files [nomad-oasis.zip](nomad-oasis_files/nomad-oasis.zip) from this repository.
+- Download the modified configuration files [nomad-oasis.zip](nomad-oasis.zip) from this repository.
 - Run the following commands (skip `chown` on MacOS and Windows computers)
 
 
@@ -42,3 +41,21 @@ the container has to be run under the docker group. You need to replace the defa
 id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker group id.
 Run `id` if you are a docker user, or `getent group | grep docker` to find our your
 systems docker gid. The user id 1000 is used as the nomad user inside all containers.
+
+You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
+[nomad-lab.eu/prod/v1/docs/oasis/install.html](https://nomad-lab.eu/prod/v1/docs/oasis/install.html)
+
+### For an existing Oasis
+
+If you already have an Oasis running you only need to change the image being pulled in
+your `docker-compose.yaml` with `ghcr.io/GITHUB_REPOSITORY:main` for the services
+`worker`, `app`, `north`, and `logtransfer`.
+
+If you want to use the `nomad.yaml` from this repository you also need to comment out
+the inclusion of the `nomad.yaml` under the volumes key of those services in the
+`docker-compose.yaml`.
+
+```yaml
+    volumes:
+      # - ./configs/nomad.yaml:/app/nomad.yaml
+```
