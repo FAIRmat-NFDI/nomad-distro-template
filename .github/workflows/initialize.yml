@@ -32,7 +32,8 @@ jobs:
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
         run: |
-          sed -i "s|FAIRmat-NFDI/nomad-distribution-template|${{ github.repository }}|g" docker-compose.yaml
+          export image_name="${{ github.repository }}"
+          sed -i "s|fairmat-nfdi/nomad-distribution-template|${image_name,,}|g" docker-compose.yaml
           mkdir nomad-oasis
           cp docker-compose.yaml nomad-oasis
           zip -ur nomad-oasis.zip nomad-oasis
