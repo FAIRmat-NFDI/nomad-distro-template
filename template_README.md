@@ -25,25 +25,43 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 ### For a new Oasis
 
-- Find a Linux computer.
-- Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
+1. Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
 Docker nowadays comes with `docker compose` built in. Prior, you needed to
 install the stand-alone [docker-compose](https://docs.docker.com/compose/install/).
-- Download the modified configuration files [nomad-oasis.zip](nomad-oasis.zip) from this repository.
-- Run the following commands (skip `chown` on MacOS and Windows computers)
-
-
+2. Get the `nomad-oasis.zip` archive from your distribution repository using for example curl
+```sh
+curl -L -o nomad-oasis.zip "https://github.com/GITHUB_REPOSITORY/raw/main/nomad-oasis.zip"
+```
+3. Unzip the `nomad-oasis.zip` file and enter the extracted directory
 ```sh
 unzip nomad-oasis.zip
 cd nomad-oasis
+```
+4. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000) 
+```sh
 sudo chown -R 1000 .volumes
+```
+5. Pull the images speicified in the `docker-compose.yaml` (retrieved from the `nomad-oasis.zip`) using
+```sh
 docker compose pull
+```
+6. And run it with docker compose in detached (--detach or -d) mode 
+```sh
 docker compose up -d
+```
+7. Optionally you can now test that NOMAD is running with
+```
 curl localhost/nomad-oasis/alive
 ```
+8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
-- Open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser.
+Whenever you update your image you need to shut down NOMAD using
+```sh
+docker compose down
+```
+and then repeat steps 5. and 6. above.
 
+#### NOMAD Remote Tools Hub (NORTH)
 To run NORTH (the NOMAD Remote Tools Hub), the `hub` container needs to run docker and
 the container has to be run under the docker group. You need to replace the default group
 id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker group id.
@@ -67,6 +85,8 @@ the inclusion of the `nomad.yaml` under the volumes key of those services in the
     volumes:
       # - ./configs/nomad.yaml:/app/nomad.yaml
 ```
+
+To run the new image you can follow steps 5. and 6. [above](#for-a-new-oasis).
 
 ## Adding a plugin
 
