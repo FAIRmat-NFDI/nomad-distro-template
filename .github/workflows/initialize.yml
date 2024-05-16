@@ -4,6 +4,7 @@ name: Template Repository Initialization
 on:
   # Triggers the workflow on creation of repository
   create:
+  workflow_dispatch:
 
 env:
   # Use docker.io for Docker Hub if empty
