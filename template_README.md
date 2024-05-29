@@ -58,11 +58,14 @@ curl localhost/nomad-oasis/alive
 ```
 8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
-Whenever you update your image you need to shut down NOMAD using
+#### Updating the Oasis
+
+Whenever you want to update your image you first need to shut down NOMAD using `docker compose down`. Afterwards you can pull the updates and simply restart the oasis:
 ```sh
 docker compose down
+docker compose pull
+docker compose up -d
 ```
-and then repeat steps 5. and 6. above.
 
 #### NOMAD Remote Tools Hub (NORTH)
 To run NORTH (the NOMAD Remote Tools Hub), the `hub` container needs to run docker and
