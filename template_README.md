@@ -136,3 +136,14 @@ be generated.
  You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
  or how to configure a PAT (if you want to keep the distribution private) in the GitHub
  docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
+
+---
+
+ *I included and extended a custom NOMAD plugin generated from the [official NOMAD plugin template](https://github.com/FAIRmat-NFDI/nomad-plugin-template), but I can only see/use the example schema and not my own I created.*
+
+This is probably a matter of incorrectly configured EntryPoints of your own schema.  
+First, make sure that the EntryPoint of the schema is mentioned in the `pyproject.toml` of the plugin.  
+Furthermore, it is necessary to generate a new Oasis distribution image after changes. Trigger this manually in Github under Action > Docker (left column) > Run workflow.  
+ 
+
+ 
