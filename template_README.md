@@ -147,7 +147,7 @@ be generated.
 This is probably a matter of incorrectly configured EntryPoints of your own schema.  
 * First, make sure that the EntryPoint of the schema is mentioned in the `pyproject.toml` of the plugin.  
 * Furthermore, it is necessary to generate a new Oasis distribution image after changes. Trigger this manually in Github under Action > Docker (left column) > Run workflow.  
-* Finally, the new plugin mechanism is not compatible with the use of the `plugins/include` option in the `nomad.yml` configuration file. Omitting this section completely solves this issue, as it will load all installed/available plugins.  
+* Finally, the new plugin mechanism is not compatible with the use of the `plugins/include` option in the `nomad.yml` configuration file. Omitting this section completely will solve this problem, as it will load all installed/available plugins.  
  
 
  
