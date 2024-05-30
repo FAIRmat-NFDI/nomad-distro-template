@@ -58,11 +58,14 @@ curl localhost/nomad-oasis/alive
 ```
 8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
-Whenever you update your image you need to shut down NOMAD using
+#### Updating the Oasis
+
+Whenever you want to update your image you first need to shut down NOMAD using `docker compose down`. Afterwards you can pull the updates and simply restart the oasis:
 ```sh
 docker compose down
+docker compose pull
+docker compose up -d
 ```
-and then repeat steps 5. and 6. above.
 
 #### NOMAD Remote Tools Hub (NORTH)
 To run NORTH (the NOMAD Remote Tools Hub), the `hub` container needs to run docker and
@@ -136,3 +139,15 @@ be generated.
  You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
  or how to configure a PAT (if you want to keep the distribution private) in the GitHub
  docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
+
+---
+
+ *I included and extended a custom NOMAD plugin generated from the [official NOMAD plugin template](https://github.com/FAIRmat-NFDI/nomad-plugin-template), but I can only see/use the example schema and not my own I created.*
+
+This is probably a matter of incorrectly configured EntryPoints of your own schema.  
+* First, make sure that the EntryPoint of the schema is mentioned in the `pyproject.toml` of the plugin.  
+* Furthermore, it is necessary to generate a new Oasis distribution image after changes. Trigger this manually in Github under Action > Docker (left column) > Run workflow.  
+* Finally, the way to explicitly include or exclude plugins from loading using the `nomad.yaml` configuration file has changed in the past. The easiest way is to omit the `plugins/include` option in `nomad.yaml` altogether, as this will load all installed/available plugins.  
+  To still control plugin loading explicitly via `nomad.yaml`, you have to use `plugins.entry_points.{include/exclude}` with the corresponding `entry-points` of the used schemas or parsers, as they are also listed in the `pyproject.toml` of the respective plugin. More details about it [here](https://nomad-lab.eu/prod/v1/staging/docs/howto/plugins/plugins.html#controlling-loading-of-plugin-entry-points). 
+
+ 
