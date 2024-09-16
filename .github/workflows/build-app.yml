@@ -1,0 +1,89 @@
+# Build and publish a Docker image.
+
+on:
+  push:
+    branches: ["main"]
+    # Publish semver tags as releases.
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: ["main"]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  docker-publish:
+    permissions: write-all
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          submodules: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Update lock file
+        run: ./scripts/generate_python_dependencies.sh
+
+      # Commits all changes
+      - name: Commit repository initialization
+        run: |
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
+          git add requirements*
+          if [[ `git status --porcelain` ]]; then
+            git commit -m "Update lockfile"
+            git push origin -o ci.skip # prevent triggering pipeline again
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker nomad app metadata
+        id: nomad-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}-app
+
+      - name: Extract Docker jupyter metadata
+        id: jupyter-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}-jupyter
+
+      - name: "Build and push Docker nomad image"
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          # Reuse the builder
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: final
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.nomad-meta.outputs.tags }}
+          labels: ${{ steps.nomad-meta.outputs.labels }}
+
+      - name: "Build and push Docker jupyter image"
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          # Reuse the builder
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: jupyter
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.jupyter-meta.outputs.tags }}
+          labels: ${{ steps.jupyter-meta.outputs.labels }}

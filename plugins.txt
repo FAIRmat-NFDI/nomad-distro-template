@@ -1,2 +1,0 @@
-nomad-measurements
-nomad-material-processing
