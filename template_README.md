@@ -35,6 +35,15 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 ```sh
 git clone https://github.com/GITHUB_REPOSITORY.git
+cd GITHUB_REPOSITORY
+```
+
+or
+
+```sh
+curl-L -o GITHUB_REPOSITORY.zip "https://github.com/GITHUB_REPOSITORY/archive/main.zip"
+unzip GITHUB_REPOSITORY.zip
+cd GITHUB_REPOSITORY
 ```
 
 3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
