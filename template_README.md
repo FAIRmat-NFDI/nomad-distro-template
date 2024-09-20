@@ -6,6 +6,20 @@ This is the NOMAD Oasis distribution of GITHUB_REPOSITORY_OWNER.
 Below are instructions for how to [deploy this distribution](#deploying-the-distribution)
 and how to customize it through [adding plugins](#adding-a-plugin).
 
+> [!IMPORTANT]
+> Depending on the settings of the owner of this repository, the distributed image might
+> be private and require authentication to pull.
+> If you want to keep the image private you need to configure and use a personal access
+> token (PAT) according to the instructions in the GitHub docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
+> If you want to make the image public (recommended), you should make sure that your
+> organization settings allow public packages and make this package public after building it.
+> You can read more about this in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
+
+> [!TIP]
+> In order for others to find and learn from your distribution we in FAIRmat would
+> greatly appreciate it if you would add the topic `nomad-distribution` by clicking the
+> ⚙️ next to "About" on the main GitHub page for this repository.
+
 ## Deploying the distribution
 
 Below are instructions for how to deploy this NOMAD Oasis distribution
