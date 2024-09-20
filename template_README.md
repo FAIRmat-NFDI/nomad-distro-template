@@ -30,13 +30,20 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 1. Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
    Docker nowadays comes with `docker compose` built in. Prior, you needed to
    install the stand-alone [docker-compose](https://docs.docker.com/compose/install/).
-2. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
+
+2. Clone the repository or download the repository as a zip file.
+
+```sh
+git clone https://github.com/GITHUB_REPOSITORY.git
+```
+
+3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
 
 ```sh
 sudo chown -R 1000 .volumes
 ```
 
-5. Pull the images specified in the `docker-compose.yaml`
+4. Pull the images specified in the `docker-compose.yaml`
 
 Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
 
@@ -44,19 +51,19 @@ Note that the image needs to be public or you need to provide a PAT (see "Import
 docker compose pull
 ```
 
-6. And run it with docker compose in detached (--detach or -d) mode
+5. And run it with docker compose in detached (--detach or -d) mode
 
 ```sh
 docker compose up -d
 ```
 
-7. Optionally you can now test that NOMAD is running with
+6. Optionally you can now test that NOMAD is running with
 
 ```
 curl localhost/nomad-oasis/alive
 ```
 
-8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
+7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
 Whenever you update your image you need to shut down NOMAD using
 
@@ -64,7 +71,7 @@ Whenever you update your image you need to shut down NOMAD using
 docker compose down
 ```
 
-and then repeat steps 5. and 6. above.
+and then repeat steps 4. and 5. above.
 
 #### NOMAD Remote Tools Hub (NORTH)
 
