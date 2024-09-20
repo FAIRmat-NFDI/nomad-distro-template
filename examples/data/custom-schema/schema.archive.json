@@ -1,0 +1,30 @@
+{
+    "definitions": {
+      "name": "A name for the package",
+      "section_definitions": [
+        {
+          "name": "MySection",
+          "base_sections": [
+            "nomad.datamodel.data.EntryData"
+          ],
+          "quantities": [
+            {
+              "name": "my_quantity",
+              "type": {
+                "type_kind": "python",
+                "type_data": "str"
+              }
+            },
+            {
+              "name": "datetime_list",
+              "type": {
+                "type_kind": "custom",
+                "type_data": "nomad.metainfo.data_type.Datetime"
+              },
+              "shape": ["*"]
+            }
+          ]
+        }
+      ]
+    }
+}

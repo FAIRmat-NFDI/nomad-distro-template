@@ -1,0 +1,6 @@
+plugin_type: normalizer
+name: NOMAD's example normalizer plugin
+normalizer_class_name: nomadnormalizerexample.ExampleNormalizer
+description: |
+  This is a simple hello world normalizer. This is meant as a template.
+  Fork the github project to create your own normalizer.

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'nomad-schema-plugin-example'
+version = '1.0'
+description = 'An example schema plugin for NOMAD.'
+readme = "README.md"
+authors = [{ name = "The NOMAD Authors" }]
+license = { text = "Apache-2.0" }
+dependencies = [
+    "nomad-lab>=1.2.0"
+]
+
+[project.urls]
+homepage = "https://github.com/nomad-coe/nomad-schema-example-plugin"
+
+[project.optional-dependencies]
+tests = [
+    'pytest'
+]
+
+[tool.setuptools.packages.find]
+include = ["nomadschemaexample*"]
+
+[tool.setuptools.package-data]
+nomadschemaexample = ['*/nomad_plugin.yaml']

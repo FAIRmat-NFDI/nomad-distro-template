@@ -1,0 +1,8 @@
+plugin_type: parser
+name: parsers/example
+description: |
+  This is a simple hello world parser. This is meant as a template. Fork the github
+  project to create your own parser.
+mainfile_name_re: ^.*\.example-format\.txt$
+parser_class_name: nomadparserexample.ExampleParser
+code_name: Example code
