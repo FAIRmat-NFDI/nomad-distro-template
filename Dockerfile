@@ -12,7 +12,8 @@ FROM python:${PYTHON_VERSION}-slim AS base
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 ENV VIRTUAL_ENV=/opt/venv \
-    PATH="/opt/venv/bin:$PATH"
+    PATH="/opt/venv/bin:$PATH" \
+    UV_LINK_MODE=copy
 
 # Final stage to create the runnable image with minimal size
 FROM base AS base_final
@@ -86,9 +87,12 @@ RUN apt-get update \
 # Install UV
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-COPY requirements.txt pyproject.toml ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv venv /opt/venv --seed && uv pip install -r requirements.txt
 
-RUN uv venv /opt/venv --seed && uv pip install -r requirements.txt
+
 
 COPY examples ./examples
 COPY scripts ./scripts
@@ -136,9 +140,11 @@ WORKDIR "${HOME}"
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-COPY requirements.txt pyproject.toml ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv pip install -r requirements.txt --system
 
-RUN uv pip install -r requirements.txt --system
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
 # groups: cannot find name for group ID 11320
