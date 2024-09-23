@@ -60,18 +60,6 @@ ENV RUNTIME=docker
 
 WORKDIR /app
 
-# Create a non-privileged user that the frenrug will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=1000
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    nomad
-
 RUN apt-get update \
  && apt-get install --yes --quiet --no-install-recommends \
       libgomp1 \
@@ -85,14 +73,26 @@ RUN apt-get update \
       git \
  && rm -rf /var/lib/apt/lists/*
 
+# Create a non-privileged user that the frenrug will run under.
+# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
+ARG UID=1000
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    nomad
+
+
 # Install UV
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --extra plugins --frozen --no-install-project
-
 
 
 COPY scripts ./scripts
@@ -137,7 +137,7 @@ RUN apt update \
 USER ${NB_UID}
 WORKDIR "${HOME}"
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
