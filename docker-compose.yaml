@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   # broker for celery
   rabbitmq:
@@ -70,7 +68,7 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distribution-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distribution-template/app:main
     container_name: nomad_oasis_worker
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -93,7 +91,7 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distribution-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distribution-template/app:main
     container_name: nomad_oasis_app
     environment:
       NOMAD_SERVICE: nomad_oasis_app
@@ -132,7 +130,7 @@ services:
   # nomad remote tools hub (JupyterHUB, e.g. for AI Toolkit)
   north:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distribution-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distribution-template/app:main
     container_name: nomad_oasis_north
     environment:
       NOMAD_SERVICE: nomad_oasis_north
@@ -149,7 +147,7 @@ services:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
       - /var/run/docker.sock:/var/run/docker.sock
-    user: '1000:991'
+    user: "1000:991"
     command: python -m nomad.cli admin run hub
     healthcheck:
       test:
@@ -167,7 +165,7 @@ services:
   # to enable the logtransfer service run "docker compose --profile with_logtransfer up"
   logtransfer:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distribution-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distribution-template/app:main
     container_name: nomad_oasis_logtransfer
     environment:
       NOMAD_SERVICE: nomad_oasis_logtransfer

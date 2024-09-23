@@ -1,4 +1,3 @@
-
 name: Template Repository Initialization
 
 on:
@@ -27,18 +26,22 @@ jobs:
       - name: Update README
         run: |
           sed -i "s|GITHUB_REPOSITORY_OWNER|${{ github.repository_owner }}|g" template_README.md
+          sed -i "s|GITHUB_REPOSITORY_NAME|${{ github.event.repository.name }}|g" template_README.md
           sed -i "s|GITHUB_REPOSITORY|${{ github.repository }}|g" template_README.md
+          sed -i "s|GITHUB_REPOSITORY_NAME|${{ github.event.repository.name }}|g" template_README.md
           mv template_README.md README.md
-          
+
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
         run: |
           export image_name="${{ github.repository }}"
           sed -i "s|fairmat-nfdi/nomad-distribution-template|${image_name,,}|g" docker-compose.yaml
-          mkdir nomad-oasis
-          cp docker-compose.yaml nomad-oasis
-          zip -ur nomad-oasis.zip nomad-oasis
-          rm -r nomad-oasis
+
+        # Replaces the template repository name in the nomad config with the new one
+      - name: Update nomad.yaml
+        run: |
+          export image_name="${{ github.repository }}"
+          sed -i "s|fairmat-nfdi/nomad-distribution-template|${image_name,,}|g" configs/nomad.yaml
 
       # Deletes this workflow file to prevent it from running on branch creation
       - name: Delete initialization workflow
