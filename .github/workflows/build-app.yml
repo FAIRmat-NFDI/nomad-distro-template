@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: update-lockfile
     strategy:
+      fail-fast: false
       matrix:
         service: [app, jupyter]
     steps:
