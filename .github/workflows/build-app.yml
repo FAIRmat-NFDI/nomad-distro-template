@@ -14,6 +14,12 @@ on:
 env:
   REGISTRY: ghcr.io
 
+permissions:
+  contents: write
+  packages: write
+  attestations: write
+  id-token: write
+
 jobs:
   # Job 1: Update Lock File
   update-lockfile:
@@ -51,11 +57,7 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: update-lockfile
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
+
     strategy:
       fail-fast: false
       matrix:
