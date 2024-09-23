@@ -4,7 +4,7 @@
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/engine/reference/builder/
 
-ARG PYTHON_VERSION=3.11
+ARG PYTHON_VERSION=3.12
 
 FROM python:${PYTHON_VERSION}-slim AS base
 
@@ -111,7 +111,7 @@ RUN mkdir -p /app/.volumes/fs \
  && chown -R nomad:1000 /app \
  && chown -R nomad:1000 /opt/venv \
  && mkdir nomad \
- && cp /opt/venv/lib/${PYTHON_VERSION}/site-packages/nomad/jupyterhub_config.py nomad/
+ && cp /opt/venv/lib/python3.12/site-packages/nomad/jupyterhub_config.py nomad/
 
 USER nomad
 
