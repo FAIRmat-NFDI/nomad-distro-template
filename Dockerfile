@@ -13,7 +13,8 @@ FROM python:${PYTHON_VERSION}-slim AS base
 ENV PYTHONUNBUFFERED=1
 ENV VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH" \
-    UV_LINK_MODE=copy
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/opt/venv
 
 # Final stage to create the runnable image with minimal size
 FROM base AS base_final
@@ -88,9 +89,9 @@ RUN apt-get update \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv /opt/venv --seed && uv pip install -r requirements.txt
+    uv sync --frozen --no-install-project
 
 
 
@@ -139,9 +140,9 @@ WORKDIR "${HOME}"
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv pip install -r requirements.txt --system
+    uv export | uv pip install -r /dev/stdin --system
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:

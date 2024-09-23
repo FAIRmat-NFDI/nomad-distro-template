@@ -33,14 +33,14 @@ jobs:
           python-version: "3.11"
 
       - name: Update lock file
-        run: ./scripts/generate_python_dependencies.sh
+        run: uv lock --upgrade-package nomad-lab
 
       # Commits any changes made to the lockfile
       - name: Commit lock file changes
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
-          git add requirements*
+          git add uv.lock
           if [[ `git status --porcelain` ]]; then
             git commit -m "Update lockfile"
             git push origin -o ci.skip # prevent triggering the pipeline again
