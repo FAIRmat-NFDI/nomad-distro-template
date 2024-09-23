@@ -26,7 +26,9 @@ jobs:
       - name: Update README
         run: |
           sed -i "s|GITHUB_REPOSITORY_OWNER|${{ github.repository_owner }}|g" template_README.md
+          sed -i "s|GITHUB_REPOSITORY_NAME|${{ github.event.repository.name }}|g" template_README.md
           sed -i "s|GITHUB_REPOSITORY|${{ github.repository }}|g" template_README.md
+          sed -i "s|GITHUB_REPOSITORY_NAME|${{ github.event.repository.name }}|g" template_README.md
           mv template_README.md README.md
 
       # Replaces the template repository name in the docker config file with the new one
