@@ -94,15 +94,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 
 
-COPY examples ./examples
 COPY scripts ./scripts
-
-RUN ./scripts/generate_example_uploads.sh
 
 FROM base_final AS final
 
 COPY --chown=nomad:1000 --from=builder /opt/venv /opt/venv
-COPY --chown=nomad:1000 --from=builder /app/examples/data/uploads /app/examples/data/uploads
 COPY --chown=nomad:1000 scripts/run.sh .
 COPY --chown=nomad:1000 scripts/run-worker.sh .
 COPY configs/nomad.yaml nomad.yaml

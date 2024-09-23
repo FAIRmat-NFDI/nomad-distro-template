@@ -1,8 +1,0 @@
-# This is not yet an official pypi release. You need to add our gitlab package registry
-# when running pip install:
-# pip install -r requirements.txt --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
-nomad-lab>=1.2.0
-# To build a nomad-lab package from a regular clone of nomad-fair
-# run "python -m build --sdist". Point to the resulting file here, e.g.:
-# ../../../dist/nomad-lab-1.2.0.dev98+g5b6b0745a.d20230330.tar.gz
-pytest

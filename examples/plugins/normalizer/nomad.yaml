@@ -1,8 +1,0 @@
-plugins:
-  # We only include our normalizer here. Without the explicit include, all plugins will be
-  # loaded. Many build in plugins require more dependencies. Install nomad-lab[parsing]
-  # to make all default plugins work.
-  include: 'normalizers/example'
-  options:
-    normalizers/example:
-      python_package: nomadnormalizerexample

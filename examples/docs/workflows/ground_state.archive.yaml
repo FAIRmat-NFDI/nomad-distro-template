@@ -1,4 +1,0 @@
-run:
-  - program:
-      name: 'VASP'
-    calculation: [{}]
