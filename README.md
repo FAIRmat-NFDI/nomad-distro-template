@@ -33,6 +33,12 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 > greatly appreciate it if you would add the topic `nomad-distribution` by clicking the
 > ⚙️ next to "About" on the main GitHub page for this repository.
 
+In this README you will find instructions for:
+1. [Deploying the distribution](#deploying-the-distribution)
+2. [Adding a plugin](#adding-a-plugin)
+3. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+4. [Solving common issues](#faqtrouble-shooting)
+
 ## Deploying the distribution
 
 Below are instructions for how to deploy this NOMAD Oasis distribution
@@ -166,7 +172,7 @@ plugins = [
 Once the changes have been committed to the main branch, the new image will automatically
 be generated.
 
-# Updating an Existing Distribution
+## Updating the distribution from the template
 
 In order to update an existing distribution with any potential changes in the template you can add a new `git remote` for the template and merge with that one while allowing for unrelated histories:
 
