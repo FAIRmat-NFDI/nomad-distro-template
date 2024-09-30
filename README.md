@@ -49,10 +49,10 @@ uv add --optional plugins -r plugins.txt --no-sync
 rm plugins.txt
 ```
 
-The `nomad.yaml` is now moved to the `configs` directory, please copy over any changes you wish to keep and remove the old one:
+The `nomad.yaml` is now moved to the `configs` directory, please copy over your existing `nomad.yaml` there:
 
 ```
-rm nomad.yaml
+mv nomad.yaml configs/nomad.yaml
 ```
 
 Finally, the new recommendation is to either `git clone` the distribution repository or to `curl` the whole repository so the `nomad-oasis.zip` can also be removed:
@@ -63,7 +63,7 @@ rm nomad-oasis.zip
 
 ## Commit the Changes and Run the Workflows
 
-Ones the merge conflict is resolved you should add the changes and commit them
+Once the merge conflict is resolved you should add the changes and commit them
 
 ```
 git add -A
