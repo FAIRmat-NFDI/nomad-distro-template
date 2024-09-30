@@ -46,54 +46,54 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 2. Clone the repository or download the repository as a zip file.
 
-```sh
-git clone https://github.com/FAIRmat-NFDI/nomad-distribution-template.git
-cd nomad-distribution-template
-```
+    ```sh
+    git clone https://github.com/FAIRmat-NFDI/nomad-distribution-template.git
+    cd nomad-distribution-template
+    ```
 
-or
+    or
 
-```sh
-curl-L -o nomad-distribution-template.zip "https://github.com/FAIRmat-NFDI/nomad-distribution-template/archive/main.zip"
-unzip nomad-distribution-template.zip
-cd nomad-distribution-template
-```
+    ```sh
+    curl-L -o nomad-distribution-template.zip "https://github.com/FAIRmat-NFDI/nomad-distribution-template/archive/main.zip"
+    unzip nomad-distribution-template.zip
+    cd nomad-distribution-template
+    ```
 
 3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
 
-```sh
-sudo chown -R 1000 .volumes
-```
+    ```sh
+    sudo chown -R 1000 .volumes
+    ```
 
 4. Pull the images specified in the `docker-compose.yaml`
 
-Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
+    Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
 
-```sh
-docker compose pull
-```
+    ```sh
+    docker compose pull
+    ```
 
 5. And run it with docker compose in detached (--detach or -d) mode
 
-```sh
-docker compose up -d
-```
+    ```sh
+    docker compose up -d
+    ```
 
 6. Optionally you can now test that NOMAD is running with
 
-```
-curl localhost/nomad-oasis/alive
-```
+    ```
+    curl localhost/nomad-oasis/alive
+    ```
 
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
-Whenever you update your image you need to shut down NOMAD using
+    Whenever you update your image you need to shut down NOMAD using
 
-```sh
-docker compose down
-```
+    ```sh
+    docker compose down
+    ```
 
-and then repeat steps 4. and 5. above.
+    and then repeat steps 4. and 5. above.
 
 #### NOMAD Remote Tools Hub (NORTH)
 
