@@ -151,18 +151,6 @@ To add a plugin in a subdirectory of a git repository you can use the `subdirect
 "ikz_pld_plugin @ git+https://github.com/FAIRmat-NFDI/AreaA-data_modeling_and_schemas.git@30fc90843428d1b36a1d222874803abae8b1cb42#subdirectory=PVD/PLD/jeremy_ikz/ikz_pld_plugin"
 ```
 
-If the plugin is new, you also need to add it under `plugins` in the [nomad.yaml](nomad.yaml)
-config file that will be included in the image.
-For example, if you have added a schema plugin `legacy_plugin` you should add
-the following:
-
-```yaml
-plugins:
-  options:
-    schemas/legacy_plugin:
-      python_package: legacy_plugin
-```
-
 Once the changes have been committed to the main branch, the new image will automatically
 be generated.
 
