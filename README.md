@@ -129,26 +129,38 @@ To add a new plugin to the docker image you should add it to the plugins table i
 
 Here you can put either plugins distributed to PyPI, e.g.
 
-```
-nomad-material-processing
+```toml
+[project.optional-dependencies]
+plugins = [
+  "nomad-material-processing>=1.0.0",
+]
 ```
 
 or plugins in a git repository with either the commit hash
 
-```
-"nomad-measurements @ git+https://github.com/FAIRmat-NFDI/nomad-measurements.git@71b7e8c9bb376ce9e8610aba9a20be0b5bce6775"
+```toml
+[project.optional-dependencies]
+plugins = [
+  "nomad-measurements @ git+https://github.com/FAIRmat-NFDI/nomad-measurements.git@71b7e8c9bb376ce9e8610aba9a20be0b5bce6775",
+]
 ```
 
 or with a tag
 
-```
-"nomad-measurements @ git+https://github.com/FAIRmat-NFDI/nomad-measurements.git@v0.0.4"
+```toml
+[project.optional-dependencies]
+plugins = [
+  "nomad-measurements @ git+https://github.com/FAIRmat-NFDI/nomad-measurements.git@v0.0.4"
+]
 ```
 
 To add a plugin in a subdirectory of a git repository you can use the `subdirectory` option, e.g.
 
-```
-"ikz_pld_plugin @ git+https://github.com/FAIRmat-NFDI/AreaA-data_modeling_and_schemas.git@30fc90843428d1b36a1d222874803abae8b1cb42#subdirectory=PVD/PLD/jeremy_ikz/ikz_pld_plugin"
+```toml
+[project.optional-dependencies]
+plugins = [
+  "ikz_pld_plugin @ git+https://github.com/FAIRmat-NFDI/AreaA-data_modeling_and_schemas.git@30fc90843428d1b36a1d222874803abae8b1cb42#subdirectory=PVD/PLD/jeremy_ikz/ikz_pld_plugin"
+]
 ```
 
 Once the changes have been committed to the main branch, the new image will automatically
