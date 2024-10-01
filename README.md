@@ -36,8 +36,9 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 In this README you will find instructions for:
 1. [Deploying the distribution](#deploying-the-distribution)
 2. [Adding a plugin](#adding-a-plugin)
-3. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-4. [Solving common issues](#faqtrouble-shooting)
+3. [Using the jupyter image](#the-jupyter-image)
+4. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+5. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -131,7 +132,7 @@ To run the new image you can follow steps 5. and 6. [above](#for-a-new-oasis).
 
 ## Adding a plugin
 
-To add a new plugin to the docker image you should add it to the plugins table in the `pyproject.toml` file.
+To add a new plugin to the docker image you should add it to the plugins table in the [`pyproject.toml`](pyproject.toml) file.
 
 Here you can put either plugins distributed to PyPI, e.g.
 
@@ -171,6 +172,25 @@ plugins = [
 
 Once the changes have been committed to the main branch, the new image will automatically
 be generated.
+
+## The Jupyter image
+
+In addition to the Docker image for running the oasis, this repository also builds a custom NORTH image for running a jupyter hub with the installed plugins.
+This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) during the initialization of this repository and should therefore already be available in your Oasis under "Analyze / NOMAD Remote Tools Hub / jupyter"
+
+If you want additional python packages to be available to all users in the jupyter hub you can add those to the jupyter table in the [`pyproject.toml`](pyproject.toml):
+
+```toml
+[project.optional-dependencies]
+jupyter = [
+  "voila",
+  "ipyaggrid",
+  "ipysheet",
+  "ipydatagrid",
+  "jupyter-flex",
+]
+```
+
 
 ## Updating the distribution from the template
 
