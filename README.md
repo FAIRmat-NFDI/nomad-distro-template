@@ -110,6 +110,8 @@ id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker g
 Run `id` if you are a docker user, or `getent group | grep docker` to find your
 systems docker gid. The user id 1000 is used as the nomad user inside all containers.
 
+Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
+
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
 [nomad-lab.eu/prod/v1/docs/oasis/install.html](https://nomad-lab.eu/prod/v1/docs/oasis/install.html)
 
@@ -177,6 +179,12 @@ be generated.
 
 In addition to the Docker image for running the oasis, this repository also builds a custom NORTH image for running a jupyter hub with the installed plugins.
 This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) during the initialization of this repository and should therefore already be available in your Oasis under "Analyze / NOMAD Remote Tools Hub / jupyter"
+
+The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
+
+```
+docker pull ghcr.io/fairmat-nfdi/nomad-distribution-template/jupyter:main
+```
 
 If you want additional python packages to be available to all users in the jupyter hub you can add those to the jupyter table in the [`pyproject.toml`](pyproject.toml):
 
