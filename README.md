@@ -36,8 +36,9 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 In this README you will find instructions for:
 1. [Deploying the distribution](#deploying-the-distribution)
 2. [Adding a plugin](#adding-a-plugin)
-3. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-4. [Solving common issues](#faqtrouble-shooting)
+3. [Using the jupyter image](#the-jupyter-image)
+4. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+5. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -109,13 +110,15 @@ id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker g
 Run `id` if you are a docker user, or `getent group | grep docker` to find your
 systems docker gid. The user id 1000 is used as the nomad user inside all containers.
 
+Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
+
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
 [nomad-lab.eu/prod/v1/docs/oasis/install.html](https://nomad-lab.eu/prod/v1/docs/oasis/install.html)
 
 ### For an existing Oasis
 
 If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/FAIRmat-NFDI/nomad-distribution-template:main` for the services
+your `docker-compose.yaml` with `ghcr.io/fairmat-nfdi/nomad-distribution-template:main` for the services
 `worker`, `app`, `north`, and `logtransfer`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out
@@ -131,7 +134,7 @@ To run the new image you can follow steps 5. and 6. [above](#for-a-new-oasis).
 
 ## Adding a plugin
 
-To add a new plugin to the docker image you should add it to the plugins table in the `pyproject.toml` file.
+To add a new plugin to the docker image you should add it to the plugins table in the [`pyproject.toml`](pyproject.toml) file.
 
 Here you can put either plugins distributed to PyPI, e.g.
 
@@ -171,6 +174,31 @@ plugins = [
 
 Once the changes have been committed to the main branch, the new image will automatically
 be generated.
+
+## The Jupyter image
+
+In addition to the Docker image for running the oasis, this repository also builds a custom NORTH image for running a jupyter hub with the installed plugins.
+This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) during the initialization of this repository and should therefore already be available in your Oasis under "Analyze / NOMAD Remote Tools Hub / jupyter"
+
+The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
+
+```
+docker pull ghcr.io/fairmat-nfdi/nomad-distribution-template/jupyter:main
+```
+
+If you want additional python packages to be available to all users in the jupyter hub you can add those to the jupyter table in the [`pyproject.toml`](pyproject.toml):
+
+```toml
+[project.optional-dependencies]
+jupyter = [
+  "voila",
+  "ipyaggrid",
+  "ipysheet",
+  "ipydatagrid",
+  "jupyter-flex",
+]
+```
+
 
 ## Updating the distribution from the template
 
