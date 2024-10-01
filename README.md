@@ -118,7 +118,7 @@ You can find more details on setting up and maintaining an Oasis in the NOMAD do
 ### For an existing Oasis
 
 If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/FAIRmat-NFDI/nomad-distribution-template:main` for the services
+your `docker-compose.yaml` with `ghcr.io/fairmat-nfdi/nomad-distribution-template:main` for the services
 `worker`, `app`, `north`, and `logtransfer`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out

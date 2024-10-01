@@ -26,6 +26,8 @@ jobs:
       - name: Update README
         run: |
           sed -i "/# NOMAD Oasis Distribution/,/button on the right./d" README.md
+          export image_name="${{ github.repository }}"
+          sed -i "s|fairmat-nfdi/nomad-distribution-template|${image_name,,}|g" README.md
           sed -i "s|FAIRmat-NFDI/nomad-distribution-template|${{ github.repository }}|g" README.md
           sed -i "s|FAIRmat-NFDI|${{ github.repository_owner }}|g" README.md
           sed -i "s|nomad-distribution-template|${{ github.event.repository.name }}|g" README.md
