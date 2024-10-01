@@ -127,11 +127,11 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 USER root
 
-RUN apt update \
- && apt install --yes --quiet --no-install-recommends \
-        libmagic-dev \
- && rm -rf /var/lib/apt/lists/*
-
+RUN apt-get update \
+ && apt-get install --yes --quiet --no-install-recommends \
+       libmagic1 \
+       # clean cache and logs
+       && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
