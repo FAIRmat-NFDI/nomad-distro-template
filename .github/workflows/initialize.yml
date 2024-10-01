@@ -25,11 +25,13 @@ jobs:
       # Replaces the template repository name in the README with the new one
       - name: Update README
         run: |
-          sed -i "s|GITHUB_REPOSITORY_OWNER|${{ github.repository_owner }}|g" template_README.md
-          sed -i "s|GITHUB_REPOSITORY_NAME|${{ github.event.repository.name }}|g" template_README.md
-          sed -i "s|GITHUB_REPOSITORY|${{ github.repository }}|g" template_README.md
-          sed -i "s|GITHUB_REPOSITORY_NAME|${{ github.event.repository.name }}|g" template_README.md
-          mv template_README.md README.md
+          sed -i "/# NOMAD Oasis Distribution/,/button on the right./d" README.md
+          sed -i "s|FAIRmat-NFDI/nomad-distribution-template|${{ github.repository }}|g" README.md
+          sed -i "s|FAIRmat-NFDI|${{ github.repository_owner }}|g" README.md
+          sed -i "s|nomad-distribution-template|${{ github.event.repository.name }}|g" README.md
+          sed -i "s|template https://github.com/${{ github.repository }}|template https://github.com/FAIRmat-NFDI/nomad-distribution-template|g" README.md
+          sed -i "s|${{ github.repository }}/releases/latest|FAIRmat-NFDI/nomad-distribution-template/releases/latest|g" README.md
+          sed -i "s|@ git+https://github.com/${{ github.repository_owner }}|@ git+https://github.com/FAIRmat-NFDI|g" README.md
 
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
