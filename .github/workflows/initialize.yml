@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   initialize_repository:
-    if: github.repository != 'FAIRmat-NFDI/nomad-distribution-template'
+    if: github.repository != 'FAIRmat-NFDI/nomad-distro-template'
     runs-on: ubuntu-latest
 
     steps:
@@ -27,25 +27,25 @@ jobs:
         run: |
           sed -i "/# NOMAD Oasis Distribution/,/button on the right./d" README.md
           export image_name="${{ github.repository }}"
-          sed -i "s|fairmat-nfdi/nomad-distribution-template|${image_name,,}|g" README.md
-          sed -i "s|FAIRmat-NFDI/nomad-distribution-template|${{ github.repository }}|g" README.md
+          sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" README.md
+          sed -i "s|FAIRmat-NFDI/nomad-distro-template|${{ github.repository }}|g" README.md
           sed -i "s|FAIRmat-NFDI|${{ github.repository_owner }}|g" README.md
-          sed -i "s|nomad-distribution-template|${{ github.event.repository.name }}|g" README.md
-          sed -i "s|template https://github.com/${{ github.repository }}|template https://github.com/FAIRmat-NFDI/nomad-distribution-template|g" README.md
-          sed -i "s|${{ github.repository }}/releases/latest|FAIRmat-NFDI/nomad-distribution-template/releases/latest|g" README.md
+          sed -i "s|nomad-distro-template|${{ github.event.repository.name }}|g" README.md
+          sed -i "s|template https://github.com/${{ github.repository }}|template https://github.com/FAIRmat-NFDI/nomad-distro-template|g" README.md
+          sed -i "s|${{ github.repository }}/releases/latest|FAIRmat-NFDI/nomad-distro-template/releases/latest|g" README.md
           sed -i "s|@ git+https://github.com/${{ github.repository_owner }}|@ git+https://github.com/FAIRmat-NFDI|g" README.md
 
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
         run: |
           export image_name="${{ github.repository }}"
-          sed -i "s|fairmat-nfdi/nomad-distribution-template|${image_name,,}|g" docker-compose.yaml
+          sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" docker-compose.yaml
 
         # Replaces the template repository name in the nomad config with the new one
       - name: Update nomad.yaml
         run: |
           export image_name="${{ github.repository }}"
-          sed -i "s|fairmat-nfdi/nomad-distribution-template|${image_name,,}|g" configs/nomad.yaml
+          sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" configs/nomad.yaml
 
       # Deletes this workflow file to prevent it from running on branch creation
       - name: Delete initialization workflow
