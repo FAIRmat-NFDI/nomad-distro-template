@@ -1,17 +1,5 @@
-![docker image](https://github.com/FAIRmat-NFDI/nomad-distribution-template/actions/workflows/docker-publish.yml/badge.svg)
+![docker image](https://github.com/FAIRmat-NFDI/nomad-distro-template/actions/workflows/docker-publish.yml/badge.svg)
 
-# NOMAD Oasis Distribution *Template*
-This repository is a template for creating your own custom NOMAD Oasis distribution image.
-Click [here](https://github.com/new?template_name=nomad-distribution-template&template_owner=FAIRmat-NFDI)
-to use this template, or click the `Use this template` button in the upper right corner of
-the main GitHub page for this template.
-
-> [!IMPORTANT] 
-> The templated repository will run a GitHub action on creation which might take a few minutes.
-> After the workflow finishes you should refresh the page and this message should disappear.
-> If this message persists you might need to trigger the workflow manually by navigating to the
-> "Actions" tab at the top, clicking "Template Repository Initialization" on the left side,
-> and triggering it by clicking "Run workflow" under the "Run workflow" button on the right.
 
 # FAIRmat-NFDI's NOMAD Oasis Distribution
 
@@ -54,16 +42,16 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 2. Clone the repository or download the repository as a zip file.
 
     ```sh
-    git clone https://github.com/FAIRmat-NFDI/nomad-distribution-template.git
-    cd nomad-distribution-template
+    git clone https://github.com/FAIRmat-NFDI/nomad-distro-template.git
+    cd nomad-distro-template
     ```
 
     or
 
     ```sh
-    curl-L -o nomad-distribution-template.zip "https://github.com/FAIRmat-NFDI/nomad-distribution-template/archive/main.zip"
-    unzip nomad-distribution-template.zip
-    cd nomad-distribution-template
+    curl-L -o nomad-distro-template.zip "https://github.com/FAIRmat-NFDI/nomad-distro-template/archive/main.zip"
+    unzip nomad-distro-template.zip
+    cd nomad-distro-template
     ```
 
 3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
@@ -118,7 +106,7 @@ You can find more details on setting up and maintaining an Oasis in the NOMAD do
 ### For an existing Oasis
 
 If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/fairmat-nfdi/nomad-distribution-template:main` for the services
+your `docker-compose.yaml` with `ghcr.io/fairmat-nfdi/nomad-distro-template:main` for the services
 `worker`, `app`, `north`, and `logtransfer`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out
@@ -183,7 +171,7 @@ This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) duri
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
 ```
-docker pull ghcr.io/fairmat-nfdi/nomad-distribution-template/jupyter:main
+docker pull ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
 ```
 
 If you want additional python packages to be available to all users in the jupyter hub you can add those to the jupyter table in the [`pyproject.toml`](pyproject.toml):
@@ -230,7 +218,7 @@ Ideally all workflows should be triggered automatically but you might need to ru
 
 ## FAQ/Trouble shooting
 
-_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/FAIRmat-NFDI/nomad-distribution-template/manifests/main": unauthorized`
+_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/FAIRmat-NFDI/nomad-distro-template/manifests/main": unauthorized`
 _when trying to pull my docker image._
 
 Most likely you have not made the package public or provided a personal access token (PAT).
