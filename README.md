@@ -94,16 +94,16 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
-    Whenever you update your image you need to shut down NOMAD using
+#### Updating the image
+1. Whenever you update your image you need to shut down NOMAD using
 
     ```sh
     docker compose down
     ```
 
     and then repeat steps 4. and 5. above.
-8. Clean up old container images:
-
-    You can remove unused images to free up space by running:
+   
+2. You can remove unused images to free up space by running
 
     ```sh
     docker image prune -a
