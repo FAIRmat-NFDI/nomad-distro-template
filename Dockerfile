@@ -87,7 +87,7 @@ RUN adduser \
 
 
 # Install UV
-COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -119,7 +119,7 @@ EXPOSE 9000
 VOLUME /app/.volumes/fs
 
 
-FROM jupyter/datascience-notebook:lab-3.6.2 AS jupyter
+FROM quay.io/jupyter/datascience-notebook:2025-01-13 AS jupyter
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
@@ -137,12 +137,12 @@ RUN apt-get update \
 USER ${NB_UID}
 WORKDIR "${HOME}"
 
-COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv export --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
+    uv export --frozen --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
