@@ -87,7 +87,7 @@ RUN adduser \
 
 
 # Install UV
-COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -137,7 +137,7 @@ RUN apt-get update \
 USER ${NB_UID}
 WORKDIR "${HOME}"
 
-COPY --from=ghcr.io/astral-sh/uv:0.4 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
