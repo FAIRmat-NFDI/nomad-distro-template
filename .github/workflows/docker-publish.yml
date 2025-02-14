@@ -101,6 +101,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: "SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION=${{ env.SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: ${{ matrix.service == 'jupyter' && 'jupyter' || 'final' }}
