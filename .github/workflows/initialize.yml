@@ -47,6 +47,12 @@ jobs:
           export image_name="${{ github.repository }}"
           sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" configs/nomad.yaml
 
+        # Replaces the template repository name in the pyproject.toml with the new one
+      - name: Update pyproject.toml
+        run: |
+          export image_name="${{ github.repository }}"
+          sed -i "s|FAIRmat-NFDI/nomad-distro-template|${image_name,,}|g" pyproject.toml
+
       # Deletes this workflow file to prevent it from running on branch creation
       - name: Delete initialization workflow
         run: rm .github/workflows/initialize.yml

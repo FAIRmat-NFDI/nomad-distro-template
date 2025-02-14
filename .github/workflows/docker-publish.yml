@@ -25,6 +25,8 @@ jobs:
   update-lockfile:
     name: Update Python Lock File
     runs-on: ubuntu-latest
+    outputs:
+      scm_version: ${{ steps.get_scm_version.outputs.scm_version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,7 +36,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: ">=0.5.0"
+          version: "==0.5"
 
       - uses: actions/setup-python@v5
         with:
@@ -54,6 +56,13 @@ jobs:
             git push origin -o ci.skip # prevent triggering the pipeline again
           fi
 
+      - name: Get SCM Version
+        id: get_scm_version
+        run: |
+          SCM_VERSION=$(uvx --with setuptools_scm python -m setuptools_scm)
+          echo "SCM version: $SCM_VERSION"
+          echo "scm_version=$SCM_VERSION" >> "$GITHUB_OUTPUT"
+
   # Job 2: Build and Push Docker Image
   docker-publish:
     name: Build Docker Image
@@ -64,6 +73,10 @@ jobs:
       fail-fast: false
       matrix:
         service: [app, jupyter]
+
+    env:
+      SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION: ${{ needs.update-lockfile.outputs.scm_version }}
+
     steps:
       - uses: actions/checkout@v4
         with:
