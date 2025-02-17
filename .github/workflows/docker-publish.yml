@@ -13,6 +13,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  UV_VERSION: 0.6
 
 permissions:
   contents: write
@@ -35,7 +36,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "==0.5"
+          version: ${{ UV_VERSION }}
 
       - uses: actions/setup-python@v5
         with:
@@ -83,7 +84,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "==0.5"
+          version: ${{ UV_VERSION }}
 
       - uses: actions/setup-python@v5
         with:
@@ -98,6 +99,7 @@ jobs:
           PLUGIN_TESTS_CI_NODE_INDEX: ${{ matrix.group }}
         run: |
           uv run --extra plugins plugin_tests.py
+
 
   # Job 3: Build and Push Docker Image
   docker-publish:
@@ -137,7 +139,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          build-args: "SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION=${{ env.SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION }}"
+          build-args: |
+            SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION=${{ env.SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION }}
+            UV_VERSION=${{ env.UV_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: ${{ matrix.service == 'jupyter' && 'jupyter' || 'final' }}
