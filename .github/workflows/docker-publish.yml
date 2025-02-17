@@ -67,6 +67,7 @@ jobs:
     name: Run plugin unit tests
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         group: [1, 2]
     env:
