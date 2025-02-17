@@ -63,11 +63,42 @@ jobs:
           echo "SCM version: $SCM_VERSION"
           echo "scm_version=$SCM_VERSION" >> "$GITHUB_OUTPUT"
 
-  # Job 2: Build and Push Docker Image
+  # Job 2:
+  plugin_unit_tests:
+    name: Run plugin unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          submodules: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "==0.5"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download plugin_tests.py
+        run: |
+          curl -sSL "https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-distro/-/raw/create-plugin-test-cli/scripts/plugin_tests.py" -o plugin_tests.py
+
+      - name: Run plugin tests
+        run: |
+          uv run --extra plugins plugin_tests.py \
+            --plugins-to-skip nomad_simulations,perovskite_solar_cell_database
+
+  # Job 3: Build and Push Docker Image
   docker-publish:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    needs: update-lockfile
+    needs:
+      - update-lockfile
+      - plugin_unit_tests
 
     strategy:
       fail-fast: false
