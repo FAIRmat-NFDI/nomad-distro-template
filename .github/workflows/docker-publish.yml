@@ -100,8 +100,49 @@ jobs:
         run: |
           uv run --extra plugins plugin_tests.py
 
+  # Job 3: Run example upload tests
+  example_upload_tests:
+    name: Run example upload tests
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3.11.5
+        env:
+          RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+          RABBITMQ_DEFAULT_USER: rabbitmq
+          RABBITMQ_DEFAULT_PASS: rabbitmq
+          RABBITMQ_DEFAULT_VHOST: /
+      elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+        env:
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+      mongo:
+        image: mongo:5.0.6
+    env:
+      NOMAD_RABBITMQ_HOST: rabbitmq
+      NOMAD_ELASTIC_HOST: elastic
+      NOMAD_MONGO_HOST: mongo
+      NOMAD_KEYCLOAK_PASSWORD: ${CI_KEYCLOAK_ADMIN_PASSWORD}
+      NOMAD_NORMALIZE_SPRINGER_DB_PATH: /nomad/fairdi/db/data/springer.msg
+      UV_EXTRA_INDEX_URL: "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple"
 
-  # Job 3: Build and Push Docker Image
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ UV_VERSION }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+  # Job 4: Build and Push Docker Image
   docker-publish:
     name: Build Docker Image
     runs-on: ubuntu-latest
