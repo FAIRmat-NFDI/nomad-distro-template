@@ -76,8 +76,15 @@ jobs:
     env:
       PLUGIN_TESTS_CI_NODE_TOTAL: 2
       # If you want to skip the unit tests for some plugins, add them to the list below
-      PLUGIN_TESTS_PLUGINS_TO_SKIP: "workflowparsers,nomad_porous_materials"
-
+      PLUGIN_TESTS_PLUGINS_TO_SKIP: |
+        workflowparsers
+        nomad_porous_materials
+        simulationworkflowschema
+        databaseparsers
+        soapnormalizer
+        eelsdbparser
+        atomisticparsers
+        nomad_aitoolkit
     steps:
       - uses: actions/checkout@v4
         with:
@@ -100,7 +107,9 @@ jobs:
         env:
           PLUGIN_TESTS_CI_NODE_INDEX: ${{ matrix.group }}
         run: |
-          uv run --extra plugins plugin_tests.py
+          # replace the yaml list with a string, use a `,` to separate the plugins
+          PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
+          uv run --extra plugins plugin_tests.py --plugins-to-skip "$PLUGINS_STRING"
 
   # Job 3: Run example upload tests
   example_upload_tests:
