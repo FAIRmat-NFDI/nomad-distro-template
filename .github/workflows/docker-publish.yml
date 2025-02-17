@@ -67,6 +67,7 @@ jobs:
   # Job 2: Run unit tests for all of the plugin
   plugin_unit_tests:
     name: Run plugin unit tests
+    needs: update-lockfile
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -104,6 +105,7 @@ jobs:
   # Job 3: Run example upload tests
   example_upload_tests:
     name: Run example upload tests
+    needs: update-lockfile
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -147,8 +149,7 @@ jobs:
   docker-publish:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    needs:
-      - update-lockfile
+    needs: update-lockfile
 
     strategy:
       fail-fast: false
