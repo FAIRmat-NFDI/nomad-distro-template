@@ -14,6 +14,7 @@ on:
 env:
   REGISTRY: ghcr.io
   UV_VERSION: 0.6
+  PYTHON_VERSION: 3.12
 
 permissions:
   contents: write
@@ -40,7 +41,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Update lock file
         run: uv lock --upgrade-package nomad-lab
@@ -88,7 +89,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Download plugin tests script
         run: |
@@ -140,7 +141,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
   # Job 4: Build and Push Docker Image
   docker-publish:
@@ -183,6 +184,7 @@ jobs:
           build-args: |
             SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION=${{ env.SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION }}
             UV_VERSION=${{ env.UV_VERSION }}
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: ${{ matrix.service == 'jupyter' && 'jupyter' || 'final' }}
