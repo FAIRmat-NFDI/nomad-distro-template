@@ -30,7 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
           submodules: true
 
       - name: Install uv
@@ -71,7 +70,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
           submodules: true
 
       - name: Install uv
@@ -111,7 +109,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
           submodules: true
 
       - uses: docker/setup-buildx-action@v3
