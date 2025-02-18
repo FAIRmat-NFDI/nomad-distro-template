@@ -111,51 +111,8 @@ jobs:
           PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
           uv run --extra plugins plugin_tests.py --plugins-to-skip "$PLUGINS_STRING"
 
-  # Job 3: Run example upload tests
-  example_upload_tests:
-    name: Run example upload tests
-    needs: update-lockfile
-    runs-on: ubuntu-latest
-    services:
-      rabbitmq:
-        image: rabbitmq:3.11.5
-        env:
-          RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
-          RABBITMQ_DEFAULT_USER: rabbitmq
-          RABBITMQ_DEFAULT_PASS: rabbitmq
-          RABBITMQ_DEFAULT_VHOST: /
-      elastic:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
-        env:
-          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-          discovery.type: single-node
-          xpack.security.enabled: "false"
-      mongo:
-        image: mongo:5.0.6
-    env:
-      NOMAD_RABBITMQ_HOST: rabbitmq
-      NOMAD_ELASTIC_HOST: elastic
-      NOMAD_MONGO_HOST: mongo
-      NOMAD_KEYCLOAK_PASSWORD: ${CI_KEYCLOAK_ADMIN_PASSWORD}
-      NOMAD_NORMALIZE_SPRINGER_DB_PATH: /nomad/fairdi/db/data/springer.msg
-      UV_EXTRA_INDEX_URL: "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple"
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: ${{ env.UV_VERSION }}
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-  # Job 4: Build and Push Docker Image
-  docker-publish:
+  # Job 3: Build and Push Docker Image
+  build:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: update-lockfile
@@ -201,3 +158,51 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+    outputs:
+      image: ${{ steps.meta.outputs.images }}
+
+  # Job 4: Run example upload tests
+  example_upload_tests:
+    name: Run example upload tests
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3.11.5
+        env:
+          RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+          RABBITMQ_DEFAULT_USER: rabbitmq
+          RABBITMQ_DEFAULT_PASS: rabbitmq
+          RABBITMQ_DEFAULT_VHOST: /
+      elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+        env:
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+      mongo:
+        image: mongo:5.0.6
+      app:
+        image: ${{ needs.build.outputs.image }}
+        ports:
+          - 8000:8000
+        env:
+          NOMAD_RABBITMQ_HOST: rabbitmq
+          NOMAD_ELASTIC_HOST: elastic
+          NOMAD_MONGO_HOST: mongo
+          NOMAD_KEYCLOAK_PASSWORD: ${CI_KEYCLOAK_ADMIN_PASSWORD}
+          NOMAD_NORMALIZE_SPRINGER_DB_PATH: /nomad/fairdi/db/data/springer.msg
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
