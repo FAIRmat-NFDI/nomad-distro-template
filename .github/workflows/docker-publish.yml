@@ -13,6 +13,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  UV_VERSION: 0.6
+  PYTHON_VERSION: 3.12
 
 permissions:
   contents: write
@@ -36,11 +38,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "==0.5"
+          version: ${{ env.UV_VERSION }}
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Update lock file
         run: uv lock --upgrade-package nomad-lab
@@ -63,8 +65,56 @@ jobs:
           echo "SCM version: $SCM_VERSION"
           echo "scm_version=$SCM_VERSION" >> "$GITHUB_OUTPUT"
 
-  # Job 2: Build and Push Docker Image
-  docker-publish:
+  # Job 2: Run unit tests for all of the plugin
+  plugin_unit_tests:
+    name: Run plugin unit tests
+    needs: update-lockfile
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2]
+    env:
+      PLUGIN_TESTS_CI_NODE_TOTAL: 2
+      # If you want to skip the unit tests for some plugins, add them to the list below
+      PLUGIN_TESTS_PLUGINS_TO_SKIP: |
+        workflowparsers
+        nomad_porous_materials
+        simulationworkflowschema
+        databaseparsers
+        soapnormalizer
+        eelsdbparser
+        atomisticparsers
+        nomad_aitoolkit
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          submodules: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Download plugin tests script
+        run: |
+          curl -sSL "https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-distro/-/raw/main/scripts/plugin_tests.py" -o plugin_tests.py
+
+      - name: Run plugin tests
+        env:
+          PLUGIN_TESTS_CI_NODE_INDEX: ${{ matrix.group }}
+        run: |
+          # replace the yaml list with a string, use a `,` to separate the plugins
+          PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
+          uv run --extra plugins plugin_tests.py --plugins-to-skip "$PLUGINS_STRING"
+
+  # Job 3: Build and Push Docker Image
+  build:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: update-lockfile
@@ -101,10 +151,65 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          build-args: "SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION=${{ env.SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION }}"
+          build-args: |
+            SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION=${{ env.SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION }}
+            UV_VERSION=${{ env.UV_VERSION }}
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: ${{ matrix.service == 'jupyter' && 'jupyter' || 'final' }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+
+  # Job 4: Run example upload tests
+  example_upload_tests:
+    name: Run example upload tests
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3.11.5
+        env:
+          RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+          RABBITMQ_DEFAULT_USER: rabbitmq
+          RABBITMQ_DEFAULT_PASS: rabbitmq
+          RABBITMQ_DEFAULT_VHOST: /
+      elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+        env:
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+      mongo:
+        image: mongo:5.0.6
+      app:
+        image: ${{ needs.build.outputs.tags }}
+        ports:
+          - 8000:8000
+        env:
+          NOMAD_RABBITMQ_HOST: rabbitmq
+          NOMAD_ELASTIC_HOST: elastic
+          NOMAD_MONGO_HOST: mongo
+          NOMAD_KEYCLOAK_PASSWORD: ${CI_KEYCLOAK_ADMIN_PASSWORD}
+          NOMAD_NORMALIZE_SPRINGER_DB_PATH: /nomad/fairdi/db/data/springer.msg
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          submodules: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Print image name
+        run: |
+          echo "IMAGE: ${{ needs.build.outputs.tags }}"
