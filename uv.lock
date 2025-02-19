@@ -4410,6 +4410,7 @@ name = "nomad-distribution"
 source = { editable = "." }
 dependencies = [
     { name = "nomad-lab", extra = ["infrastructure", "parsing"] },
+    { name = "setuptools" },
 ]
 
 [package.optional-dependencies]
@@ -4459,6 +4460,7 @@ requires-dist = [
     { name = "nomad-simulations", marker = "extra == 'plugins'", specifier = "==0.3.1" },
     { name = "perovskite-solar-cell-database", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database.git?rev=v0.1.1" },
     { name = "pynxtools", extras = ["convert"], marker = "extra == 'plugins'", specifier = "==0.9.1" },
+    { name = "setuptools" },
 ]
 provides-extras = ["plugins", "jupyter", "dev"]
 
