@@ -169,38 +169,20 @@ jobs:
     name: Run example upload tests
     needs: build
     runs-on: ubuntu-latest
-    services:
-      rabbitmq:
-        image: rabbitmq:3.11.5
-        env:
-          RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
-          RABBITMQ_DEFAULT_USER: rabbitmq
-          RABBITMQ_DEFAULT_PASS: rabbitmq
-          RABBITMQ_DEFAULT_VHOST: /
-      elastic:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
-        env:
-          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-          discovery.type: single-node
-          xpack.security.enabled: "false"
-      mongo:
-        image: mongo:5.0.6
-      app:
-        image: ${{ needs.build.outputs.tags }}
-        ports:
-          - 8000:8000
-        env:
-          NOMAD_RABBITMQ_HOST: rabbitmq
-          NOMAD_ELASTIC_HOST: elastic
-          NOMAD_MONGO_HOST: mongo
-          NOMAD_KEYCLOAK_PASSWORD: ${CI_KEYCLOAK_ADMIN_PASSWORD}
-          NOMAD_NORMALIZE_SPRINGER_DB_PATH: /nomad/fairdi/db/data/springer.msg
+    env:
+      APP_IMAGE: ${{ needs.build.outputs.tags }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           submodules: true
+      - name: Start containers
+        working-directory: tests
+        run: |
+          docker pull ${{ env.APP_IMAGE }} -q
+          docker compose up -d --quiet-pull
+
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
@@ -210,6 +192,34 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Print image name
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Health check
         run: |
-          echo "IMAGE: ${{ needs.build.outputs.tags }}"
+          #!/bin/bash
+          set -e # Exit immediately if a command exits with a non-zero status.
+
+          secs=180                           # Set interval (duration) in seconds.
+          endTime=$(( $(date +%s) + secs )) # Calculate end time.
+
+          check_health() {
+              curl -s localhost:8000/-/health > /dev/null
+          }
+
+          while [ $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
+               if check_health; then
+                echo "Health endpoint is responding correctly."
+                exit 0
+              else
+                echo "Health endpoint is not responding. Retrying in 10 seconds..."
+                sleep 10
+              fi
+          done
+
+          echo "Timeout reached. Health endpoint did not respond within 3 minutes."
+          exit 1
+
+      - name: Run tests
+        working-directory: tests
+        run: uv run pytest -sv
