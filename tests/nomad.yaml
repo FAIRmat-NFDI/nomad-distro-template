@@ -5,3 +5,5 @@ client:
   url: "http://localhost:8000/fairdi/nomad/latest/api"
   user: "test"
   password: "password"
+services:
+  upload_limit: 1000
