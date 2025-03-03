@@ -6,18 +6,16 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
-  # Enable version updates for uv
   - package-ecosystem: "uv"
-    # Look for `pyproject.toml` and `uv.lock` files in the `root` directory
     directory: "/"
-    # Check the pypi registry for updates every day (weekdays)
     schedule:
       interval: "daily"
     groups:
-      # Non nomad dependencies
-      not-nomad-dependencies:
-        exclude-patterns:
-          - "nomad*"
+      python:
+        patterns:
+          - "*"
+    allow:
+      - dependency-type: all
 
   # Enable version updates for Docker
   - package-ecosystem: "docker"
