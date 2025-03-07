@@ -86,6 +86,7 @@ jobs:
         eelsdbparser
         atomisticparsers
         nomad_aitoolkit
+        pynxtools_igor
     steps:
       - uses: actions/checkout@v4
         with:
