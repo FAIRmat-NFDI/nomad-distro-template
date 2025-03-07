@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   initialize_repository:
-    if: github.repository != 'FAIRmat-NFDI/nomad-distro-template'
+    if: github.repository != 'FAIRmat-NFDI/nomad-distro-template' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
 
     steps:
