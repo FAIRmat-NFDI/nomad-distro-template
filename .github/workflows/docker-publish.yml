@@ -45,7 +45,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Update lock file
-        run: uv lock --upgrade-package nomad-lab
+        run: uv lock
 
       # Commits any changes made to the lockfile
       - name: Commit lock file changes
@@ -180,7 +180,6 @@ jobs:
       - name: Start containers
         working-directory: tests
         run: |
-          docker pull ${{ env.APP_IMAGE }} -q
           docker compose up -d --quiet-pull
 
       - name: Install uv
