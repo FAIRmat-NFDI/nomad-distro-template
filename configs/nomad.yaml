@@ -11,7 +11,7 @@ north:
   tools:
     options:
       jupyter:
-        image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+        image: ghcr.io/blueraft/nomad-distribution-template/jupyter:main
 
 meta:
   deployment: "oasis"
