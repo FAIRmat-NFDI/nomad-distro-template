@@ -67,7 +67,7 @@ services:
       start_period: 10s
 
   keycloak:
-    image: gitlab-registry.mpcdf.mpg.de/nomad-lab/nomad-test-keycloak:latest
+    image: gitlab-registry.mpcdf.mpg.de/nomad-lab/nomad-test-keycloak:v1.0
     platform: linux/amd64
     container_name: keycloak
     environment:
