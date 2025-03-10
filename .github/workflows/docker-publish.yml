@@ -162,8 +162,13 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Set output only for app service
+        if: matrix.service == 'app'
+        run: echo "APP_IMAGE=${{ steps.meta.outputs.tags }}" >> $GITHUB_ENV
+
     outputs:
-      tags: ${{ steps.meta.outputs.tags }}
+      app_image: ${{ env.APP_IMAGE }}
 
   # Job 4: Run example upload tests
   example_upload_tests:
@@ -171,7 +176,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      APP_IMAGE: ${{ needs.build.outputs.tags }}
+      APP_IMAGE: ${{ needs.build.outputs.app_image }}
 
     steps:
       - uses: actions/checkout@v4
