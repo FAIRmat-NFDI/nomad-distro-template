@@ -54,10 +54,10 @@ def test_example_uploads(entry_point_id, auth):
         response = api.get(url, auth=auth, headers={"Accept": "application/json"})
         if response.ok:
             upload_data = response.json().get("data", {})
+            assert not upload_data.get("errors", [])
+            assert not upload_data.get("warnings", [])
             running = upload_data.get("process_running")
             if not running:
-                assert not upload_data.get("errors", [])
-                assert not upload_data.get("warnings", [])
                 return True
         time.sleep(interval)
 
