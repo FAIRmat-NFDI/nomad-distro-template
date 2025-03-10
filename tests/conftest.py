@@ -4,8 +4,6 @@ import pytest
 
 @pytest.fixture(scope="session")
 def auth():
-    print(f"Used nomad is {config.client.url}")
-
     from nomad.client import Auth
 
     return Auth(

@@ -1,3 +1,4 @@
+import time
 from nomad.client import api
 from nomad.config import config
 
@@ -25,7 +26,7 @@ def get_example_upload_ids() -> list[str]:
     return [
         entry_point.id
         for entry_point in get_example_upload_entrypoints()
-        if entry_point.id and "pynxtools" in entry_point.id
+        if entry_point.id and not entry_point.from_examples_directory
     ]
 
 
@@ -42,3 +43,22 @@ def test_example_uploads(entry_point_id, auth):
         headers={"Accept": "application/json"},
     )
     assert response.status_code == 200, response.text
+    upload_id = response.json().get("upload_id")
+    url = f"uploads/{upload_id}"
+
+    timeout = 300
+    interval = 10
+    start_time = time.time()
+
+    while time.time() - start_time < timeout:
+        response = api.get(url, auth=auth, headers={"Accept": "application/json"})
+        if response.ok:
+            upload_data = response.json().get("data", {})
+            running = upload_data.get("process_running")
+            if not running:
+                assert not upload_data.get("errors", [])
+                assert not upload_data.get("warnings", [])
+                return True
+        time.sleep(interval)
+
+    assert False

@@ -227,4 +227,4 @@ jobs:
 
       - name: Run tests
         working-directory: tests
-        run: uv run pytest -p no:warnings -sv
+        run: uv run --extra plugins pytest -p no:warnings -sv
