@@ -48,17 +48,44 @@ def test_example_uploads(entry_point_id, auth):
 
     timeout = 300
     interval = 10
-    start_time = time.time()
+    start = time.time()
+    processing = True
 
-    while time.time() - start_time < timeout:
-        response = api.get(url, auth=auth, headers={"Accept": "application/json"})
-        if response.ok:
-            upload_data = response.json().get("data", {})
-            assert not upload_data.get("errors", [])
-            assert not upload_data.get("warnings", [])
-            running = upload_data.get("process_running")
-            if not running:
-                return True
+    while processing:
+        if time.time() - start > timeout:
+            raise TimeoutError("Example upload processing timed out")
         time.sleep(interval)
+        response = api.get(
+            f"uploads/{upload_id}",
+            auth=auth,
+            headers={"Accept": "application/json"},
+        )
+        assert response.status_code == 200, response.text
 
-    assert False
+        upload_data = response.json()["data"]
+        assert not upload_data["errors"]
+        assert not upload_data["warnings"]
+        if not upload_data["process_running"]:
+            # Check that upload processed fine with no overall errors/warnings
+            assert upload_data["process_status"] == "SUCCESS"
+            processing = False
+
+    # Check entries for errors
+    response = api.post(
+        "entries/query",
+        auth=auth,
+        json={"upload_id": upload_id},
+        headers={"Accept": "application/json"},
+    )
+    assert response.status_code == 200, response.text
+    entry_ids = [entry.entry_id for entry in response.json()["data"]]
+    for entry_id in entry_ids:
+        response = api.get(
+            f"entries/{entry_id}/archive",
+            auth=auth,
+            headers={"Accept": "application/json"},
+        )
+        assert response.status_code == 200, response.text
+        logs = response.json()["data"]["archive"]["processing_logs"]
+        for log in logs:
+            assert log["level"] != "ERROR"
