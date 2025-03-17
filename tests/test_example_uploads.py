@@ -1,9 +1,12 @@
 import time
+import os
 from nomad.client import api
 from nomad.config import config
 
 from nomad.config.models.plugins import ExampleUploadEntryPoint
 import pytest
+
+PLUGINS_TO_SKIP = os.getenv("PLUGINS_STRING", "")
 
 
 def get_example_upload_entrypoints() -> list[ExampleUploadEntryPoint]:
@@ -26,7 +29,9 @@ def get_example_upload_ids() -> list[str]:
     return [
         entry_point.id
         for entry_point in get_example_upload_entrypoints()
-        if entry_point.id and not entry_point.from_examples_directory
+        if entry_point.id
+        and not entry_point.from_examples_directory
+        and (entry_point.plugin_package or "") not in PLUGINS_TO_SKIP
     ]
 
 

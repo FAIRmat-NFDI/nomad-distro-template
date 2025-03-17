@@ -15,6 +15,17 @@ env:
   REGISTRY: ghcr.io
   UV_VERSION: 0.6
   PYTHON_VERSION: 3.12
+  # If you want to skip the tests for some plugins, add them to the list below
+  PLUGIN_TESTS_PLUGINS_TO_SKIP: |
+    workflowparsers
+    nomad_porous_materials
+    simulationworkflowschema
+    databaseparsers
+    soapnormalizer
+    eelsdbparser
+    atomisticparsers
+    nomad_aitoolkit
+    pynxtools_igor
 
 permissions:
   contents: write
@@ -76,17 +87,6 @@ jobs:
         group: [1, 2]
     env:
       PLUGIN_TESTS_CI_NODE_TOTAL: 2
-      # If you want to skip the unit tests for some plugins, add them to the list below
-      PLUGIN_TESTS_PLUGINS_TO_SKIP: |
-        workflowparsers
-        nomad_porous_materials
-        simulationworkflowschema
-        databaseparsers
-        soapnormalizer
-        eelsdbparser
-        atomisticparsers
-        nomad_aitoolkit
-        pynxtools_igor
     steps:
       - uses: actions/checkout@v4
         with:
@@ -226,4 +226,6 @@ jobs:
 
       - name: Run tests
         working-directory: tests
-        run: uv run --extra plugins pytest -p no:warnings -sv
+        run: |
+          export PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
+          uv run --extra plugins pytest -p no:warnings -sv
