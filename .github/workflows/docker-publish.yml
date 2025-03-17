@@ -102,17 +102,16 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Download plugin tests script
-        run: |
-          curl -sSL "https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-distro/-/raw/main/scripts/plugin_tests.py" -o plugin_tests.py
-
       - name: Run plugin tests
         env:
           PLUGIN_TESTS_CI_NODE_INDEX: ${{ matrix.group }}
         run: |
           # replace the yaml list with a string, use a `,` to separate the plugins
           PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
-          uv run --extra plugins plugin_tests.py --plugins-to-skip "$PLUGINS_STRING"
+          uv run \
+            --extra plugins \
+            --with "nomad-plugin-tests==0.1" \
+            nomad-plugin-tests --plugins-to-skip "$PLUGINS_STRING"
 
   # Job 3: Build and Push Docker Image
   build:
