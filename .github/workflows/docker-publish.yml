@@ -222,6 +222,8 @@ jobs:
           done
 
           echo "Timeout reached. Health endpoint did not respond within 3 minutes."
+          echo "Fetching Docker logs for debugging..."
+          docker logs app  # Output logs from the app container
           exit 1
 
       - name: Run tests
