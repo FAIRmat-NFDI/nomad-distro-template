@@ -66,10 +66,10 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     cd nomad-distro-template
     ```
 
-3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
+3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the current user
 
     ```sh
-    sudo chown -R 1000 .volumes
+    sudo chown -R $(id -u):$(id -g) .volumes
     ```
 
 4. Pull the images specified in the `docker-compose.yaml`
