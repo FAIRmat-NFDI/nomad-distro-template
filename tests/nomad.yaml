@@ -1,0 +1,9 @@
+keycloak:
+  server_url: "http://keycloak:8080/"
+  realm_name: "fairdi_nomad_test"
+client:
+  url: "http://localhost:8000/fairdi/nomad/latest/api"
+  user: "test"
+  password: "password"
+services:
+  upload_limit: 1000

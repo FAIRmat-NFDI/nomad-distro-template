@@ -5,6 +5,9 @@
 # https://docs.docker.com/engine/reference/builder/
 
 ARG PYTHON_VERSION=3.12
+ARG UV_VERSION=0.6
+
+FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_image
 
 FROM python:${PYTHON_VERSION}-slim AS base
 
@@ -87,7 +90,7 @@ RUN adduser \
 
 
 # Install UV
-COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
+COPY --from=uv_image /uv /bin/uv
 
 ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
 
@@ -121,7 +124,7 @@ EXPOSE 9000
 VOLUME /app/.volumes/fs
 
 
-FROM quay.io/jupyter/datascience-notebook:2025-01-13 AS jupyter
+FROM quay.io/jupyter/datascience-notebook:2025-03-17 AS jupyter
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
@@ -139,7 +142,7 @@ RUN apt-get update \
 USER ${NB_UID}
 WORKDIR "${HOME}"
 
-COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
+COPY --from=uv_image /uv /bin/uv
 
 ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
 
