@@ -110,7 +110,7 @@ jobs:
           PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
           uv run \
             --extra plugins \
-            --with "nomad-plugin-tests==0.1" \
+            --with "nomad-plugin-tests" \
             nomad-plugin-tests --plugins-to-skip "$PLUGINS_STRING"
 
   # Job 3: Build and Push Docker Image
