@@ -68,13 +68,19 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     cd nomad-distro-template
     ```
 
-3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
+3. Change the images in the `docker-compose.yaml` and `configs/nomad.yaml`
+   The images should be created after the initalization of your repository. Look under packages.
+   In the `docker-compose.yaml`, change the URL wherever there is `image: ghcr.io/fairmat-nfdi/nomad-distro-template:main` to where your image is found. The same goes for the jupyter-image.
+   
+   
+
+4. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
 
     ```sh
     sudo chown -R 1000 .volumes
     ```
 
-4. Pull the images specified in the `docker-compose.yaml`
+5. Pull the images specified in the `docker-compose.yaml`
 
     Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
 
@@ -82,22 +88,24 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     docker compose pull
     ```
 
-5. And run it with docker compose in detached (--detach or -d) mode
+6. And run it with docker compose in detached (--detach or -d) mode
 
     ```sh
     docker compose up -d
     ```
 
-6. Optionally you can now test that NOMAD is running with
+7. Optionally you can now test that NOMAD is running with
 
     ```
     curl localhost/nomad-oasis/alive
     ```
 
-7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
+8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
 #### Updating the image
-1. Whenever you update your image you need to shut down NOMAD using
+1. To update the image, just push your changes to GitHub and the workflow will automatically create the new images.
+   
+2. Whenever you update your image you need to shut down NOMAD using
 
     ```sh
     docker compose down
@@ -105,7 +113,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
     and then repeat steps 4. and 5. above.
    
-2. You can remove unused images to free up space by running
+3. You can remove unused images to free up space by running
 
     ```sh
     docker image prune -a
