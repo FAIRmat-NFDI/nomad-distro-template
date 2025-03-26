@@ -113,7 +113,7 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
 
     and then repeat steps 4. and 5. above.
    
-3. You can remove unused images to free up space by running
+2. You can remove unused images to free up space by running
 
     ```sh
     docker image prune -a
