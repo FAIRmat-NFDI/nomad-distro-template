@@ -140,6 +140,14 @@ services:
       retries: 30
       start_period: 10s
 
+  jupyter:
+    restart: unless-stopped
+    image: ${JUPYTER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main}
+    platform: linux/amd64
+    container_name: jupyter
+    ports:
+      - 8888:8888
+
 volumes:
   mongo:
     name: "mongo"
