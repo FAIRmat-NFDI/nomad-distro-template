@@ -68,13 +68,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     cd nomad-distro-template
     ```
 
-3. Change the images in the `docker-compose.yaml` and `configs/nomad.yaml`
-   The images should be created after the initalization of your repository. Look under packages.
-   In the `docker-compose.yaml`, change the URL wherever there is `image: ghcr.io/fairmat-nfdi/nomad-distro-template:main` to where your image is found. The same goes for the jupyter-image.
-   
-   
-
-4. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
+3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
 
     ```sh
     sudo chown -R 1000 .volumes
