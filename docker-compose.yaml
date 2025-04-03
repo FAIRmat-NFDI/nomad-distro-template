@@ -69,6 +69,7 @@ services:
   worker:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    platform: linux/amd64
     container_name: nomad_oasis_worker
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -92,6 +93,7 @@ services:
   app:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
       NOMAD_SERVICE: nomad_oasis_app
@@ -131,6 +133,7 @@ services:
   north:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    platform: linux/amd64
     container_name: nomad_oasis_north
     environment:
       NOMAD_SERVICE: nomad_oasis_north
@@ -166,6 +169,7 @@ services:
   logtransfer:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    platform: linux/amd64
     container_name: nomad_oasis_logtransfer
     environment:
       NOMAD_SERVICE: nomad_oasis_logtransfer
@@ -205,6 +209,7 @@ services:
   # jupyterlab image: (this is only used to pull the image, no service is run for this)
   jupyterlab_image:
     image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+    platform: linux/amd64
     container_name: nomad_jupyter_image
     pull_policy: always
     entrypoint: ["true"]
