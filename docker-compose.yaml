@@ -199,6 +199,7 @@ services:
         condition: service_healthy
     ports:
       - 80:80
+      # - 443:443
 
   # jupyterlab image: (this is only used to pull the image, no service is run for this)
   jupyterlab_image:
