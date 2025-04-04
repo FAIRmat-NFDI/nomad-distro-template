@@ -188,6 +188,13 @@ jobs:
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           submodules: true
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Start containers
         working-directory: tests
         run: |
