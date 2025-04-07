@@ -7,6 +7,7 @@
 ARG PYTHON_VERSION=3.12
 ARG UV_VERSION=0.6
 
+
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_image
 
 FROM python:${PYTHON_VERSION}-slim AS base
@@ -102,18 +103,41 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY scripts ./scripts
 
+FROM builder AS docs
+
+WORKDIR /app
+
+ARG NOMAD_DOCS_REPO="https://github.com/FAIRmat-NFDI/nomad-docs.git"
+
+RUN set -ex && \
+    echo "Cloning from: $NOMAD_DOCS_REPO" && \
+    git clone "$NOMAD_DOCS_REPO" docs
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --all-extras --frozen
+
+RUN uv run --directory docs mkdocs build \
+ && mkdir -p built_docs \
+ && cp -r docs/site/* built_docs
+
 FROM base_final AS final
+
+ARG PYTHON_VERSION=3.12
 
 COPY --chown=nomad:1000 --from=builder /opt/venv /opt/venv
 COPY --chown=nomad:1000 scripts/run.sh .
 COPY --chown=nomad:1000 scripts/run-worker.sh .
 COPY configs/nomad.yaml nomad.yaml
+COPY --chown=nomad:1000 --from=docs /app/built_docs /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/app/static/docs
 
 RUN mkdir -p /app/.volumes/fs \
  && chown -R nomad:1000 /app \
  && chown -R nomad:1000 /opt/venv \
  && mkdir nomad \
- && cp /opt/venv/lib/python3.12/site-packages/nomad/jupyterhub_config.py nomad/
+ && cp /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/jupyterhub_config.py nomad/
+
 
 USER nomad
 
