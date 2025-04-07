@@ -6,7 +6,7 @@ Click [here](https://github.com/new?template_name=nomad-distro-template&template
 to use this template, or click the `Use this template` button in the upper right corner of
 the main GitHub page for this template.
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > The templated repository will run a GitHub action on creation which might take a few minutes.
 > After the workflow finishes you should refresh the page and this message should disappear.
 > If this message persists you might need to trigger the workflow manually by navigating to the
@@ -90,8 +90,12 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 6. Optionally you can now test that NOMAD is running with
 
-    ```
+    ```sh
+    # HTTP
     curl localhost/nomad-oasis/alive
+
+    # HTTPS with self-signed SSL certificate
+    curl -k https://localhost/nomad-oasis/alive
     ```
 
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
@@ -104,7 +108,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     ```
 
     and then repeat steps 4. and 5. above.
-   
+
 2. You can remove unused images to free up space by running
 
     ```sh
