@@ -97,7 +97,9 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
 #### Updating the image
-1. Whenever you update your image you need to shut down NOMAD using
+Any pushes to the main branch of this repository, such as when [adding a plugin](#adding-a-plugin), will trigger a pipeline that generates a new app and jupyter image.
+   
+1. To update your local image you need to shut down NOMAD using
 
     ```sh
     docker compose down
