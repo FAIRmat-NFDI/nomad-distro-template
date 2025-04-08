@@ -123,8 +123,8 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     # HTTP
     curl localhost/nomad-oasis/alive
 
-    # HTTPS with self-signed SSL certificate
-    curl -k https://localhost/nomad-oasis/alive
+    # HTTPS with self-signed SSL certificate (and trust self-signed certificate)
+    curl --insecure https://localhost/nomad-oasis/alive
     ```
 
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
