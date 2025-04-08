@@ -117,11 +117,9 @@ RUN set -ex && \
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --all-extras
-
-RUN uv run --directory docs mkdocs build \
- && mkdir -p built_docs \
- && cp -r docs/site/* built_docs
+    uv run --all-extras --directory docs mkdocs build \
+    && mkdir -p built_docs \
+    && cp -r docs/site/* built_docs
 
 FROM base_final AS final
 
