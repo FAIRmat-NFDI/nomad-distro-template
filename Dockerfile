@@ -172,7 +172,7 @@ ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv export --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
+    uv export --frozen --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
