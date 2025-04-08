@@ -18,6 +18,7 @@ ENV PYTHONUNBUFFERED=1
 ENV VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH" \
     UV_LINK_MODE=copy \
+    UV_FROZEN=1 \
     UV_PROJECT_ENVIRONMENT=/opt/venv
 
 # Final stage to create the runnable image with minimal size
@@ -98,7 +99,7 @@ ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --extra plugins --frozen
+    uv sync --extra plugins
 
 
 COPY scripts ./scripts
@@ -116,7 +117,7 @@ RUN set -ex && \
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --all-extras --frozen
+    uv sync --all-extras
 
 RUN uv run --directory docs mkdocs build \
  && mkdir -p built_docs \
@@ -173,7 +174,7 @@ ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv export --frozen --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
+    uv export --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
