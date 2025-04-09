@@ -6,7 +6,7 @@ Click [here](https://github.com/new?template_name=nomad-distro-template&template
 to use this template, or click the `Use this template` button in the upper right corner of
 the main GitHub page for this template.
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > The templated repository will run a GitHub action on creation which might take a few minutes.
 > After the workflow finishes you should refresh the page and this message should disappear.
 > If this message persists you might need to trigger the workflow manually by navigating to the
@@ -82,16 +82,49 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     docker compose pull
     ```
 
-5. And run it with docker compose in detached (--detach or -d) mode
+5. (Optional) Deploy Oasis with HTTPS
+
+    Generate a self-signed SSL certificate (or use a trusted certificate authority if preferred):
+    ```sh
+    mkdir ssl
+    openssl req -x509 -nodes -days 365 \
+      -newkey rsa:2048 \
+      -keyout ./ssl/selfsigned.key \
+      -out ./ssl/selfsigned.crt \
+      -subj "/CN=localhost"
+    ```
+
+    Update the `proxy` config in `docker-compose.yml` to use the HTTPS Nginx config instead of the HTTP one:
+    ```diff
+    - # HTTP
+    - - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
+
+    + # HTTPS (you need to generate SSL certificate)
+    + - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
+    + - ./ssl:/etc/nginx/ssl:ro  # generate your SSL certificate
+    ```
+
+    Also make sure port 443 is exposed:
+    ```yaml
+    ports:
+      - 80:80
+      - 443:443
+    ```
+
+6. And run it with docker compose in detached (--detach or -d) mode
 
     ```sh
     docker compose up -d
     ```
 
-6. Optionally you can now test that NOMAD is running with
+7. (Optional) You can now test that NOMAD is running with
 
-    ```
+    ```sh
+    # HTTP
     curl localhost/nomad-oasis/alive
+
+    # HTTPS with self-signed SSL certificate (and trust self-signed certificate)
+    curl --insecure https://localhost/nomad-oasis/alive
     ```
 
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
@@ -106,7 +139,7 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
     ```
 
     and then repeat steps 4. and 5. above.
-   
+
 2. You can remove unused images to free up space by running
 
     ```sh
@@ -193,7 +226,7 @@ This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) duri
 
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
-```
+```sh
 docker pull ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
 ```
 
@@ -232,7 +265,7 @@ This automated process helps ensure that your dependencies stay up to date, impr
 
 In order to update an existing distribution with any potential changes in the template you can add a new `git remote` for the template and merge with that one while allowing for unrelated histories:
 
-```
+```sh
 git remote add template https://github.com/FAIRmat-NFDI/nomad-distro-template
 git fetch template
 git merge template/main --allow-unrelated-histories
@@ -240,7 +273,7 @@ git merge template/main --allow-unrelated-histories
 
 Most likely this will result in some merge conflicts which will need to be resolved. At the very least the `Dockerfile` and GitHub workflows should be taken from "theirs":
 
-```
+```sh
 git checkout --theirs Dockerfile
 git checkout --theirs .github/workflows/docker-publish.yml
 ```
@@ -249,7 +282,7 @@ For detailed instructions on how to resolve the merge conflicts between differen
 
 Once the merge conflicts are resolved you should add the changes and commit them
 
-```
+```sh
 git add -A
 git commit -m "Updated to new distribution version"
 ```
