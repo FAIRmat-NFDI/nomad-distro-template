@@ -60,6 +60,7 @@ jobs:
 
       # Commits any changes made to the lockfile
       - name: Commit lock file changes
+        if: github.ref_type != 'tag'
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
@@ -164,11 +165,15 @@ jobs:
 
       - name: Set APP_IMAGE for app service
         if: matrix.service == 'app'
-        run: echo "APP_IMAGE=${{ steps.meta.outputs.tags }}" >> $GITHUB_ENV
+        run: |
+          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "APP_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
       - name: Set JUPYTER_IMAGE for jupyter service
         if: matrix.service == 'jupyter'
-        run: echo "JUPYTER_IMAGE=${{ steps.meta.outputs.tags }}" >> $GITHUB_ENV
+        run: |
+          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "JUPYTER_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
     outputs:
       app_image: ${{ env.APP_IMAGE }}
