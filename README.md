@@ -82,34 +82,42 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     docker compose pull
     ```
 
-5. (Optional) Deploy Oasis with HTTPS
+5. Configuring Secure HTTP and HTTPS Connections
 
-    Generate a self-signed SSL certificate (or use a trusted certificate authority if preferred):
-    ```sh
-    mkdir ssl
-    openssl req -x509 -nodes -days 365 \
-      -newkey rsa:2048 \
-      -keyout ./ssl/selfsigned.key \
-      -out ./ssl/selfsigned.crt \
-      -subj "/CN=localhost"
-    ```
+   By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server—including credentials and sensitive data—can be compromised.
 
-    Update the `proxy` config in `docker-compose.yml` to use the HTTPS Nginx config instead of the HTTP one:
-    ```diff
-    - # HTTP
-    - - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
+   HTTPS requires a TLS certificate, which must be renewed periodically. Depending on your setup, you have several options:
 
-    + # HTTPS (you need to generate SSL certificate)
-    + - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
-    + - ./ssl:/etc/nginx/ssl:ro  # generate your SSL certificate
-    ```
+   1. You already have a certificate.
 
-    Also make sure port 443 is exposed:
-    ```yaml
-    ports:
-      - 80:80
-      - 443:443
-    ```
+      In this case, you just need the certificate and key files.
+
+   2. Free certificate from Let's Encrypt
+
+      [Let's Encrypt](https://letsencrypt.org/) provides free TLS certificates for those with a domain name. Follow their tutorials for instructions on generating a certificate.
+
+   3. Self-signed certificate
+
+      For testing, you can create a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate). Note that self-signed certificates are not recommended for production since they are not trusted by browsers. You can generate one with:
+
+      ```sh
+      mkdir ssl
+      openssl req -x509 -nodes -days 365 \
+        -newkey rsa:2048 \
+        -keyout ./ssl/selfsigned.key \
+        -out ./ssl/selfsigned.crt \
+        -subj "/CN=localhost"
+      ```
+
+   To start using a TLS certificate, update the `proxy` configuration in `docker-compose.yml`:
+   ```diff
+   - # HTTP
+   - - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
+
+   + # HTTPS
+   + - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
+   + - ./ssl:/etc/nginx/ssl:ro  # Your certificate files
+   ```
 
 6. And run it with docker compose in detached (--detach or -d) mode
 
@@ -123,7 +131,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     # HTTP
     curl localhost/nomad-oasis/alive
 
-    # HTTPS with self-signed SSL certificate (and trust self-signed certificate)
+    # HTTPS (--insecure flag is only needed for a self-signed certificate)
     curl --insecure https://localhost/nomad-oasis/alive
     ```
 
