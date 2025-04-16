@@ -193,7 +193,13 @@ services:
     container_name: nomad_oasis_proxy
     command: nginx -g 'daemon off;'
     volumes:
-      - ./configs/nginx.conf:/etc/nginx/conf.d/default.conf
+      # Shared config
+      - ./configs/nginx_base_conf:/etc/nginx/conf.d/nginx_base_conf:ro
+      # HTTP
+      - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
+      # HTTPS (you need to have an SSL certificate)
+      # - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
+      # - ./ssl:/etc/nginx/ssl:ro
     depends_on:
       app:
         condition: service_healthy
@@ -203,6 +209,7 @@ services:
         condition: service_healthy
     ports:
       - 80:80
+      - 443:443
 
   # jupyterlab image: (this is only used to pull the image, no service is run for this)
   jupyterlab_image:

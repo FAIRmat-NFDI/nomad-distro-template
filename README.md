@@ -6,7 +6,7 @@ Click [here](https://github.com/new?template_name=nomad-distro-template&template
 to use this template, or click the `Use this template` button in the upper right corner of
 the main GitHub page for this template.
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > The templated repository will run a GitHub action on creation which might take a few minutes.
 > After the workflow finishes you should refresh the page and this message should disappear.
 > If this message persists you might need to trigger the workflow manually by navigating to the
@@ -82,16 +82,57 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     docker compose pull
     ```
 
-5. And run it with docker compose in detached (--detach or -d) mode
+5. Configuring Secure HTTP and HTTPS Connections
+
+   By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server—including credentials and sensitive data—can be compromised.
+
+   HTTPS requires a TLS certificate, which must be renewed periodically. Depending on your setup, you have several options:
+
+   1. You already have a certificate.
+
+      In this case, you just need the certificate and key files.
+
+   2. Free certificate from Let's Encrypt
+
+      [Let's Encrypt](https://letsencrypt.org/) provides free TLS certificates for those with a domain name. Follow their tutorials for instructions on generating a certificate.
+
+   3. Self-signed certificate
+
+      For testing, you can create a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate). Note that self-signed certificates are not recommended for production since they are not trusted by browsers. You can generate one with:
+
+      ```sh
+      mkdir ssl
+      openssl req -x509 -nodes -days 365 \
+        -newkey rsa:2048 \
+        -keyout ./ssl/selfsigned.key \
+        -out ./ssl/selfsigned.crt \
+        -subj "/CN=localhost"
+      ```
+
+   To start using a TLS certificate, update the `proxy` configuration in `docker-compose.yml`:
+   ```diff
+   - # HTTP
+   - - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
+
+   + # HTTPS
+   + - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
+   + - ./ssl:/etc/nginx/ssl:ro  # Your certificate files
+   ```
+
+6. And run it with docker compose in detached (--detach or -d) mode
 
     ```sh
     docker compose up -d
     ```
 
-6. Optionally you can now test that NOMAD is running with
+7. (Optional) You can now test that NOMAD is running with
 
-    ```
+    ```sh
+    # HTTP
     curl localhost/nomad-oasis/alive
+
+    # HTTPS (--insecure flag is only needed for a self-signed certificate)
+    curl --insecure https://localhost/nomad-oasis/alive
     ```
 
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
@@ -106,7 +147,7 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
     ```
 
     and then repeat steps 4. and 5. above.
-   
+
 2. You can remove unused images to free up space by running
 
     ```sh
@@ -193,7 +234,7 @@ This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) duri
 
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
-```
+```sh
 docker pull ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
 ```
 
@@ -232,7 +273,7 @@ This automated process helps ensure that your dependencies stay up to date, impr
 
 In order to update an existing distribution with any potential changes in the template you can add a new `git remote` for the template and merge with that one while allowing for unrelated histories:
 
-```
+```sh
 git remote add template https://github.com/FAIRmat-NFDI/nomad-distro-template
 git fetch template
 git merge template/main --allow-unrelated-histories
@@ -240,7 +281,7 @@ git merge template/main --allow-unrelated-histories
 
 Most likely this will result in some merge conflicts which will need to be resolved. At the very least the `Dockerfile` and GitHub workflows should be taken from "theirs":
 
-```
+```sh
 git checkout --theirs Dockerfile
 git checkout --theirs .github/workflows/docker-publish.yml
 ```
@@ -249,7 +290,7 @@ For detailed instructions on how to resolve the merge conflicts between differen
 
 Once the merge conflicts are resolved you should add the changes and commit them
 
-```
+```sh
 git add -A
 git commit -m "Updated to new distribution version"
 ```
