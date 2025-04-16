@@ -259,7 +259,7 @@ In addition to unit tests, the pipeline also verifies that all example uploads c
 
 For example upload tests, the CI uses the image built in the Build Image step. It then runs the Docker container and starts up the application to confirm that it functions correctly. This approach ensures that if the pipeline passes, the app is more likely to run smoothly in a Dockerized environment on a server, not just locally.
 
-If you need to disable tests for specific plugins, update the **PLUGIN_TESTS_PLUGINS_TO_SKIP** variable in [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) by adding the plugin names to the existing list.
+If you need to disable tests for specific plugins, update the **PLUGIN_TESTS_PLUGINS_TO_SKIP** variable in [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L21) by adding the plugin names to the existing list.
 
 ## Set Up Regular Package Updates with Dependabot
 
@@ -268,6 +268,17 @@ Dependabot is already configured in the repository’s CI setup, but you need to
 To enable Dependabot, go to Settings > Code security and analysis in your GitHub repository. From there, turn on Dependabot alerts and version updates. Once enabled, Dependabot will automatically check for dependency updates and create pull requests when new versions are available.
 
 This automated process helps ensure that your dependencies stay up to date, improving security and reducing the risk of vulnerabilities.
+
+## Customising Documentation
+
+By default, documentation is built using the [nomad-docs](https://github.com/FAIRmat-NFDI/nomad-docs) repository. However, if you'd like to customize the documentation for your Oasis instance, you can easily do so.
+
+1. First, [fork the nomad-docs repository](https://github.com/FAIRmat-NFDI/nomad-docs/fork).
+2. Make your desired changes in your fork.
+3. Update the `NOMAD_DOCS_REPO` variable in the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file to point to the URL of your forked repository.
+
+This setup ensures that your custom documentation is used when building your Oasis.
+
 
 ## Updating the distribution from the template
 
@@ -285,6 +296,12 @@ Most likely this will result in some merge conflicts which will need to be resol
 git checkout --theirs Dockerfile
 git checkout --theirs .github/workflows/docker-publish.yml
 ```
+
+The lock file merge conflicts can be resolved to use your versions instead of the template repository resolution.
+```sh
+git checkout --ours uv.lock
+```
+
 
 For detailed instructions on how to resolve the merge conflicts between different version we refer you to the latest template release [notes](https://github.com/FAIRmat-NFDI/nomad-distro-template/releases/latest)
 
