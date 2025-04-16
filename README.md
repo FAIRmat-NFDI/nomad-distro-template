@@ -269,7 +269,7 @@ To enable Dependabot, go to Settings > Code security and analysis in your GitHub
 
 This automated process helps ensure that your dependencies stay up to date, improving security and reducing the risk of vulnerabilities.
 
-## Customising Documentation
+## Customizing Documentation
 
 By default, documentation is built using the [nomad-docs](https://github.com/FAIRmat-NFDI/nomad-docs) repository. However, if you'd like to customize the documentation for your Oasis instance, you can easily do so.
 
