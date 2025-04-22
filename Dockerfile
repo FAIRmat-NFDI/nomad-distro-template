@@ -124,7 +124,7 @@ EXPOSE 9000
 VOLUME /app/.volumes/fs
 
 
-FROM quay.io/jupyter/datascience-notebook:2025-04-04 AS jupyter
+FROM quay.io/jupyter/base-notebook:2025-04-14 AS jupyter
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
@@ -134,9 +134,17 @@ USER root
 
 RUN apt-get update \
  && apt-get install --yes --quiet --no-install-recommends \
-       libmagic1 \
-       # clean cache and logs
-       && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+      libgomp1 \
+      libmagic1 \
+      file \
+      gcc \
+      build-essential \
+      curl \
+      zip \
+      unzip \
+      git \
+      # clean cache and logs
+      && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
