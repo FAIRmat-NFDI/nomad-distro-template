@@ -139,7 +139,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 #### Updating the image
 Any pushes to the main branch of this repository, such as when [adding a plugin](#adding-a-plugin), will trigger a pipeline that generates a new app and jupyter image.
-   
+
 1. To update your local image you need to shut down NOMAD using
 
     ```sh
@@ -231,6 +231,11 @@ be generated.
 
 In addition to the Docker image for running the oasis, this repository also builds a custom NORTH image for running a jupyter hub with the installed plugins.
 This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) during the initialization of this repository and should therefore already be available in your Oasis under "Analyze / NOMAD Remote Tools Hub / jupyter"
+
+We currently use `quay.io/jupyter/base-notebook:2025-04-14` as our base image for Jupyter. While it includes the necessary Python packages, it does not come with `R` or `Julia` pre-installed.
+If you need support for those languages, you can switch to `quay.io/jupyter/datascience-notebook:2025-04-04`, which includes both `R` and `Julia`.
+
+Note that the base-notebook image is more lightweight and uses less disk space compared to the datascience-notebook image.
 
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
