@@ -147,7 +147,7 @@ EXPOSE 9000
 VOLUME /app/.volumes/fs
 
 
-FROM quay.io/jupyter/base-notebook:2025-04-14 AS jupyter
+FROM quay.io/jupyter/base-notebook:2025-04-14 AS jupyter_build
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
@@ -180,7 +180,34 @@ ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv export --frozen --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
+    uv export --frozen --extra plugins --extra jupyter --no-emit-package "nomad-distribution" | uv pip install -r /dev/stdin --system
+
+
+FROM quay.io/jupyter/base-notebook:2025-04-14 AS jupyter
+# Fix: https://github.com/hadolint/hadolint/wiki/DL4006
+# Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+USER root
+
+RUN apt-get update \
+ && apt-get install --yes --quiet --no-install-recommends \
+      libgomp1 \
+      libmagic1 \
+      file \
+      curl \
+      zip \
+      unzip \
+      git \
+      # clean cache and logs
+      && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}
+WORKDIR "${HOME}"
+
+COPY --from=uv_image /uv /bin/uv
+COPY --from=jupyter_build /opt/conda /opt/conda
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
