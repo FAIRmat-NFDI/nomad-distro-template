@@ -6,7 +6,7 @@
 
 ARG PYTHON_VERSION=3.12
 ARG UV_VERSION=0.6
-
+ARG JUPYTER_VERSION=2025-04-14
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_image
 
@@ -147,7 +147,7 @@ EXPOSE 9000
 VOLUME /app/.volumes/fs
 
 
-FROM quay.io/jupyter/base-notebook:2025-04-14 AS jupyter_build
+FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter_builder
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
@@ -175,15 +175,13 @@ WORKDIR "${HOME}"
 
 COPY --from=uv_image /uv /bin/uv
 
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
-
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv export --frozen --extra plugins --extra jupyter --no-emit-package "nomad-distribution" | uv pip install -r /dev/stdin --system
 
 
-FROM quay.io/jupyter/base-notebook:2025-04-14 AS jupyter
+FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -199,6 +197,11 @@ RUN apt-get update \
       zip \
       unzip \
       git \
+      # `nbconvert` dependencies
+      # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
+      texlive-xetex \
+      texlive-fonts-recommended \
+      texlive-plain-generic \
       # clean cache and logs
       && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
@@ -207,7 +210,7 @@ USER ${NB_UID}
 WORKDIR "${HOME}"
 
 COPY --from=uv_image /uv /bin/uv
-COPY --from=jupyter_build /opt/conda /opt/conda
+COPY --from=jupyter_builder /opt/conda /opt/conda
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
