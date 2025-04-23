@@ -149,6 +149,9 @@ VOLUME /app/.volumes/fs
 
 FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter_builder
 
+ENV UV_PROJECT_ENVIRONMENT=/opt/conda \
+    UV_FROZEN=1
+
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -178,7 +181,9 @@ COPY --from=uv_image /uv /bin/uv
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv export --frozen --extra plugins --extra jupyter --no-emit-package "nomad-distribution" | uv pip install -r /dev/stdin --system
+    # Use inexact to avoid removing pre-installed packages in the environment
+    # Use no-install-project to skip installing the current project (`nomad-distribution`)
+    uv sync --extra plugins --extra jupyter --no-install-project --inexact
 
 
 FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter
