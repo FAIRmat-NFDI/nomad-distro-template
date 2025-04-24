@@ -6,7 +6,7 @@
 
 ARG PYTHON_VERSION=3.12
 ARG UV_VERSION=0.6
-
+ARG JUPYTER_VERSION=2025-04-14
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_image
 
@@ -94,9 +94,8 @@ RUN adduser \
 # Install UV
 COPY --from=uv_image /uv /bin/uv
 
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
-
 RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=source=.git,target=.git,type=bind \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --extra plugins
@@ -147,7 +146,10 @@ EXPOSE 9000
 VOLUME /app/.volumes/fs
 
 
-FROM quay.io/jupyter/base-notebook:2025-04-14 AS jupyter
+FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter_builder
+
+ENV UV_PROJECT_ENVIRONMENT=/opt/conda \
+    UV_FROZEN=1
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
@@ -175,12 +177,44 @@ WORKDIR "${HOME}"
 
 COPY --from=uv_image /uv /bin/uv
 
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
-
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv export --frozen --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
+    # Use inexact to avoid removing pre-installed packages in the environment
+    # Use no-install-project to skip installing the current project (`nomad-distribution`)
+    uv sync --extra plugins --extra jupyter --no-install-project --inexact
+
+
+FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter
+# Fix: https://github.com/hadolint/hadolint/wiki/DL4006
+# Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+USER root
+
+RUN apt-get update \
+ && apt-get install --yes --quiet --no-install-recommends \
+      libgomp1 \
+      libmagic1 \
+      file \
+      curl \
+      zip \
+      unzip \
+      git \
+      # `nbconvert` dependencies
+      # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
+      texlive-xetex \
+      texlive-fonts-recommended \
+      texlive-plain-generic \
+      # clean cache and logs
+      && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}
+WORKDIR "${HOME}"
+
+COPY --from=uv_image /uv /bin/uv
+COPY --from=jupyter_builder /opt/conda /opt/conda
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:

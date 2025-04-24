@@ -234,8 +234,10 @@ This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) duri
 
 We currently use `quay.io/jupyter/base-notebook:2025-04-14` as our base image for Jupyter. While it includes the necessary Python packages, it does not come with `R` or `Julia` pre-installed.
 If you need support for those languages, you can switch to `quay.io/jupyter/datascience-notebook:2025-04-04`, which includes both `R` and `Julia`.
+The Jupyter image does not include `gcc` or `build-essential` by default. If you want to allow users to install Python packages that require compilation while running a notebook, you'll need to install these tools in the [Dockerfile](./Dockerfile#L172) or switch the base image to `quay.io/jupyter/datascience-notebook:2025-04-04`.
+However, including these packages can increase the image size and may introduce security risks if arbitrary code is compiled at runtime.
 
-Note that the base-notebook image is more lightweight and uses less disk space compared to the datascience-notebook image.
+Note that the `base-notebook` image is more lightweight and uses less disk space compared to the `datascience-notebook` image.
 
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
