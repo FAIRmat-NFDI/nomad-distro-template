@@ -94,9 +94,8 @@ RUN adduser \
 # Install UV
 COPY --from=uv_image /uv /bin/uv
 
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
-
 RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=source=.git,target=.git,type=bind \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --extra plugins
