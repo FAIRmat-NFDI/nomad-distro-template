@@ -206,11 +206,6 @@ RUN apt-get update \
       texlive-xetex \
       texlive-fonts-recommended \
       texlive-plain-generic \
-      # `nbconvert` dependencies
-      # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
-      texlive-xetex \
-      texlive-fonts-recommended \
-      texlive-plain-generic \
       # clean cache and logs
       && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
