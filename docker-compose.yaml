@@ -2,7 +2,7 @@ services:
   # broker for celery
   rabbitmq:
     restart: unless-stopped
-    image: rabbitmq:3.11.5
+    image: docker.io/rabbitmq:3.11.5
     container_name: nomad_oasis_rabbitmq
     environment:
       - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
@@ -43,7 +43,7 @@ services:
   # the user data db
   mongo:
     restart: unless-stopped
-    image: mongo:5.0.6
+    image: docker.io/mongo:5.0.6
     container_name: nomad_oasis_mongo
     environment:
       - MONGO_DATA_DIR=/data/db
@@ -189,7 +189,7 @@ services:
   # nomad proxy (a reverse proxy for nomad)
   proxy:
     restart: unless-stopped
-    image: nginx:1.27.4-alpine
+    image: docker.io/nginx:1.27.4-alpine
     container_name: nomad_oasis_proxy
     command: nginx -g 'daemon off;'
     volumes:
