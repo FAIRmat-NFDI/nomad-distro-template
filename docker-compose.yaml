@@ -1,6 +1,6 @@
 services:
   # broker for celery
-  docker.io/rabbitmq:
+  rabbitmq:
     restart: unless-stopped
     image: docker.io/rabbitmq:3.11.5
     container_name: nomad_oasis_rabbitmq
