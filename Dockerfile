@@ -21,6 +21,19 @@ ENV VIRTUAL_ENV=/opt/venv \
     UV_FROZEN=1 \
     UV_PROJECT_ENVIRONMENT=/opt/venv
 
+# Create a non-privileged user.
+# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
+ARG UID=1000
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    nomad
+
+
 # Final stage to create the runnable image with minimal size
 FROM base AS base_final
 
@@ -44,17 +57,6 @@ RUN apt-get update \
 # https://pythonspeed.com/articles/multi-stage-docker-python/
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Create a non-privileged user that the frenrug will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=1000
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    nomad
 
 FROM base AS builder
 
@@ -77,19 +79,6 @@ RUN apt-get update \
       unzip \
       git \
  && rm -rf /var/lib/apt/lists/*
-
-# Create a non-privileged user that the frenrug will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=1000
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    nomad
-
 
 # Install UV
 COPY --from=uv_image /uv /bin/uv
