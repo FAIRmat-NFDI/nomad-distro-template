@@ -3440,7 +3440,7 @@ plugins = [
     { name = "nomad-schema-plugin-simulation-workflow" },
     { name = "nomad-simulations" },
     { name = "perovskite-solar-cell-database" },
-    { name = "pynxtools", extra = ["convert"] },
+    { name = "pynxtools" },
     { name = "pynxtools-apm" },
     { name = "pynxtools-ellips" },
     { name = "pynxtools-em" },
@@ -3473,7 +3473,7 @@ requires-dist = [
     { name = "nomad-schema-plugin-simulation-workflow", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
     { name = "nomad-simulations", marker = "extra == 'plugins'", specifier = "==0.3.2" },
     { name = "perovskite-solar-cell-database", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database.git?rev=v0.1.1" },
-    { name = "pynxtools", extras = ["convert"], marker = "extra == 'plugins'", specifier = "==0.10.7" },
+    { name = "pynxtools", marker = "extra == 'plugins'", specifier = "==0.10.7" },
     { name = "pynxtools-apm", marker = "extra == 'plugins'", specifier = ">=0.2.3" },
     { name = "pynxtools-ellips", marker = "extra == 'plugins'", specifier = ">=0.0.10" },
     { name = "pynxtools-em", marker = "extra == 'plugins'", specifier = ">=0.3.2" },
@@ -4922,19 +4922,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fc/ae/43f3ebccf17724c72661f4b35b1b7cea842a1f3b7bd8f9ab8e138f912803/pynxtools-0.10.7.tar.gz", hash = "sha256:21433be88190ab22cbb98e10e4dcbc5ae167d84bc5e4deb478da4e7ab814e13e", size = 5348056, upload-time = "2025-05-23T16:23:39.754Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e9/32/4a1cb4123a82d0a84ea6527a0aa12f8eb70812a5e25fc74ec7185fe34225/pynxtools-0.10.7-py3-none-any.whl", hash = "sha256:a5f2fddba2e7d4d4e8d9e0fdc541fa20064ccc1280e54e9af660f1aee376581b", size = 5720827, upload-time = "2025-05-23T16:23:37.8Z" },
-]
-
-[package.optional-dependencies]
-convert = [
-    { name = "pynxtools-apm" },
-    { name = "pynxtools-ellips" },
-    { name = "pynxtools-em" },
-    { name = "pynxtools-igor" },
-    { name = "pynxtools-mpes" },
-    { name = "pynxtools-raman" },
-    { name = "pynxtools-spm" },
-    { name = "pynxtools-xps" },
-    { name = "pynxtools-xrd" },
 ]
 
 [[package]]
