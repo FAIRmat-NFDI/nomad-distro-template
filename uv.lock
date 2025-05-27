@@ -3471,7 +3471,7 @@ requires-dist = [
     { name = "nomad-porous-materials", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-porous-materials.git?rev=522f4a3208077f534f1c5e886527ee2104283d0b" },
     { name = "nomad-schema-plugin-run", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
     { name = "nomad-schema-plugin-simulation-workflow", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
-    { name = "nomad-simulations", marker = "extra == 'plugins'", specifier = "==0.3.2" },
+    { name = "nomad-simulations", marker = "extra == 'plugins'", specifier = "==0.4.0" },
     { name = "perovskite-solar-cell-database", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database.git?rev=v0.1.1" },
     { name = "pynxtools", marker = "extra == 'plugins'", specifier = "==0.10.7" },
     { name = "pynxtools-apm", marker = "extra == 'plugins'", specifier = ">=0.2.3" },
@@ -3830,15 +3830,15 @@ wheels = [
 
 [[package]]
 name = "nomad-simulations"
-version = "0.3.2"
+version = "0.4.0"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "matid" },
     { name = "nomad-lab" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/84/ff0de2a0513dd1943d964b02d334270b23b7e5e594166443ea4517a67776/nomad_simulations-0.3.2.tar.gz", hash = "sha256:84d830ebf80797774e3036401599d31d37558112337b6b1ee631cd51ee17763a", size = 601252, upload-time = "2025-03-20T14:00:52.528Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c6/d6/04d5cd5e56f402cb0dd3bed6b8b72cc94e729043aeca6ea40a38876d7c68/nomad_simulations-0.4.0.tar.gz", hash = "sha256:4903b69db6a4547f53cb2d77368d2ff4a2fdaa3cbc2583b73508a5c60ede6bb8", size = 604397, upload-time = "2025-05-06T14:33:53.979Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/53/7b/b4c43a351919c6c74d3dc8fe118845cd89c1d18272a378ba6baa708526eb/nomad_simulations-0.3.2-py3-none-any.whl", hash = "sha256:07d21eaecc5fb0b00c9528e2634acef903d3b18ac6b5a88f8c0c1d95ae5967a0", size = 96729, upload-time = "2025-03-20T14:00:51.137Z" },
+    { url = "https://files.pythonhosted.org/packages/82/05/0aa3b69b0a559778488852bd3652fe2194429b5dbe0e7d2fd1a3c0317763/nomad_simulations-0.4.0-py3-none-any.whl", hash = "sha256:7132640e7cb39373bd37ee732e305b73b5bb36abd2cb5f2eaf81e36612a5c87f", size = 106431, upload-time = "2025-05-06T14:33:52.894Z" },
 ]
 
 [[package]]
