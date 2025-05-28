@@ -113,15 +113,15 @@ FROM base_final AS final
 
 ARG PYTHON_VERSION=3.12
 
-COPY --chown=nomad:1000 --from=builder /opt/venv /opt/venv
-COPY --chown=nomad:1000 scripts/run.sh .
-COPY --chown=nomad:1000 scripts/run-worker.sh .
+COPY --chown=nomad:${UID} --from=builder /opt/venv /opt/venv
+COPY --chown=nomad:${UID} scripts/run.sh .
+COPY --chown=nomad:${UID} scripts/run-worker.sh .
 COPY configs/nomad.yaml nomad.yaml
-COPY --chown=nomad:1000 --from=docs /app/built_docs /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/app/static/docs
+COPY --chown=nomad:${UID} --from=docs /app/built_docs /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/app/static/docs
 
 RUN mkdir -p /app/.volumes/fs \
- && chown -R nomad:1000 /app \
- && chown -R nomad:1000 /opt/venv \
+ && chown -R nomad:${UID} /app \
+ && chown -R nomad:${UID} /opt/venv \
  && mkdir nomad \
  && cp /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/jupyterhub_config.py nomad/
 
