@@ -5,7 +5,8 @@
 # https://docs.docker.com/engine/reference/builder/
 
 ARG PYTHON_VERSION=3.12
-ARG UV_VERSION=0.6
+ARG UV_VERSION=0.7
+ARG JUPYTER_VERSION=2025-04-14
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_image
 
@@ -17,7 +18,21 @@ ENV PYTHONUNBUFFERED=1
 ENV VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH" \
     UV_LINK_MODE=copy \
+    UV_FROZEN=1 \
     UV_PROJECT_ENVIRONMENT=/opt/venv
+
+# Create a non-privileged user.
+# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
+ARG UID=1000
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    nomad
+
 
 # Final stage to create the runnable image with minimal size
 FROM base AS base_final
@@ -42,17 +57,6 @@ RUN apt-get update \
 # https://pythonspeed.com/articles/multi-stage-docker-python/
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Create a non-privileged user that the frenrug will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=1000
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    nomad
 
 FROM base AS builder
 
@@ -76,44 +80,51 @@ RUN apt-get update \
       git \
  && rm -rf /var/lib/apt/lists/*
 
-# Create a non-privileged user that the frenrug will run under.
-# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
-ARG UID=1000
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    nomad
-
-
 # Install UV
 COPY --from=uv_image /uv /bin/uv
 
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
-
 RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=source=.git,target=.git,type=bind \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --extra plugins --frozen
+    uv sync --extra plugins
 
 
 COPY scripts ./scripts
 
+FROM builder AS docs
+
+WORKDIR /app
+
+ARG NOMAD_DOCS_REPO="https://github.com/FAIRmat-NFDI/nomad-docs.git"
+
+RUN set -ex && \
+    echo "Cloning from: $NOMAD_DOCS_REPO" && \
+    git clone "$NOMAD_DOCS_REPO" docs
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv run --with nomad-docs --directory docs mkdocs build \
+    && mkdir -p built_docs \
+    && cp -r docs/site/* built_docs
+
 FROM base_final AS final
 
-COPY --chown=nomad:1000 --from=builder /opt/venv /opt/venv
-COPY --chown=nomad:1000 scripts/run.sh .
-COPY --chown=nomad:1000 scripts/run-worker.sh .
+ARG PYTHON_VERSION=3.12
+
+COPY --chown=nomad:${UID} --from=builder /opt/venv /opt/venv
+COPY --chown=nomad:${UID} scripts/run.sh .
+COPY --chown=nomad:${UID} scripts/run-worker.sh .
 COPY configs/nomad.yaml nomad.yaml
+COPY --chown=nomad:${UID} --from=docs /app/built_docs /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/app/static/docs
 
 RUN mkdir -p /app/.volumes/fs \
- && chown -R nomad:1000 /app \
- && chown -R nomad:1000 /opt/venv \
+ && chown -R nomad:${UID} /app \
+ && chown -R nomad:${UID} /opt/venv \
  && mkdir nomad \
- && cp /opt/venv/lib/python3.12/site-packages/nomad/jupyterhub_config.py nomad/
+ && cp /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/jupyterhub_config.py nomad/
+
 
 USER nomad
 
@@ -124,7 +135,10 @@ EXPOSE 9000
 VOLUME /app/.volumes/fs
 
 
-FROM quay.io/jupyter/datascience-notebook:2025-04-04 AS jupyter
+FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter_builder
+
+ENV UV_PROJECT_ENVIRONMENT=/opt/conda \
+    UV_FROZEN=1
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
@@ -134,9 +148,17 @@ USER root
 
 RUN apt-get update \
  && apt-get install --yes --quiet --no-install-recommends \
-       libmagic1 \
-       # clean cache and logs
-       && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+      libgomp1 \
+      libmagic1 \
+      file \
+      gcc \
+      build-essential \
+      curl \
+      zip \
+      unzip \
+      git \
+      # clean cache and logs
+      && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
@@ -144,12 +166,44 @@ WORKDIR "${HOME}"
 
 COPY --from=uv_image /uv /bin/uv
 
-ARG SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION='0.0'
-
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv export --frozen --extra plugins --extra jupyter | uv pip install -r /dev/stdin --system
+    # Use inexact to avoid removing pre-installed packages in the environment
+    # Use no-install-project to skip installing the current project (`nomad-distribution`)
+    uv sync --extra plugins --extra jupyter --no-install-project --inexact
+
+
+FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter
+# Fix: https://github.com/hadolint/hadolint/wiki/DL4006
+# Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+USER root
+
+RUN apt-get update \
+ && apt-get install --yes --quiet --no-install-recommends \
+      libgomp1 \
+      libmagic1 \
+      file \
+      curl \
+      zip \
+      unzip \
+      git \
+      # `nbconvert` dependencies
+      # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
+      texlive-xetex \
+      texlive-fonts-recommended \
+      texlive-plain-generic \
+      # clean cache and logs
+      && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER ${NB_UID}
+WORKDIR "${HOME}"
+
+COPY --from=uv_image /uv /bin/uv
+COPY --from=jupyter_builder /opt/conda /opt/conda
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:

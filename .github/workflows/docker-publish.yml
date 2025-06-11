@@ -13,8 +13,11 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  UV_VERSION: 0.6
+  UV_VERSION: 0.7
   PYTHON_VERSION: 3.12
+  JUPYTER_VERSION: 2025-04-14
+  # If you want to include custom documentation, create a fork of the repo below and link the forked repo here
+  NOMAD_DOCS_REPO: https://github.com/FAIRmat-NFDI/nomad-docs.git
   # If you want to skip the tests for some plugins, add them to the list below
   PLUGIN_TESTS_PLUGINS_TO_SKIP: |
     workflowparsers
@@ -38,8 +41,6 @@ jobs:
   update-lockfile:
     name: Update Python Lock File
     runs-on: ubuntu-latest
-    outputs:
-      scm_version: ${{ steps.get_scm_version.outputs.scm_version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,6 +61,7 @@ jobs:
 
       # Commits any changes made to the lockfile
       - name: Commit lock file changes
+        if: github.ref_type != 'tag'
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
@@ -68,13 +70,6 @@ jobs:
             git commit -m "Update lockfile"
             git push origin -o ci.skip # prevent triggering the pipeline again
           fi
-
-      - name: Get SCM Version
-        id: get_scm_version
-        run: |
-          SCM_VERSION=$(uvx --with setuptools_scm python -m setuptools_scm)
-          echo "SCM version: $SCM_VERSION"
-          echo "scm_version=$SCM_VERSION" >> "$GITHUB_OUTPUT"
 
   # Job 2: Run unit tests for all of the plugin
   plugin_unit_tests:
@@ -124,9 +119,6 @@ jobs:
       matrix:
         service: [app, jupyter]
 
-    env:
-      SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION: ${{ needs.update-lockfile.outputs.scm_version }}
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -152,9 +144,10 @@ jobs:
         with:
           context: .
           build-args: |
-            SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION=${{ env.SETUPTOOLS_SCM_PRETEND_VERSION_FOR_NOMAD_DISTRIBUTION }}
             UV_VERSION=${{ env.UV_VERSION }}
             PYTHON_VERSION=${{ env.PYTHON_VERSION }}
+            NOMAD_DOCS_REPO=${{ env.NOMAD_DOCS_REPO }}
+            JUPYTER_VERSION=${{ env.JUPYTER_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: ${{ matrix.service == 'jupyter' && 'jupyter' || 'final' }}
@@ -164,11 +157,15 @@ jobs:
 
       - name: Set APP_IMAGE for app service
         if: matrix.service == 'app'
-        run: echo "APP_IMAGE=${{ steps.meta.outputs.tags }}" >> $GITHUB_ENV
+        run: |
+          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "APP_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
       - name: Set JUPYTER_IMAGE for jupyter service
         if: matrix.service == 'jupyter'
-        run: echo "JUPYTER_IMAGE=${{ steps.meta.outputs.tags }}" >> $GITHUB_ENV
+        run: |
+          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "JUPYTER_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
     outputs:
       app_image: ${{ env.APP_IMAGE }}
