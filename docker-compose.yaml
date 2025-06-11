@@ -2,7 +2,7 @@ services:
   # broker for celery
   rabbitmq:
     restart: unless-stopped
-    image: docker.io/rabbitmq:3.11.5
+    image: docker.io/rabbitmq:3.11.5-alpine
     container_name: nomad_oasis_rabbitmq
     environment:
       - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
