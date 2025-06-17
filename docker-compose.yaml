@@ -124,6 +124,67 @@ services:
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run orchestrator-internal-worker
 
+  # nomad gpu worker (workflows)
+  gpu_worker:
+    restart: unless-stopped
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-workflow:main
+    platform: linux/amd64
+    container_name: nomad_oasis_gpu_worker
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all # Use all available GPUs
+              capabilities: [gpu]
+    environment:
+      NOMAD_SERVICE: nomad_oasis_gpu_worker
+      NOMAD_RABBITMQ_HOST: rabbitmq
+      NOMAD_ELASTIC_HOST: elastic
+      NOMAD_MONGO_HOST: mongo
+      NOMAD_LOGSTASH_HOST: logtransfer
+      NOMAD_TEMPORAL_HOST: temporal
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      elastic:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    volumes:
+      # - ./configs/nomad.yaml:/app/nomad.yaml
+      - ./.volumes/fs:/app/.volumes/fs
+    command: python -m nomad.cli admin run orchestrator-gpu-worker
+
+  # nomad cpu worker (workflows)
+  cpu_worker:
+    restart: unless-stopped
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-workflow:main
+    platform: linux/amd64
+    container_name: nomad_oasis_cpu_worker
+    environment:
+      NOMAD_SERVICE: nomad_oasis_cpu_worker
+      NOMAD_RABBITMQ_HOST: rabbitmq
+      NOMAD_ELASTIC_HOST: elastic
+      NOMAD_MONGO_HOST: mongo
+      NOMAD_LOGSTASH_HOST: logtransfer
+      NOMAD_TEMPORAL_HOST: temporal
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      elastic:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    volumes:
+      # - ./configs/nomad.yaml:/app/nomad.yaml
+      - ./.volumes/fs:/app/.volumes/fs
+    command: python -m nomad.cli admin run orchestrator-cpu-worker
+
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
