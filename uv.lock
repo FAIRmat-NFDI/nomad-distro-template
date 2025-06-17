@@ -3485,7 +3485,7 @@ requires-dist = [
     { name = "pynxtools-xrd", marker = "extra == 'plugins'", specifier = ">=0.0.5" },
     { name = "setuptools" },
 ]
-provides-extras = ["plugins", "jupyter", "dev"]
+provides-extras = ["plugins", "jupyter", "workflows", "dev"]
 
 [[package]]
 name = "nomad-dos-fingerprints"
