@@ -65,21 +65,56 @@ services:
       retries: 30
       start_period: 10s
 
+  postgresql:
+    container_name: nomad_oasis_postgresql
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+    image: postgres:16
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+  temporal:
+    container_name: nomad_oasis_temporal
+    depends_on:
+      - postgresql
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    image: docker.io/temporalio/auto-setup:1.28
+    healthcheck:
+      test: >
+        bash -c '
+          temporal operator cluster health --address $$(hostname -i):7233 |
+          grep -q "SERVING"
+        '
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   # nomad worker (processing)
   worker:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
     platform: linux/amd64
-    container_name: nomad_oasis_worker
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
       NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
+      NOMAD_TEMPORAL_HOST: temporal
     env_file:
       - ./.env
     depends_on:
+      temporal:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       elastic:
@@ -89,7 +124,26 @@ services:
     volumes:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
-    command: python -m celery -A nomad.processing worker -l info -Q celery --max-tasks-per-child 128
+    command: python -m nomad.cli admin run action-internal-worker
+    healthcheck:
+      # See https://keithtenzer.com/temporal/Deploying_Temporal_Worker_on_Kubernetes/#liveliness-and-readiness-probes
+      # for rationale on using 'ls /' as a liveness/readiness probe for Temporal workers.
+      test: ls /
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "2.0" # Maximum 2 CPU cores
+          memory: 8G # Maximum 8GB RAM
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 15
+        window: 1800s
 
   # nomad app (api + proxy)
   app:
@@ -106,9 +160,12 @@ services:
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_NORTH_HUB_HOST: north
+      NOMAD_TEMPORAL_HOST: temporal
     env_file:
       - ./.env
     depends_on:
+      temporal:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       elastic:
@@ -238,7 +295,8 @@ volumes:
     name: "nomad_oasis_rabbitmq"
   keycloak:
     name: "nomad_oasis_keycloak"
-
+  postgresql:
+    name: "nomad_oasis_postgresql"
 networks:
   default:
     name: nomad_oasis_network
