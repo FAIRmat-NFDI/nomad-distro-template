@@ -64,6 +64,38 @@ services:
       timeout: 10s
       retries: 30
       start_period: 10s
+    
+  postgresql:
+    container_name: nomad_oasis_postgresql
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+    image: postgres:16
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+
+  temporal:
+    container_name: nomad_oasis_temporal
+    depends_on:
+      - postgresql
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    image: temporalio/auto-setup:1.27.2
+
+  temporal-ui:
+    container_name: nomad_oasis_temporal_ui
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    image: temporalio/ui:2.34.0
 
   # nomad worker (processing)
   worker:
@@ -89,6 +121,70 @@ services:
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m celery -A nomad.processing worker -l info -Q celery --max-tasks-per-child 128
 
+  # nomad gpu worker (workflows)
+  gpu_worker:
+    restart: unless-stopped
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/workflow:main
+    platform: linux/amd64
+    container_name: nomad_oasis_gpu_worker
+    runtime: nvidia 
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all  # Use all available GPUs
+              capabilities: [gpu]
+    environment:
+      NOMAD_SERVICE: nomad_oasis_gpu_worker
+      NOMAD_RABBITMQ_HOST: rabbitmq
+      NOMAD_ELASTIC_HOST: elastic
+      NOMAD_MONGO_HOST: mongo
+      NOMAD_LOGSTASH_HOST: logtransfer
+      NOMAD_TEMPORAL_HOST: temporal
+      NOMAD_TEMPORAL_CLI_HOST: temporal
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      elastic:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    volumes:
+      # - ./configs/nomad.yaml:/app/nomad.yaml
+      - ./.volumes/fs:/app/.volumes/fs
+    command: python -m nomad.cli admin run orchestrator-gpu-worker
+
+  # nomad cpu worker (workflows)
+  cpu_worker:
+    restart: unless-stopped
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/workflow:main
+    platform: linux/amd64
+    container_name: nomad_oasis_cpu_worker
+    environment:
+      NOMAD_SERVICE: nomad_oasis_cpu_worker
+      NOMAD_RABBITMQ_HOST: rabbitmq
+      NOMAD_ELASTIC_HOST: elastic
+      NOMAD_MONGO_HOST: mongo
+      NOMAD_LOGSTASH_HOST: logtransfer
+      NOMAD_TEMPORAL_HOST: temporal
+      NOMAD_TEMPORAL_CLI_HOST: temporal
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      elastic:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    volumes:
+      # - ./configs/nomad.yaml:/app/nomad.yaml
+      - ./.volumes/fs:/app/.volumes/fs
+    command: python -m nomad.cli admin run orchestrator-cpu-worker
+  
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
@@ -230,7 +326,8 @@ volumes:
     name: "nomad_oasis_rabbitmq"
   keycloak:
     name: "nomad_oasis_keycloak"
-
+  postgresql:
+    name: "nomad_oasis_postgresql"
 networks:
   default:
     name: nomad_oasis_network

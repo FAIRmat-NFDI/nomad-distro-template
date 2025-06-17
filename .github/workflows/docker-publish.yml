@@ -117,7 +117,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [app, jupyter]
+        service: [app, jupyter, workflow]
 
     steps:
       - uses: actions/checkout@v4
@@ -137,7 +137,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}${{ matrix.service == 'jupyter' && '/jupyter' || '' }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}${{ matrix.service == 'jupyter' && '/jupyter' || matrix.service == 'workflow' && '/workflow' || '' }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -150,7 +150,7 @@ jobs:
             JUPYTER_VERSION=${{ env.JUPYTER_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          target: ${{ matrix.service == 'jupyter' && 'jupyter' || 'final' }}
+          target: ${{ matrix.service == 'jupyter' && 'jupyter' || matrix.service == 'workflow' && 'workflow_final' || 'final' }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -167,9 +167,16 @@ jobs:
           FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
           echo "JUPYTER_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
+      - name: Set WORKFLOW_IMAGE for workflow service
+        if: matrix.service == 'workflow'
+        run: |
+          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "WORKFLOW_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
+
     outputs:
       app_image: ${{ env.APP_IMAGE }}
       jupyter_image: ${{ env.JUPYTER_IMAGE }}
+      workflow_image: ${{ env.WORKFLOW_IMAGE }}
 
   # Job 4: Run example upload tests
   example_upload_tests:
