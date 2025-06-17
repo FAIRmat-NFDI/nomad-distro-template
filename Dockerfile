@@ -109,6 +109,50 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     && mkdir -p built_docs \
     && cp -r docs/site/* built_docs
 
+FROM builder AS gpu_workflow
+
+WORKDIR /app
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --extra plugins --extra gpu-workflow
+
+FROM base_final AS gpu_workflow_final
+
+COPY --chown=nomad:${UID} --from=gpu_workflow /opt/venv /opt/venv
+COPY configs/nomad.yaml nomad.yaml
+
+RUN mkdir -p /app/.volumes/fs \
+ && chown -R nomad:${UID} /app \
+ && chown -R nomad:${UID} /opt/venv
+
+USER nomad
+
+VOLUME /app/.volumes/fs
+
+FROM builder AS cpu_workflow
+
+WORKDIR /app
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --extra plugins --extra cpu-workflow
+
+FROM base_final AS cpu_workflow_final
+
+COPY --chown=nomad:${UID} --from=cpu_workflow /opt/venv /opt/venv
+COPY configs/nomad.yaml nomad.yaml
+
+RUN mkdir -p /app/.volumes/fs \
+ && chown -R nomad:${UID} /app \
+ && chown -R nomad:${UID} /opt/venv
+
+USER nomad
+
+VOLUME /app/.volumes/fs
+
 FROM base_final AS final
 
 ARG PYTHON_VERSION=3.12

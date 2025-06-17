@@ -60,6 +60,9 @@ plugins = [
   "nomad-parser-plugins-database>=1.0",
 ]
 jupyter = ["jupyter-events"]
+gpu-workflow = []
+cpu-workflow = []
+
 dev = ["nomad-lab[parsing, infrastructure, dev]>=1.3.4"]
 
 [tool.uv]
