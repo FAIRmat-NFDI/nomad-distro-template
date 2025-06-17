@@ -64,7 +64,7 @@ services:
       timeout: 10s
       retries: 30
       start_period: 10s
-    
+
   postgresql:
     container_name: nomad_oasis_postgresql
     environment:
@@ -127,13 +127,12 @@ services:
     image: ghcr.io/fairmat-nfdi/nomad-distro-template/workflow:main
     platform: linux/amd64
     container_name: nomad_oasis_gpu_worker
-    runtime: nvidia 
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: all  # Use all available GPUs
+              count: all # Use all available GPUs
               capabilities: [gpu]
     environment:
       NOMAD_SERVICE: nomad_oasis_gpu_worker
@@ -184,7 +183,7 @@ services:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run orchestrator-cpu-worker
-  
+
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
