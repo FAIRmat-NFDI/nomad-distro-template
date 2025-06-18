@@ -87,6 +87,16 @@ services:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
     image: temporalio/auto-setup:1.27.2
+    healthcheck:
+      test: >
+        bash -c '
+          temporal operator cluster health --address $$(hostname -i):7233 |
+          grep -q "SERVING"
+        '
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   temporal-ui:
     container_name: nomad_oasis_temporal_ui
@@ -109,6 +119,7 @@ services:
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
+      NOMAD_TEMPORAL_HOST: temporal
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -124,7 +135,7 @@ services:
   # nomad gpu worker (workflows)
   gpu_worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template/workflow:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-workflow:main
     platform: linux/amd64
     container_name: nomad_oasis_gpu_worker
     deploy:
@@ -141,7 +152,6 @@ services:
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_TEMPORAL_HOST: temporal
-      NOMAD_TEMPORAL_CLI_HOST: temporal
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -159,7 +169,7 @@ services:
   # nomad cpu worker (workflows)
   cpu_worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template/workflow:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-workflow:main
     platform: linux/amd64
     container_name: nomad_oasis_cpu_worker
     environment:
@@ -169,7 +179,6 @@ services:
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_TEMPORAL_HOST: temporal
-      NOMAD_TEMPORAL_CLI_HOST: temporal
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -199,6 +208,7 @@ services:
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_NORTH_HUB_HOST: north
+      NOMAD_TEMPORAL_HOST: temporal
     depends_on:
       rabbitmq:
         condition: service_healthy
