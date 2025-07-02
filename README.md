@@ -165,7 +165,7 @@ systems docker gid. The user id 1000 is used as the nomad user inside all contai
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
 
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
-[nomad-lab.eu/prod/v1/docs/oasis/install.html](https://nomad-lab.eu/prod/v1/docs/oasis/install.html)
+[https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
 
 ### For an existing Oasis
 
