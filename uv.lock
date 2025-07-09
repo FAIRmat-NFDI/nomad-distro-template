@@ -3814,7 +3814,7 @@ wheels = [
 
 [[package]]
 name = "nomad-schema-plugin-simulation-workflow"
-version = "1.0.9"
+version = "1.0.10"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "mdanalysis" },
@@ -3823,9 +3823,9 @@ dependencies = [
     { name = "nomad-schema-plugin-run" },
     { name = "scipy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/e8/ec357f148972c4da18084401a509a882d04b480ad33cb0c5362c835cd835/nomad_schema_plugin_simulation_workflow-1.0.9.tar.gz", hash = "sha256:241d8e11c642ef0c5f14061722e33babf33901995a7ebe91c0bdf6dfe42e85d0", size = 8866796, upload-time = "2025-03-17T13:25:16.993Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b5/91/c57629b3a81ba58ef8929014e5bd2c670b105829c777007870276a3b0118/nomad_schema_plugin_simulation_workflow-1.0.10.tar.gz", hash = "sha256:a011ec7ffe93e681f9b3e16809151b5c4c03a54c80405777f0e11cc525b3f859", size = 8867123, upload-time = "2025-06-03T11:26:41.218Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/b4/8c4df1cde169fd38ac1917032fca8d99574a9c2649b977b5aaf992e27748/nomad_schema_plugin_simulation_workflow-1.0.9-py3-none-any.whl", hash = "sha256:d2110a81759948516faa8827610d7fed4509935be29fae3a4f001195ec0fcc1c", size = 55355, upload-time = "2025-03-17T13:25:14.748Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/b4/c90313aa39c86fa48f1e014290cfedf36952c251412a7afc6e64f8de0441/nomad_schema_plugin_simulation_workflow-1.0.10-py3-none-any.whl", hash = "sha256:35fc82179f37b8e11cba34a9ab9e76d31ad44c7c03a248d024a9dda710dded90", size = 55641, upload-time = "2025-06-03T11:26:39.036Z" },
 ]
 
 [[package]]
