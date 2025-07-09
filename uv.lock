@@ -3699,7 +3699,7 @@ wheels = [
 
 [[package]]
 name = "nomad-parser-plugins-atomistic"
-version = "1.0.6"
+version = "1.0.7"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "ase" },
@@ -3715,9 +3715,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "scipy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/47/59/809189722d25c53dc25b19e4ac6984aa3e1bca5c20c81ab1385bf7fac371/nomad_parser_plugins_atomistic-1.0.6.tar.gz", hash = "sha256:e0d327cf1f4b97563565c8abc4b81a83609382586cb92a6d7b92a270d522a0c0", size = 94053505, upload-time = "2025-03-26T11:30:36.98Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/da/f9/aeef0b6e037d0499f815575797d249a0bc4b191bb9f266fe7ccac45134be/nomad_parser_plugins_atomistic-1.0.7.tar.gz", hash = "sha256:53ec6bbf10fd53dcf224e26631b843beb1c34c7b124eb585d9ce1997bd07e7a1", size = 94053672, upload-time = "2025-06-04T09:03:39.57Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c8/18/cac56397103d825b3cc42c30f098ebdb271f0b33043ee411385e4cceb1e9/nomad_parser_plugins_atomistic-1.0.6-py3-none-any.whl", hash = "sha256:2997a270aea66c4df67d670ba27d336892c96178a5443934fbe501d295e29427", size = 189470, upload-time = "2025-03-26T11:30:33.887Z" },
+    { url = "https://files.pythonhosted.org/packages/74/df/415e6777ab2cb3bc14c2716718e20537146629b6ec32a63b876b436eead6/nomad_parser_plugins_atomistic-1.0.7-py3-none-any.whl", hash = "sha256:bb4a26053ac8e4b0e639e0d1faab18824627091d0df84f4c643621f2c1108b55", size = 189333, upload-time = "2025-06-04T09:03:35.346Z" },
 ]
 
 [[package]]
