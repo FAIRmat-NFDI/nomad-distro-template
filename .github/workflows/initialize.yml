@@ -3,6 +3,8 @@ name: Template Repository Initialization
 on:
   # Triggers the workflow on creation of repository
   create:
+  push:
+    branches: ["main"]
   workflow_dispatch:
 
 env:
