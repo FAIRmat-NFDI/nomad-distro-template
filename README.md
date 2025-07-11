@@ -6,7 +6,7 @@ Click [here](https://github.com/new?template_name=nomad-distro-template&template
 to use this template, or click the `Use this template` button in the upper right corner of
 the main GitHub page for this template.
 
-> [!IMPORTANT]
+> [!CAUTION]
 > The templated repository will run a GitHub action on creation which might take a few minutes.
 > After the workflow finishes you should refresh the page and this message should disappear.
 > If this message persists you might need to trigger the workflow manually by navigating to the
