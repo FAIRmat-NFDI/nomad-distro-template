@@ -117,7 +117,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [app, jupyter]
+        service:
+          - app
+          - jupyter
+        include:
+          - service: app
+            target: final
+            image_suffix: ""
+          - service: jupyter
+            target: jupyter
+            image_suffix: /jupyter
 
     steps:
       - uses: actions/checkout@v4
@@ -137,7 +146,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository }}${{ matrix.service == 'jupyter' && '/jupyter' || '' }}
+          images: ${{ env.REGISTRY }}/${{ github.repository }}${{ matrix.image_suffix }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
@@ -150,26 +159,19 @@ jobs:
             JUPYTER_VERSION=${{ env.JUPYTER_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          target: ${{ matrix.service == 'jupyter' && 'jupyter' || 'final' }}
+          target: ${{ matrix.target }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Set APP_IMAGE for app service
-        if: matrix.service == 'app'
+      - name: Set image output
         run: |
           FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
-          echo "APP_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
-
-      - name: Set JUPYTER_IMAGE for jupyter service
-        if: matrix.service == 'jupyter'
-        run: |
-          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
-          echo "JUPYTER_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
+          echo "${{ matrix.service }}_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
     outputs:
-      app_image: ${{ env.APP_IMAGE }}
-      jupyter_image: ${{ env.JUPYTER_IMAGE }}
+      app_image: ${{ env.app_IMAGE }}
+      jupyter_image: ${{ env.jupyter_IMAGE }}
 
   # Job 4: Run example upload tests
   example_upload_tests:
