@@ -3206,7 +3206,7 @@ requires-dist = [
     { name = "nomad-schema-plugin-simulation-workflow", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
     { name = "nomad-simulations", marker = "extra == 'plugins'", specifier = "==0.3.2" },
     { name = "perovskite-solar-cell-database", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database.git?rev=v0.1.1" },
-    { name = "pynxtools", marker = "extra == 'plugins'", specifier = "==0.10.9" },
+    { name = "pynxtools", marker = "extra == 'plugins'", specifier = "==0.11.1" },
     { name = "pynxtools-apm", marker = "extra == 'plugins'", specifier = ">=0.2.3" },
     { name = "pynxtools-ellips", marker = "extra == 'plugins'", specifier = ">=0.0.10" },
     { name = "pynxtools-em", marker = "extra == 'plugins'", specifier = ">=0.3.2" },
@@ -4596,7 +4596,7 @@ wheels = [
 
 [[package]]
 name = "pynxtools"
-version = "0.10.9"
+version = "0.11.1"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "anytree" },
@@ -4615,9 +4615,9 @@ dependencies = [
     { name = "toposort" },
     { name = "xarray" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d4/09/a257b2d333beabe0fdbcd68ae333bd58e2974be0d11240b93aab56149d78/pynxtools-0.10.9.tar.gz", hash = "sha256:84ca55abe87c65dce77763f65d9778dcbd822ed4ec9d1b029512b4dd977718b8", size = 5361665, upload-time = "2025-06-30T09:04:03.023Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/86/a1/e23d31b68c0dc9579cf2f6ee834d285e205afbb0253419142a08d4015868/pynxtools-0.11.1.tar.gz", hash = "sha256:cdc09b9ec7919dbc6221633f0b4ff7b2fd40e4366738228e6c6c72df977d7111", size = 5352988, upload-time = "2025-08-07T14:42:41.845Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/16/00/b67b8af443d4faf252427622c37fc9e9244752da37365044e8232f8b98b2/pynxtools-0.10.9-py3-none-any.whl", hash = "sha256:1074ef3a6e28204eee874b6732d2975709b7a0e4ce1c0a940725f0d3af84559a", size = 5733706, upload-time = "2025-06-30T09:04:00.944Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/6d/be4c51b1cdb621708b8eb4331125e9a25282cc2e5caf6b3139dd14ad759a/pynxtools-0.11.1-py3-none-any.whl", hash = "sha256:37547fd78c68dddf690d40b2233ac5660b642283708ea0c34f9ab7a75f0c4623", size = 5719208, upload-time = "2025-08-07T14:42:39.676Z" },
 ]
 
 [[package]]
