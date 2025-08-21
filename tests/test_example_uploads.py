@@ -1,10 +1,18 @@
+from __future__ import annotations
+
 import os
 import time
 
+from typing import TYPE_CHECKING
+
 import pytest
-from nomad.client import Auth, api
+from nomad.client import api
 from nomad.config import config
-from nomad.config.models.plugins import ExampleUploadEntryPoint
+
+if TYPE_CHECKING:
+    from nomad.client import Auth
+    from nomad.config.models.plugins import ExampleUploadEntryPoint
+
 
 PLUGINS_TO_SKIP = os.getenv("PLUGINS_STRING", "")
 
