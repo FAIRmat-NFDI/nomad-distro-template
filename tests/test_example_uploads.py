@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 import time
 
@@ -16,7 +14,7 @@ if TYPE_CHECKING:
 PLUGINS_TO_SKIP = os.getenv("PLUGINS_STRING", "")
 
 
-def get_example_upload_entrypoints() -> list[ExampleUploadEntryPoint]:
+def get_example_upload_entrypoints() -> list["ExampleUploadEntryPoint"]:
     """
     Retrieves information about example upload entrypoints
     """
