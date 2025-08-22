@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import TYPE_CHECKING
 
 import pytest
@@ -18,7 +16,9 @@ def auth():
     return Auth(user=config.client.user, password=config.client.password, from_api=True)
 
 
-def make_request_with_retry(request_func, url, auth, json=None, check_status: bool = True):
+def make_request_with_retry(
+    request_func, url, auth, json=None, check_status: bool = True
+):
     """
     Makes a request to the given URL with authentication.
     If a 401 response is received, resets the authentication token and retries once.
@@ -27,6 +27,7 @@ def make_request_with_retry(request_func, url, auth, json=None, check_status: bo
         request_func: The request function (api.post or api.get).
         url: The URL to send the request to.
         auth: The authentication object.
+        check_status: Check if the request returns status 200.
 
     Returns:
         The API response object.
@@ -42,9 +43,9 @@ def make_request_with_retry(request_func, url, auth, json=None, check_status: bo
     return response
 
 
-def post_request(url: str, auth: Auth, json=None):
+def post_request(url: str, auth: "Auth", json=None):
     return api.post(url, auth=auth, headers={"Accept": "application/json"}, json=json)
 
 
-def get_request(url: str, auth: Auth, json=None):
+def get_request(url: str, auth: "Auth", json=None):
     return api.get(url, auth=auth, headers={"Accept": "application/json"})
