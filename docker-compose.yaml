@@ -86,7 +86,7 @@ services:
       - POSTGRES_SEEDS=postgresql
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
-    image: temporalio/auto-setup:1.27.2
+    image: docker.io/temporalio/auto-setup:1.28
     healthcheck:
       test: >
         bash -c '
@@ -112,6 +112,8 @@ services:
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_TEMPORAL_HOST: temporal
     depends_on:
+      temporal:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       elastic:
@@ -139,8 +141,8 @@ services:
       restart_policy:
         condition: on-failure
         delay: 5s
-        max_attempts: 3
-        window: 120s
+        max_attempts: 15
+        window: 1800s
 
   # nomad app (api + proxy)
   app:
@@ -160,6 +162,8 @@ services:
       NOMAD_NORTH_HUB_HOST: north
       NOMAD_TEMPORAL_HOST: temporal
     depends_on:
+      temporal:
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
       elastic:
