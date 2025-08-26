@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from nomad.client import Auth
 
 
-@pytest.mark.xfail(reason="waiting for fix of certain apps")
 def test_apps_entry_points(auth: "Auth"):
     # 1. List all app entry points
     list_resp = make_request_with_retry(get_request, "apps/entry-points", auth)
