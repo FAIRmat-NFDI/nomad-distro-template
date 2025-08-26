@@ -173,9 +173,9 @@ jobs:
       app_image: ${{ env.app_IMAGE }}
       jupyter_image: ${{ env.jupyter_IMAGE }}
 
-  # Job 4: Run example upload tests
-  example_upload_tests:
-    name: Run example upload tests
+  # Job 4: Run tests
+  run_tests:
+    name: Run tests
     needs: build
     runs-on: ubuntu-latest
     env:
@@ -240,10 +240,10 @@ jobs:
           echo "Timeout reached. The App or Jupyter health endpoint did not respond within 5 minutes."
           echo "Fetching Docker logs for debugging..."
           docker logs app  # Output logs from the app container
-          docker logs jupyter  # Output logs from the Jupyter container 
+          docker logs jupyter  # Output logs from the Jupyter container
           exit 1
 
-      - name: Run tests
+      - name: Run pytest
         working-directory: tests
         run: |
           export PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
