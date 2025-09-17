@@ -194,14 +194,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Start containers
+      - name: Start containers and check app/jupyter container health
         working-directory: tests
         run: |
           set -e
           if ! docker compose up -d --quiet-pull --wait; then
-            echo "Containers failed to become healthy."
-            echo "Printing logs for app: "
-            docker logs app
+            echo "Containers failed health check."
+            echo "Logs for app:"
+            docker logs app || true
+            echo "Logs for jupyter:"
+            docker logs jupyter || true
             exit 1
           fi
 
@@ -216,33 +218,6 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --all-extras
-
-      - name: Jupyter health check
-        run: |
-          #!/bin/bash
-          set -e # Exit immediately if a command exits with a non-zero status.
-
-          secs=300                           # Set timeout in seconds.
-          endTime=$(( $(date +%s) + secs ))  # Calculate end time.
-
-          check_jupyter_health() {
-              curl -s localhost:8888/ > /dev/null
-          }
-
-          while [ $(date +%s) -lt $endTime ]; do  # Loop until timeout has elapsed.
-            if check_jupyter_health; then
-                echo "Jupyter health endpoint is responding correctly."
-                exit 0
-            else
-                echo "The Jupyter health endpoint is not responding. Retrying in 10 seconds..."
-                sleep 10
-            fi
-          done
-
-          echo "Timeout reached. The Jupyter health endpoint did not respond within ${secs} seconds."
-          echo "Fetching Docker logs for debugging..."
-          docker logs jupyter  # Output logs from the Jupyter container
-          exit 1
 
       - name: Run tests
         working-directory: tests
