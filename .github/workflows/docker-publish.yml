@@ -197,7 +197,7 @@ jobs:
       - name: Start containers
         working-directory: tests
         run: |
-          docker compose up -d --quiet-pull
+          docker compose up -d --quiet-pull --wait
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -240,7 +240,7 @@ jobs:
           echo "Timeout reached. The App or Jupyter health endpoint did not respond within 5 minutes."
           echo "Fetching Docker logs for debugging..."
           docker logs app  # Output logs from the app container
-          docker logs jupyter  # Output logs from the Jupyter container 
+          docker logs jupyter  # Output logs from the Jupyter container
           exit 1
 
       - name: Run tests
