@@ -166,6 +166,17 @@ services:
     container_name: jupyter
     ports:
       - 8888:8888
+    healthcheck:
+      test:
+        - "CMD"
+        - "curl"
+        - "--fail"
+        - "--silent"
+        - "http://localhost:8888/"
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 10s
 
 volumes:
   mongo:

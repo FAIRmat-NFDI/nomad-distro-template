@@ -194,10 +194,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Start containers
+      - name: Start containers and check app/jupyter container health
         working-directory: tests
         run: |
-          docker compose up -d --quiet-pull
+          if ! docker compose up -d --quiet-pull --wait; then
+            echo "Containers failed health check."
+            echo "Logs for app:"
+            docker logs app
+            echo "Logs for jupyter:"
+            docker logs jupyter
+            exit 1
+          fi
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -210,38 +217,6 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --all-extras
-
-      - name: Health check
-        run: |
-          #!/bin/bash
-          set -e # Exit immediately if a command exits with a non-zero status.
-
-          secs=300                           # Set interval (duration) in seconds.
-          endTime=$(( $(date +%s) + secs )) # Calculate end time.
-
-          check_app_health() {
-              curl -s localhost:8000/-/health > /dev/null
-          }
-
-          check_jupyter_health() {
-              curl -s localhost:8888/ > /dev/null
-          }
-
-          while [ $(date +%s) -lt $endTime ]; do  # Loop until interval has elapsed.
-            if check_app_health && check_jupyter_health; then
-                echo "Both App and Jupyter health endpoints are responding correctly."
-                exit 0
-            else
-                echo "The App or Jupyter health endpoint is not responding. Retrying in 10 seconds..."
-                sleep 10
-            fi
-          done
-
-          echo "Timeout reached. The App or Jupyter health endpoint did not respond within 5 minutes."
-          echo "Fetching Docker logs for debugging..."
-          docker logs app  # Output logs from the app container
-          docker logs jupyter  # Output logs from the Jupyter container 
-          exit 1
 
       - name: Run tests
         working-directory: tests
