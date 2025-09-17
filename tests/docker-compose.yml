@@ -103,7 +103,7 @@ services:
         "nomad.cli",
         "admin",
         "run",
-        "appworker",
+        "appworkerDEBUG",
         "--app-host",
         "0.0.0.0",
       ]
