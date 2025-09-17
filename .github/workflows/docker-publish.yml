@@ -197,7 +197,7 @@ jobs:
       - name: Start containers
         working-directory: tests
         run: |
-          docker compose up -d --quiet-pull
+          docker compose up -d --quiet-pull --wait
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
