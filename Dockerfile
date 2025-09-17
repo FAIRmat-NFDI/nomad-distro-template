@@ -5,12 +5,10 @@
 # https://docs.docker.com/engine/reference/builder/
 
 ARG PYTHON_VERSION=3.12
-ARG UV_VERSION=0.7
+ARG UV_VERSION=0.8.17
 ARG JUPYTER_VERSION=2025-04-14
 
-FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv_image
-
-FROM python:${PYTHON_VERSION}-slim AS base
+FROM ghcr.io/astral-sh/uv:${UV_VERSION}-python${PYTHON_VERSION}-trixie-slim as base
 
 # Keeps Python from buffering stdout and stderr to avoid situations where
 # the application crashes without emitting any logs due to buffering.
@@ -80,8 +78,6 @@ RUN apt-get update \
       git \
  && rm -rf /var/lib/apt/lists/*
 
-# Install UV
-COPY --from=uv_image /uv /bin/uv
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=source=.git,target=.git,type=bind \
@@ -138,6 +134,8 @@ VOLUME /app/.volumes/fs
 
 FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter_builder
 
+ARG UV_VERSION=0.8.17
+
 ENV UV_PROJECT_ENVIRONMENT=/opt/conda \
     UV_FROZEN=1
 
@@ -165,7 +163,11 @@ RUN apt-get update \
 USER ${NB_UID}
 WORKDIR "${HOME}"
 
-COPY --from=uv_image /uv /bin/uv
+# Add uv installer
+ADD https://astral.sh/uv/${UV_VERSION}/install.sh uv-installer.sh
+
+# Run the installer then remove it
+RUN sh uv-installer.sh && rm uv-installer.sh
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -203,7 +205,6 @@ RUN apt-get update \
 USER ${NB_UID}
 WORKDIR "${HOME}"
 
-COPY --from=uv_image /uv /bin/uv
 COPY --from=jupyter_builder /opt/conda /opt/conda
 
 
