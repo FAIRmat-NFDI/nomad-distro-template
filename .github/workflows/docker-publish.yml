@@ -200,8 +200,8 @@ jobs:
           set -e
           if ! docker compose up -d --quiet-pull --wait; then
             echo "Containers failed to become healthy."
-            echo "Printing logs for nomad_oasis_app: "
-            docker logs nomad_oasis_app
+            echo "Printing logs for app: "
+            docker logs app
             exit 1
           fi
 
