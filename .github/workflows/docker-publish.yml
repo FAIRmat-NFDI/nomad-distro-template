@@ -197,13 +197,12 @@ jobs:
       - name: Start containers and check app/jupyter container health
         working-directory: tests
         run: |
-          set -e
           if ! docker compose up -d --quiet-pull --wait; then
             echo "Containers failed health check."
             echo "Logs for app:"
-            docker logs app || true
+            docker logs app
             echo "Logs for jupyter:"
-            docker logs jupyter || true
+            docker logs jupyter
             exit 1
           fi
 
