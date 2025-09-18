@@ -3226,7 +3226,7 @@ requires-dist = [
     { name = "nomad-normalizer-plugin-system", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-parser-plugins-atomistic", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-parser-plugins-database", marker = "extra == 'plugins'", specifier = ">=1.0" },
-    { name = "nomad-parser-plugins-electronic", marker = "extra == 'plugins'", specifier = ">=1.0" },
+    { name = "nomad-parser-plugins-electronic", marker = "extra == 'plugins'", git = "https://github.com/DanielYang59/electronic-parsers.git?rev=use-approx-for-float-compare" },
     { name = "nomad-parser-plugins-workflow", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-porous-materials", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-porous-materials.git?rev=522f4a3208077f534f1c5e886527ee2104283d0b" },
     { name = "nomad-schema-plugin-run", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
@@ -3461,8 +3461,8 @@ wheels = [
 
 [[package]]
 name = "nomad-parser-plugins-electronic"
-version = "1.0.4"
-source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+version = "0.1.dev475+g6eee02886"
+source = { git = "https://github.com/DanielYang59/electronic-parsers.git?rev=use-approx-for-float-compare#6eee02886d99a2ce08c214dbc85c9ec8096994c2" }
 dependencies = [
     { name = "h5py" },
     { name = "lxml" },
@@ -3471,12 +3471,9 @@ dependencies = [
     { name = "nomad-parser-plugins-simulation" },
     { name = "nomad-schema-plugin-run" },
     { name = "nomad-schema-plugin-simulation-workflow" },
+    { name = "numpy" },
     { name = "pydantic" },
     { name = "pyyaml" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/b1/3c/650029be76526cae78ae3f5847bdda1c5f8f8fed78d2661f13422028939b/nomad_parser_plugins_electronic-1.0.4.tar.gz", hash = "sha256:39008c559ab7e264b4b7d77ec088dc6bde05f9c853fa53bbbb1dfed5ac6d6225", size = 82890555, upload-time = "2025-03-19T14:24:09.187Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/05/1f/f8c90cbb91f5bed584187e614e5c18f3d55306eda727d51dead00ae4c423/nomad_parser_plugins_electronic-1.0.4-py3-none-any.whl", hash = "sha256:2489e8a448dc9bbd1f02a995e92359f00def6ebb8e39ca8eb040ec2ae9e19bee", size = 1129153, upload-time = "2025-03-19T14:24:06.102Z" },
 ]
 
 [[package]]
