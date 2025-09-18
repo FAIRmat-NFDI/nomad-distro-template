@@ -1,21 +1,27 @@
 import os
 import time
 
+from typing import TYPE_CHECKING
+
 import pytest
-from nomad.client import Auth, api
 from nomad.config import config
-from nomad.config.models.plugins import ExampleUploadEntryPoint
+from conftest import make_request_with_retry, get_request, post_request
+
+if TYPE_CHECKING:
+    from nomad.config.models.plugins import ExampleUploadEntryPoint
+
 
 PLUGINS_TO_SKIP = os.getenv("PLUGINS_STRING", "")
 
 
-def get_example_upload_entrypoints() -> list[ExampleUploadEntryPoint]:
+def get_example_upload_entrypoints() -> list["ExampleUploadEntryPoint"]:
     """
     Retrieves information about example upload entrypoints
     """
     config.load_plugins()
     if not config.plugins:
         return []
+
     example_uploads = [
         entry_point
         for entry_point in config.plugins.entry_points.filtered_values()
@@ -33,37 +39,6 @@ def get_example_upload_ids() -> list[str]:
         and not entry_point.from_examples_directory
         and (entry_point.plugin_package or "") not in PLUGINS_TO_SKIP
     ]
-
-
-def make_request_with_retry(request_func, url, auth, json=None):
-    """
-    Makes a request to the given URL with authentication.
-    If a 404 response is received, resets the authentication token and retries once.
-
-    Args:
-        request_func: The request function (api.post or api.get).
-        url: The URL to send the request to.
-        auth: The authentication object.
-
-    Returns:
-        The API response object.
-    """
-    response = request_func(url, auth, json)
-
-    if response.status_code == 401:
-        auth._token = None  # Reset token
-        response = request_func(url, auth, json)
-
-    assert response.status_code == 200, response.text
-    return response
-
-
-def post_request(url: str, auth: Auth, json=None):
-    return api.post(url, auth=auth, headers={"Accept": "application/json"}, json=json)
-
-
-def get_request(url: str, auth: Auth, json=None):
-    return api.get(url, auth=auth, headers={"Accept": "application/json"})
 
 
 @pytest.mark.parametrize(
