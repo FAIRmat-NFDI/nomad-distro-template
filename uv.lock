@@ -3231,7 +3231,7 @@ requires-dist = [
     { name = "nomad-porous-materials", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-porous-materials.git?rev=522f4a3208077f534f1c5e886527ee2104283d0b" },
     { name = "nomad-schema-plugin-run", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
     { name = "nomad-schema-plugin-simulation-workflow", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
-    { name = "nomad-simulations", marker = "extra == 'plugins'", specifier = "==0.3.2" },
+    { name = "nomad-simulations", marker = "extra == 'plugins'", git = "https://github.com/nomad-coe/nomad-simulations.git" },
     { name = "perovskite-solar-cell-database", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database.git?rev=v0.1.1" },
     { name = "pynxtools", marker = "extra == 'plugins'", specifier = "==0.10.9" },
     { name = "pynxtools-apm", marker = "extra == 'plugins'", specifier = ">=0.2.3" },
@@ -3551,15 +3551,11 @@ wheels = [
 
 [[package]]
 name = "nomad-simulations"
-version = "0.3.2"
-source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+version = "0.4.1.dev27+g9c1add436"
+source = { git = "https://github.com/nomad-coe/nomad-simulations.git#9c1add4361f254406f47a669c132daeab86d0f7e" }
 dependencies = [
     { name = "matid" },
-    { name = "nomad-lab" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/46/84/ff0de2a0513dd1943d964b02d334270b23b7e5e594166443ea4517a67776/nomad_simulations-0.3.2.tar.gz", hash = "sha256:84d830ebf80797774e3036401599d31d37558112337b6b1ee631cd51ee17763a", size = 601252, upload-time = "2025-03-20T14:00:52.528Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/53/7b/b4c43a351919c6c74d3dc8fe118845cd89c1d18272a378ba6baa708526eb/nomad_simulations-0.3.2-py3-none-any.whl", hash = "sha256:07d21eaecc5fb0b00c9528e2634acef903d3b18ac6b5a88f8c0c1d95ae5967a0", size = 96729, upload-time = "2025-03-20T14:00:51.137Z" },
+    { name = "nomad-lab", extra = ["infrastructure"] },
 ]
 
 [[package]]
