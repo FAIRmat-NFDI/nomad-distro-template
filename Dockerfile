@@ -109,49 +109,23 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     && mkdir -p built_docs \
     && cp -r docs/site/* built_docs
 
-FROM builder AS gpu_workflow
+FROM builder AS gpu_action_builder
 
 WORKDIR /app
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --extra plugins --extra gpu-workflow
+    uv sync --extra plugins --extra gpu-action
 
-FROM base_final AS gpu_workflow_final
-
-COPY --chown=nomad:${UID} --from=gpu_workflow /opt/venv /opt/venv
-COPY configs/nomad.yaml nomad.yaml
-
-RUN mkdir -p /app/.volumes/fs \
- && chown -R nomad:${UID} /app \
- && chown -R nomad:${UID} /opt/venv
-
-USER nomad
-
-VOLUME /app/.volumes/fs
-
-FROM builder AS cpu_workflow
+FROM builder AS cpu_action_builder
 
 WORKDIR /app
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --extra plugins --extra cpu-workflow
-
-FROM base_final AS cpu_workflow_final
-
-COPY --chown=nomad:${UID} --from=cpu_workflow /opt/venv /opt/venv
-COPY configs/nomad.yaml nomad.yaml
-
-RUN mkdir -p /app/.volumes/fs \
- && chown -R nomad:${UID} /app \
- && chown -R nomad:${UID} /opt/venv
-
-USER nomad
-
-VOLUME /app/.volumes/fs
+    uv sync --extra plugins --extra cpu-action
 
 FROM base_final AS final
 
@@ -178,6 +152,14 @@ EXPOSE 8000
 EXPOSE 9000
 
 VOLUME /app/.volumes/fs
+
+FROM final AS cpu_action_final
+
+COPY --chown=nomad:${UID} --from=gpu_action_builder /opt/venv /opt/venv
+
+FROM final AS gpu_action_final
+
+COPY --chown=nomad:${UID} --from=cpu_action_builder /opt/venv /opt/venv
 
 
 FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter_builder
