@@ -3226,7 +3226,7 @@ requires-dist = [
     { name = "nomad-normalizer-plugin-system", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-parser-plugins-atomistic", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-parser-plugins-database", marker = "extra == 'plugins'", specifier = ">=1.0" },
-    { name = "nomad-parser-plugins-electronic", marker = "extra == 'plugins'", git = "https://github.com/DanielYang59/electronic-parsers.git?rev=use-approx-for-float-compare" },
+    { name = "nomad-parser-plugins-electronic", marker = "extra == 'plugins'", git = "https://github.com/nomad-coe/electronic-parsers" },
     { name = "nomad-parser-plugins-workflow", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-porous-materials", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-porous-materials.git?rev=522f4a3208077f534f1c5e886527ee2104283d0b" },
     { name = "nomad-schema-plugin-run", marker = "extra == 'plugins'", specifier = ">=1.0.1" },
@@ -3461,8 +3461,8 @@ wheels = [
 
 [[package]]
 name = "nomad-parser-plugins-electronic"
-version = "0.1.dev475+g6eee02886"
-source = { git = "https://github.com/DanielYang59/electronic-parsers.git?rev=use-approx-for-float-compare#6eee02886d99a2ce08c214dbc85c9ec8096994c2" }
+version = "1.0.8.dev2+gd1276bb02"
+source = { git = "https://github.com/nomad-coe/electronic-parsers#d1276bb02ed9a88ab3852a8a1f3e5f6afa6bb20d" }
 dependencies = [
     { name = "h5py" },
     { name = "lxml" },
