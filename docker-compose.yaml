@@ -134,10 +134,10 @@ services:
       retries: 5
       start_period: 15s
     deploy:
-      replicas: 2
+      replicas: 4
       resources:
         limits:
-          cpus: "2.0" # Maximum 2 CPU cores
+          cpus: "4.0" # Maximum 4 CPU cores
           memory: 8G # Maximum 8GB RAM
       restart_policy:
         condition: on-failure
