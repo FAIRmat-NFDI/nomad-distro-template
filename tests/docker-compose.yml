@@ -91,6 +91,22 @@ services:
       start_period: 30s
       test: bash /opt/keycloak/bin/healthcheck_keycloak.sh || exit 1
 
+  temporal:
+    container_name: nomad_temporal
+    image: ghcr.io/fairmat-nfdi/temporal-dev-server:v1.4.0
+    ports:
+      - 7233:7233
+    healthcheck:
+      test: >
+        bash -c '
+          temporal operator cluster health --address $$(hostname -i):7233 |
+          grep -q "SERVING"
+        '
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
   app:
     restart: unless-stopped
     image: ${APP_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template:main}
@@ -114,6 +130,7 @@ services:
       NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
+      NOMAD_TEMPORAL_HOST: temporal
       NOMAD_LOGSTASH_HOST: logtransfer
     depends_on:
       rabbitmq:
@@ -123,6 +140,8 @@ services:
       mongo:
         condition: service_healthy
       keycloak:
+        condition: service_healthy
+      temporal:
         condition: service_healthy
     volumes:
       - ./nomad.yaml:/app/nomad.yaml
