@@ -2901,7 +2901,7 @@ wheels = [
 
 [[package]]
 name = "nomad-parser-plugins-electronic"
-version = "1.0.7"
+version = "1.0.8"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "h5py" },
@@ -2915,9 +2915,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/39/08/b116af86d42ad45899138faa20b8e1511bc0b43ae110ffcc0f98d5625df6/nomad_parser_plugins_electronic-1.0.7.tar.gz", hash = "sha256:d8b81e5d163de4d13323359e097d286e79dd2e59dc4d43225ce8a62940386393", size = 82908553, upload-time = "2025-09-15T13:18:58.749Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/b1/72e2a08c6e7698f8c33139ec289883a4f7de25193cc9f4652bafd66cd6f9/nomad_parser_plugins_electronic-1.0.8.tar.gz", hash = "sha256:ee4fea04a83c85a258eca63f8589e525f5553315f673f94775584d044380d6b6", size = 82905988, upload-time = "2025-10-02T10:30:25.624Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/bd/7184e9d328f3a48723384baeaca4e899b84fbb833a8dbb660e58624ba50c/nomad_parser_plugins_electronic-1.0.7-py3-none-any.whl", hash = "sha256:55645fb6a7f6ca74e1dcc2b94c5422594bae979e82bda973be0ef139db897d71", size = 1132167, upload-time = "2025-09-15T13:18:55.689Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/89/9677179f91d451f04b692fd714af058e65d9d84b8b9a6f988968aa206e8c/nomad_parser_plugins_electronic-1.0.8-py3-none-any.whl", hash = "sha256:efb220a477e9ec2305d39fd09ac694c3f40ed7715870fa31450dc144bbf9f0f1", size = 1132313, upload-time = "2025-10-02T10:30:23.051Z" },
 ]
 
 [[package]]
