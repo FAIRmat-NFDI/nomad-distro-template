@@ -4,12 +4,14 @@ requires-python = ">=3.10, <3.13"
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
-    "python_full_version < '3.11'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 
 [options]
-prerelease-mode = "disallow"
+prerelease-mode = "allow"
 
 [manifest]
 constraints = [{ name = "hyperspy", specifier = ">=1.7.6" }]
@@ -117,7 +119,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/2d/6a/885bc91484e1aa8f6
 
 [[package]]
 name = "ase"
-version = "3.22.1"
+version = "3.26.0"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "matplotlib" },
@@ -125,9 +127,9 @@ dependencies = [
     { name = "scipy", version = "1.15.3", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.16.2", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/69/64/096410b2e0b58aee082b40a37cdd61e708ed722a7471d7cf0e2dcb01cade/ase-3.22.1.tar.gz", hash = "sha256:004df6b0ea04b1114c790fadfe45d4125eb0e53125c66a93425af853d82ab432", size = 2807134, upload-time = "2021-12-01T12:51:29.408Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/30/33/2ffa44950267450f6a5cdb711c68e12d0d72d626e246e5897e3bada7bac6/ase-3.26.0.tar.gz", hash = "sha256:a071a355775b0a8062d23e9266e9d811b19d9f6d9ec5215e8032f7d93dc65075", size = 2405567, upload-time = "2025-08-12T13:06:55.589Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/38/b0/3c0a7afaf66274588216c251376ac2bea0269eb7a5e1da77521811060553/ase-3.22.1-py3-none-any.whl", hash = "sha256:66cc481e3d82bea8931d5fe677119932ea0bd1bc08b901fd84f36b37fa681c9e", size = 2192122, upload-time = "2021-12-01T12:51:26.713Z" },
+    { url = "https://files.pythonhosted.org/packages/dd/f0/6e52d797bee63530f4b778cb4cbb3a01970f104197c364a8ff51bc9f5a21/ase-3.26.0-py3-none-any.whl", hash = "sha256:77fd0e609bd3868006d4bb3bb95cdc4081d9e292ac84f6c9fb564b5751d2689e", size = 2946787, upload-time = "2025-08-12T13:06:53.316Z" },
 ]
 
 [[package]]
@@ -225,6 +227,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b3/ca/824b1195773ce6166d388573fc106ce56d4a805bd7427b624e063596ec58/beautifulsoup4-4.12.3.tar.gz", hash = "sha256:74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051", size = 581181, upload-time = "2024-01-17T16:53:17.902Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b1/fe/e8c672695b37eecc5cbf43e1d0638d88d66ba3a44c4d321c796f4e59167f/beautifulsoup4-4.12.3-py3-none-any.whl", hash = "sha256:b80878c9f40111313e55da8ba20bdba06d8fa3969fc68304167741bbf9e082ed", size = 147925, upload-time = "2024-01-17T16:53:12.779Z" },
+]
+
+[[package]]
+name = "bibtexparser"
+version = "2.0.0b8"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "pylatexenc" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a3/b6/967e030d0f8359b912a64ce7447db485064862a4d3980cac07b398bc95be/bibtexparser-2.0.0b8.tar.gz", hash = "sha256:11eaaa1fe80154f70092e91fa7e3fed5e5c81021f6c6c09151e36b8533f36994", size = 37746, upload-time = "2024-12-04T20:17:42.177Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/4e/226cfbf6c61c38399fc19e5f46db755ffea32f77ef078982c953031c8a3c/bibtexparser-2.0.0b8-py3-none-any.whl", hash = "sha256:eda1e6dbc7bbc040d351c926ead97a36f4734858656f3514a933259878bd37f1", size = 39642, upload-time = "2024-12-04T20:17:40.736Z" },
 ]
 
 [[package]]
@@ -585,7 +599,8 @@ name = "contourpy"
 version = "1.3.2"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version < '3.11'" },
@@ -637,7 +652,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version >= '3.11'" },
@@ -851,7 +867,8 @@ name = "diffpy-structure"
 version = "3.2.3"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version < '3.11'" },
@@ -869,7 +886,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version >= '3.11'" },
@@ -1091,6 +1109,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/28/3c/2b9345a6504e4055eaa490e0b41c10e338ad61d9aeaae41d97807873cdf2/fastapi-0.118.0.tar.gz", hash = "sha256:5e81654d98c4d2f53790a7d32d25a7353b30c81441be7d0958a26b5d761fa1c8", size = 310536, upload-time = "2025-09-29T03:37:23.126Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/54e2bdaad22ca91a59455251998d43094d5c3d3567c52c7c04774b3f43f2/fastapi-0.118.0-py3-none-any.whl", hash = "sha256:705137a61e2ef71019d2445b123aa8845bd97273c395b744d5a7dfe559056855", size = 97694, upload-time = "2025-09-29T03:37:21.338Z" },
+]
+
+[[package]]
+name = "fastapi-cache2"
+version = "0.2.2"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "fastapi" },
+    { name = "pendulum" },
+    { name = "typing-extensions" },
+    { name = "uvicorn" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/37/6f/7c2078bf097634276a266fe225d9d6a1f882fe505a662bd1835fb2cf6891/fastapi_cache2-0.2.2.tar.gz", hash = "sha256:71bf4450117dc24224ec120be489dbe09e331143c9f74e75eb6f576b78926026", size = 17950, upload-time = "2024-07-24T15:47:21.102Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6d/b3/ce7c5d9f5e75257a3039ee1e38feb77bee29da3a1792c57d6ea1acb55d17/fastapi_cache2-0.2.2-py3-none-any.whl", hash = "sha256:e1fae86d8eaaa6c8501dfe08407f71d69e87cc6748042d59d51994000532846c", size = 25411, upload-time = "2024-07-24T15:47:19.065Z" },
 ]
 
 [[package]]
@@ -1856,15 +1889,6 @@ wheels = [
 ]
 
 [[package]]
-name = "latexcodec"
-version = "3.0.1"
-source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/27/dd/4270b2c5e2ee49316c3859e62293bd2ea8e382339d63ab7bbe9f39c0ec3b/latexcodec-3.0.1.tar.gz", hash = "sha256:e78a6911cd72f9dec35031c6ec23584de6842bfbc4610a9678868d14cdfb0357", size = 31222, upload-time = "2025-06-17T18:47:34.051Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/40/23569737873cc9637fd488606347e9dd92b9fa37ba4fcda1f98ee5219a97/latexcodec-3.0.1-py3-none-any.whl", hash = "sha256:a9eb8200bff693f0437a69581f7579eb6bca25c4193515c09900ce76451e452e", size = 18532, upload-time = "2025-06-17T18:47:30.726Z" },
-]
-
-[[package]]
 name = "lazy-loader"
 version = "0.4"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
@@ -2469,7 +2493,8 @@ name = "networkx"
 version = "3.4.2"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/fd/1d/06475e1cd5264c0b870ea2cc6fdb3e37177c1e565c43f56ff17a10e3937f/networkx-3.4.2.tar.gz", hash = "sha256:307c3669428c5362aab27c8a1260aa8f47c4e91d3891f48be0141738d8d053e1", size = 2151368, upload-time = "2024-10-21T12:39:38.695Z" }
 wheels = [
@@ -2483,7 +2508,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6c/4f/ccdb8ad3a38e583f214547fd2f7ff1fc160c43a75af88e6aec213404b96a/networkx-3.5.tar.gz", hash = "sha256:d4c6f9cf81f52d69230866796b82afbccdec3db7ae4fbd1b65ea750feed50037", size = 2471065, upload-time = "2025-05-29T11:35:07.804Z" }
 wheels = [
@@ -2578,7 +2604,8 @@ name = "nionutils"
 version = "4.11.0"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/29/ab/b4fdf36d52b28cdcdf1d29862481db7cb644509c948dff969674d1596582/nionutils-4.11.0.tar.gz", hash = "sha256:846eaa47ed14cb729817fb7eb4e0c40d70b3dd13bfe4b450bb47bbbe7f01fe58", size = 59425, upload-time = "2024-06-13T01:07:37.773Z" }
 wheels = [
@@ -2592,7 +2619,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/82/17/bfa2dc532ce96e80c06d4685a39e16c5bbdca40d0e91cb5acdc8f3ba1509/nionutils-4.14.1.tar.gz", hash = "sha256:83502c4a485f959235655632b564d2cb5290d52837ef863e81be37e4ac861408", size = 61280, upload-time = "2025-04-10T03:04:36.126Z" }
 wheels = [
@@ -2655,7 +2683,7 @@ requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
     { name = "nomad-aitoolkit", marker = "extra == 'plugins'", git = "https://github.com/FAIRmat-NFDI/nomad-aitoolkit.git?rev=b203f8eb28dc4b6771a39d5c5b7ad3d9d8583ac8" },
     { name = "nomad-lab", extras = ["dev", "infrastructure", "parsing"], marker = "extra == 'dev'", specifier = ">=1.3.4" },
-    { name = "nomad-lab", extras = ["infrastructure", "parsing"], specifier = ">=1.3.4" },
+    { name = "nomad-lab", extras = ["infrastructure", "parsing"], specifier = ">=1.3.18.dev205" },
     { name = "nomad-normalizer-plugin-bandstructure", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-normalizer-plugin-dos", marker = "extra == 'plugins'", specifier = ">=1.0" },
     { name = "nomad-normalizer-plugin-simulation-workflow", marker = "extra == 'plugins'", specifier = ">=1.0" },
@@ -2699,7 +2727,7 @@ wheels = [
 
 [[package]]
 name = "nomad-lab"
-version = "1.3.17"
+version = "1.3.18.dev239+gfb1e64634"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "ase" },
@@ -2741,9 +2769,9 @@ dependencies = [
     { name = "xarray", version = "2025.6.1", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
     { name = "xarray", version = "2025.9.0", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/570b61d12848e3ebad09597a2336dd5a22862567ad94140e06450339ba6993c3/nomad_lab-1.3.17.tar.gz", hash = "sha256:570b61d12848e3ebad09597a2336dd5a22862567ad94140e06450339ba6993c3" }
+sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/f1d787ab3ee3735dd16a3b2a7ea5f36b43f9d2c604c60f2531be642b998a68a2/nomad_lab-1.3.18.dev239+gfb1e64634.tar.gz", hash = "sha256:f1d787ab3ee3735dd16a3b2a7ea5f36b43f9d2c604c60f2531be642b998a68a2" }
 wheels = [
-    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/e05325df0764191fa2bace407b47319c8c5ef84d4d4781676b1244035c6d6104/nomad_lab-1.3.17-py3-none-any.whl", hash = "sha256:e05325df0764191fa2bace407b47319c8c5ef84d4d4781676b1244035c6d6104" },
+    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/17883be582c8e0b2775b6da7e516279c6772e389650861a517514683ca187a7e/nomad_lab-1.3.18.dev239+gfb1e64634-py3-none-any.whl", hash = "sha256:17883be582c8e0b2775b6da7e516279c6772e389650861a517514683ca187a7e" },
 ]
 
 [package.optional-dependencies]
@@ -2768,6 +2796,7 @@ infrastructure = [
     { name = "celery" },
     { name = "dockerspawner" },
     { name = "fastapi" },
+    { name = "fastapi-cache2" },
     { name = "gunicorn" },
     { name = "h5grove", extra = ["fastapi"] },
     { name = "jupyterhub" },
@@ -3041,7 +3070,8 @@ name = "numcodecs"
 version = "0.13.1"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version < '3.11'" },
@@ -3069,7 +3099,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "deprecated", marker = "python_full_version >= '3.11'" },
@@ -3385,6 +3416,55 @@ wheels = [
 ]
 
 [[package]]
+name = "pendulum"
+version = "3.1.0"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+    { name = "tzdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/23/7c/009c12b86c7cc6c403aec80f8a4308598dfc5995e5c523a5491faaa3952e/pendulum-3.1.0.tar.gz", hash = "sha256:66f96303560f41d097bee7d2dc98ffca716fbb3a832c4b3062034c2d45865015", size = 85930, upload-time = "2025-04-19T14:30:01.675Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b4/d8/398cd27903a6899d0ae47b896d88e0b15849fc334931a6732e7ce3be9a45/pendulum-3.1.0-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:aa545a59e6517cf43597455a6fb44daa4a6e08473d67a7ad34e4fa951efb9620", size = 338637, upload-time = "2025-04-19T14:00:56.429Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/9d/a125554919c6db14e189393254c7781ee98ed5a121b6c05652d353b03c12/pendulum-3.1.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:299df2da6c490ede86bb8d58c65e33d7a2a42479d21475a54b467b03ccb88531", size = 326003, upload-time = "2025-04-19T14:00:58.192Z" },
+    { url = "https://files.pythonhosted.org/packages/53/9f/43a5a902f904e06252c259c2f6cf2dceafbb25aef158df08f79c0089dfd7/pendulum-3.1.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:dbaa66e3ab179a2746eec67462f852a5d555bd709c25030aef38477468dd008e", size = 344335, upload-time = "2025-04-19T14:00:59.985Z" },
+    { url = "https://files.pythonhosted.org/packages/ca/24/00fcd6abd1f7623d2bbcca048b45f01aa8bb6b647e0477c3a8ea6094335c/pendulum-3.1.0-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:c3907ab3744c32e339c358d88ec80cd35fa2d4b25c77a3c67e6b39e99b7090c5", size = 382169, upload-time = "2025-04-19T14:01:01.411Z" },
+    { url = "https://files.pythonhosted.org/packages/32/bc/20a87f24c26c6c4daf3c69311208b28130b4d19c006da16efc0e55715963/pendulum-3.1.0-cp310-cp310-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:8244958c5bc4ed1c47ee84b098ddd95287a3fc59e569ca6e2b664c6396138ec4", size = 436675, upload-time = "2025-04-19T14:01:03.068Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/eb/3b1818a796408a250b8e6cfaa5372b991c0cbec768e02e0f9a226755383d/pendulum-3.1.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ca5722b3993b85ff7dfced48d86b318f863c359877b6badf1a3601e35199ef8f", size = 353728, upload-time = "2025-04-19T14:01:04.483Z" },
+    { url = "https://files.pythonhosted.org/packages/36/23/755ef61f863b2777925171a59509540205b561a9e07ee7de0b5be9226bea/pendulum-3.1.0-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:5b77a3dc010eea1a4916ef3771163d808bfc3e02b894c37df311287f18e5b764", size = 524465, upload-time = "2025-04-19T14:01:05.865Z" },
+    { url = "https://files.pythonhosted.org/packages/07/1f/a3e5f08890d13d93eee725778bfeaa233db5c55463e526857dffbc1a47e4/pendulum-3.1.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:2d6e1eff4a15fdb8fb3867c5469e691c2465eef002a6a541c47b48a390ff4cf4", size = 525690, upload-time = "2025-04-19T14:01:07.707Z" },
+    { url = "https://files.pythonhosted.org/packages/43/c5/bf8ce472b81e8f5f074e8ba39899d288acce417c2c4a9ec7486d56970e28/pendulum-3.1.0-cp310-cp310-win_amd64.whl", hash = "sha256:73de43ec85b46ac75db848c8e2f3f5d086e90b11cd9c7f029e14c8d748d920e2", size = 260356, upload-time = "2025-04-19T14:01:09.339Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/6e/d28d3c22e6708b819a94c05bd05a3dfaed5c685379e8b6dc4b34b473b942/pendulum-3.1.0-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:61a03d14f8c64d13b2f7d5859e4b4053c4a7d3b02339f6c71f3e4606bfd67423", size = 338596, upload-time = "2025-04-19T14:01:11.306Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/e6/43324d58021d463c2eeb6146b169d2c935f2f840f9e45ac2d500453d954c/pendulum-3.1.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:e674ed2d158afa5c361e60f1f67872dc55b492a10cacdaa7fcd7b7da5f158f24", size = 325854, upload-time = "2025-04-19T14:01:13.156Z" },
+    { url = "https://files.pythonhosted.org/packages/b0/a7/d2ae79b960bfdea94dab67e2f118697b08bc9e98eb6bd8d32c4d99240da3/pendulum-3.1.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7c75377eb16e58bbe7e03ea89eeea49be6fc5de0934a4aef0e263f8b4fa71bc2", size = 344334, upload-time = "2025-04-19T14:01:15.151Z" },
+    { url = "https://files.pythonhosted.org/packages/96/94/941f071212e23c29aae7def891fb636930c648386e059ce09ea0dcd43933/pendulum-3.1.0-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:656b8b0ce070f0f2e5e2668247d3c783c55336534aa1f13bd0969535878955e1", size = 382259, upload-time = "2025-04-19T14:01:16.924Z" },
+    { url = "https://files.pythonhosted.org/packages/51/ad/a78a701656aec00d16fee636704445c23ca11617a0bfe7c3848d1caa5157/pendulum-3.1.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:48962903e6c1afe1f13548cb6252666056086c107d59e3d64795c58c9298bc2e", size = 436361, upload-time = "2025-04-19T14:01:18.796Z" },
+    { url = "https://files.pythonhosted.org/packages/da/93/83f59ccbf4435c29dca8c63a6560fcbe4783079a468a5f91d9f886fd21f0/pendulum-3.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d364ec3f8e65010fefd4b0aaf7be5eb97e5df761b107a06f5e743b7c3f52c311", size = 353653, upload-time = "2025-04-19T14:01:20.159Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/0f/42d6644ec6339b41066f594e52d286162aecd2e9735aaf994d7e00c9e09d/pendulum-3.1.0-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:dd52caffc2afb86612ec43bbeb226f204ea12ebff9f3d12f900a7d3097210fcc", size = 524567, upload-time = "2025-04-19T14:01:21.457Z" },
+    { url = "https://files.pythonhosted.org/packages/de/45/d84d909202755ab9d3379e5481fdf70f53344ebefbd68d6f5803ddde98a6/pendulum-3.1.0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:d439fccaa35c91f686bd59d30604dab01e8b5c1d0dd66e81648c432fd3f8a539", size = 525571, upload-time = "2025-04-19T14:01:23.329Z" },
+    { url = "https://files.pythonhosted.org/packages/0d/e0/4de160773ce3c2f7843c310db19dd919a0cd02cc1c0384866f63b18a6251/pendulum-3.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:43288773a86d9c5c0ddb645f88f615ff6bd12fd1410b34323662beccb18f3b49", size = 260259, upload-time = "2025-04-19T14:01:24.689Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/7f/ffa278f78112c6c6e5130a702042f52aab5c649ae2edf814df07810bbba5/pendulum-3.1.0-cp311-cp311-win_arm64.whl", hash = "sha256:569ea5072ae0f11d625e03b36d865f8037b76e838a3b621f6967314193896a11", size = 253899, upload-time = "2025-04-19T14:01:26.442Z" },
+    { url = "https://files.pythonhosted.org/packages/7a/d7/b1bfe15a742f2c2713acb1fdc7dc3594ff46ef9418ac6a96fcb12a6ba60b/pendulum-3.1.0-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:4dfd53e7583ccae138be86d6c0a0b324c7547df2afcec1876943c4d481cf9608", size = 336209, upload-time = "2025-04-19T14:01:27.815Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/87/0392da0c603c828b926d9f7097fbdddaafc01388cb8a00888635d04758c3/pendulum-3.1.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:6a6e06a28f3a7d696546347805536f6f38be458cb79de4f80754430696bea9e6", size = 323130, upload-time = "2025-04-19T14:01:29.336Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/61/95f1eec25796be6dddf71440ee16ec1fd0c573fc61a73bd1ef6daacd529a/pendulum-3.1.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7e68d6a51880708084afd8958af42dc8c5e819a70a6c6ae903b1c4bfc61e0f25", size = 341509, upload-time = "2025-04-19T14:01:31.1Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/7b/eb0f5e6aa87d5e1b467a1611009dbdc92f0f72425ebf07669bfadd8885a6/pendulum-3.1.0-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:9e3f1e5da39a7ea7119efda1dd96b529748c1566f8a983412d0908455d606942", size = 378674, upload-time = "2025-04-19T14:01:32.974Z" },
+    { url = "https://files.pythonhosted.org/packages/29/68/5a4c1b5de3e54e16cab21d2ec88f9cd3f18599e96cc90a441c0b0ab6b03f/pendulum-3.1.0-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e9af1e5eeddb4ebbe1b1c9afb9fd8077d73416ade42dd61264b3f3b87742e0bb", size = 436133, upload-time = "2025-04-19T14:01:34.349Z" },
+    { url = "https://files.pythonhosted.org/packages/87/5d/f7a1d693e5c0f789185117d5c1d5bee104f5b0d9fbf061d715fb61c840a8/pendulum-3.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:20f74aa8029a42e327bfc150472e0e4d2358fa5d795f70460160ba81b94b6945", size = 351232, upload-time = "2025-04-19T14:01:35.669Z" },
+    { url = "https://files.pythonhosted.org/packages/30/77/c97617eb31f1d0554edb073201a294019b9e0a9bd2f73c68e6d8d048cd6b/pendulum-3.1.0-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:cf6229e5ee70c2660148523f46c472e677654d0097bec010d6730f08312a4931", size = 521562, upload-time = "2025-04-19T14:01:37.05Z" },
+    { url = "https://files.pythonhosted.org/packages/76/22/0d0ef3393303877e757b848ecef8a9a8c7627e17e7590af82d14633b2cd1/pendulum-3.1.0-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:350cabb23bf1aec7c7694b915d3030bff53a2ad4aeabc8c8c0d807c8194113d6", size = 523221, upload-time = "2025-04-19T14:01:38.444Z" },
+    { url = "https://files.pythonhosted.org/packages/99/f3/aefb579aa3cebd6f2866b205fc7a60d33e9a696e9e629024752107dc3cf5/pendulum-3.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:42959341e843077c41d47420f28c3631de054abd64da83f9b956519b5c7a06a7", size = 260502, upload-time = "2025-04-19T14:01:39.814Z" },
+    { url = "https://files.pythonhosted.org/packages/02/74/4332b5d6e34c63d4df8e8eab2249e74c05513b1477757463f7fdca99e9be/pendulum-3.1.0-cp312-cp312-win_arm64.whl", hash = "sha256:006758e2125da2e624493324dfd5d7d1b02b0c44bc39358e18bf0f66d0767f5f", size = 253089, upload-time = "2025-04-19T14:01:41.171Z" },
+    { url = "https://files.pythonhosted.org/packages/66/10/3258c084653606d2be2c7168998eda4a57cf1559cecb43cf1100000fda5f/pendulum-3.1.0-pp310-pypy310_pp73-macosx_10_12_x86_64.whl", hash = "sha256:d2cac744940299d8da41a3ed941aa1e02b5abbc9ae2c525f3aa2ae30c28a86b5", size = 339442, upload-time = "2025-04-19T14:02:12.512Z" },
+    { url = "https://files.pythonhosted.org/packages/98/d5/98a1a10cd1cfb3390fbf070864e9a10de8e70a9d4509832132f4d900d655/pendulum-3.1.0-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:ffb39c3f3906a9c9a108fa98e5556f18b52d2c6451984bbfe2f14436ec4fc9d4", size = 326609, upload-time = "2025-04-19T14:02:13.838Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/2e/448abdebc11b9c54e190d273cb084162643199fc184cb1bb6bff7900e67f/pendulum-3.1.0-pp310-pypy310_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ebe18b1c2eb364064cc4a68a65900f1465cac47d0891dab82341766bcc05b40c", size = 344777, upload-time = "2025-04-19T14:02:15.512Z" },
+    { url = "https://files.pythonhosted.org/packages/ed/91/ee857bbd51168bf08b89c3a4705c920725eee0f830ccc513b8370f6ce71d/pendulum-3.1.0-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a9e9b28a35cec9fcd90f224b4878456129a057dbd694fc8266a9393834804995", size = 354404, upload-time = "2025-04-19T14:02:16.91Z" },
+    { url = "https://files.pythonhosted.org/packages/bc/d4/e63a57df65e2b2d10f3aa917a4069be9abf5ac7d56d11336e0510742d8a6/pendulum-3.1.0-pp310-pypy310_pp73-musllinux_1_1_aarch64.whl", hash = "sha256:a3be19b73a9c6a866724419295482f817727e635ccc82f07ae6f818943a1ee96", size = 524948, upload-time = "2025-04-19T14:02:18.808Z" },
+    { url = "https://files.pythonhosted.org/packages/93/87/04e74600c5a5674e5f341b8888b530a9de9b84b31889f80fac3bee3e9e87/pendulum-3.1.0-pp310-pypy310_pp73-musllinux_1_1_x86_64.whl", hash = "sha256:24a53b523819bda4c70245687a589b5ea88711f7caac4be5f276d843fe63076b", size = 526340, upload-time = "2025-04-19T14:02:20.242Z" },
+    { url = "https://files.pythonhosted.org/packages/48/27/d3577a5f6f7d1fbf1138d87ce21ebab363c78642513b991d1c424d658d09/pendulum-3.1.0-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:bd701789414fbd0be3c75f46803f31e91140c23821e4bcb0fa2bddcdd051c425", size = 261089, upload-time = "2025-04-19T14:02:21.631Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/23/e98758924d1b3aac11a626268eabf7f3cf177e7837c28d47bf84c64532d0/pendulum-3.1.0-py3-none-any.whl", hash = "sha256:f9178c2a8e291758ade1e8dd6371b1d26d08371b4c7730a6e9a3ef8b16ebae0f", size = 111799, upload-time = "2025-04-19T14:02:34.739Z" },
+]
+
+[[package]]
 name = "perovskite-solar-cell-database"
 version = "0.0.0"
 source = { git = "https://github.com/FAIRmat-NFDI/nomad-perovskite-solar-cells-database.git?rev=v0.1.1#1fa193054fe7965b37b543a510364bbcaa3f8fa9" }
@@ -3488,7 +3568,8 @@ name = "pint"
 version = "0.24.4"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "flexcache", marker = "python_full_version < '3.11'" },
@@ -3508,7 +3589,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "flexcache", marker = "python_full_version >= '3.11'" },
@@ -3681,19 +3763,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e9/e6/78ebbb10a8c8e4b61a59249394a4a594c1a7af95593dc933a349c8d00964/pyasn1_modules-0.4.2.tar.gz", hash = "sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6", size = 307892, upload-time = "2025-03-28T02:41:22.17Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/47/8d/d529b5d697919ba8c11ad626e835d4039be708a35b0d22de83a269a6682c/pyasn1_modules-0.4.2-py3-none-any.whl", hash = "sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a", size = 181259, upload-time = "2025-03-28T02:41:19.028Z" },
-]
-
-[[package]]
-name = "pybtex"
-version = "0.25.1"
-source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
-dependencies = [
-    { name = "latexcodec" },
-    { name = "pyyaml" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5f/bc/c2be05ca72f8c103670e983df8be26d1e288bc6556f487fa8cccaa27779f/pybtex-0.25.1.tar.gz", hash = "sha256:9eaf90267c7e83e225af89fea65c370afbf65f458220d3946a9e3049e1eca491", size = 406157, upload-time = "2025-06-26T13:27:41.903Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/25/68/ceb5d6679baa326261f5d3e5113d9cfed6efef2810afd9f18bffb8ed312b/pybtex-0.25.1-py2.py3-none-any.whl", hash = "sha256:9053b0d619409a0a83f38abad5d9921de5f7b3ede00742beafcd9f10ad0d8c5c", size = 127437, upload-time = "2025-06-26T13:27:43.585Z" },
 ]
 
 [[package]]
@@ -3907,20 +3976,30 @@ crypto = [
 ]
 
 [[package]]
+name = "pylatexenc"
+version = "3.0a33"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/97/6c/37cf2bfa76f122885acec21d62018fd9503ece009a05ea5d32dd348133e2/pylatexenc-3.0a33.tar.gz", hash = "sha256:087c9d6d280ba1242e01caf0a6436b18e9790e07148eb9430aeaa51b68d2c114", size = 205228, upload-time = "2025-08-26T09:09:26.385Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c6/43/0a8a0b4b42b9b38f01f255b777bd4697099eb75ea7201444b528794a2a4f/pylatexenc-3.0a33-py3-none-any.whl", hash = "sha256:71221905d8e731c0600cde10af08f16f539723b6ffe17f478e56f5c0208c507a", size = 267673, upload-time = "2025-08-26T09:09:24.832Z" },
+]
+
+[[package]]
 name = "pymatgen"
-version = "2024.5.1"
+version = "2025.10.7"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
+    { name = "bibtexparser" },
     { name = "joblib" },
     { name = "matplotlib" },
     { name = "monty" },
     { name = "networkx", version = "3.4.2", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
     { name = "networkx", version = "3.5", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "numpy" },
+    { name = "orjson" },
     { name = "palettable" },
     { name = "pandas" },
     { name = "plotly" },
-    { name = "pybtex" },
     { name = "requests" },
     { name = "ruamel-yaml" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
@@ -3931,20 +4010,26 @@ dependencies = [
     { name = "tqdm" },
     { name = "uncertainties" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/96/baf171ee518886112ceab2a1b566ff585dd336146ddac2b12e3448592bc3/pymatgen-2024.5.1.tar.gz", hash = "sha256:dc5c1e342e7013e70cc5ef3d857fd67147c09c44af42e25c4fddaa4d89979c49", size = 3008278, upload-time = "2024-05-01T19:06:57.51Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/6c/3e7f3f6884d3797a847a8d2441b165bb3a09979a0e40e328d2aca4fa933e/pymatgen-2025.10.7.tar.gz", hash = "sha256:11b4b4dcc847c377088984e58802d155b79237a53d586eb75f32370ed8fafda2", size = 3147848, upload-time = "2025-10-07T13:44:33.704Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a9/2b/8a422c7b843ba82c886660b10f539dd72f281b2001beaa6b5002a90cb390/pymatgen-2024.5.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:6dfa468492308044c2bc8b60fbc5e4b3e1c58476b588833dbb84eaaa1fb5c6ce", size = 3521632, upload-time = "2024-05-01T19:05:53.764Z" },
-    { url = "https://files.pythonhosted.org/packages/fb/fb/9b8f915ea8e6d69b6c2c86d4abb9036ba802c90b68d6110f48d11fa8ddc4/pymatgen-2024.5.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7214e7cc65374cd9eb69e1c2f6f144df77b3d714b033b144f62e8fd6978bd6d8", size = 4820989, upload-time = "2024-05-01T19:06:04.741Z" },
-    { url = "https://files.pythonhosted.org/packages/fc/23/0039ae994a24f3ace24ae77796645723e23e6ac540372466f5a8a9fd94c2/pymatgen-2024.5.1-cp310-cp310-win32.whl", hash = "sha256:dd3869629428087aafc4873aec9f69e13ba715bc0fc9b5f77cd98be3ddb0d90f", size = 3471924, upload-time = "2024-05-01T19:06:08.785Z" },
-    { url = "https://files.pythonhosted.org/packages/62/58/114df86b2f0956ac5bb2c182ba9d24fdfd389fb3c49594db411d5c350884/pymatgen-2024.5.1-cp310-cp310-win_amd64.whl", hash = "sha256:29a104b7e5b5de9641ec7602d3cba26f6f36953cc62df9b8e611c06e3d5da169", size = 3515823, upload-time = "2024-05-01T19:06:11.737Z" },
-    { url = "https://files.pythonhosted.org/packages/f7/c1/b384c1c37dd107487bfdb6dcdf7620c8cb6f720d12f7e08451c1bf3e79b6/pymatgen-2024.5.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:fcbf5ec720b40dc0d6e51a2ad11d401d4e2f050c05cb5faa14a45d63887c35de", size = 3521417, upload-time = "2024-05-01T19:06:14.955Z" },
-    { url = "https://files.pythonhosted.org/packages/66/46/79cca363d142d779ebd10d100dc11770a1d175694affdd13193709bf85b4/pymatgen-2024.5.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d77cc72459b54f1f6aaeca9b95fe536adb7b8d12b0d72c2f81a159a61b09fdda", size = 4941164, upload-time = "2024-05-01T19:06:18.712Z" },
-    { url = "https://files.pythonhosted.org/packages/40/54/35cfe9b376d97037b204b7454571bdbadaf11753fe47c9bcb3506503c923/pymatgen-2024.5.1-cp311-cp311-win32.whl", hash = "sha256:5d6156a5fff6f09577cc68da151246993ee32dd45191c0c27fd390558d40f56c", size = 3471528, upload-time = "2024-05-01T19:06:21.629Z" },
-    { url = "https://files.pythonhosted.org/packages/52/01/e0be2b3f4f42b5ca6e40568a67ddb625f6af0a46130ce75b7c167ff65e6b/pymatgen-2024.5.1-cp311-cp311-win_amd64.whl", hash = "sha256:6597af65a7f0482b4213e0cc9027aafca213adcda362ff76e32c1edefd6fa1df", size = 3516034, upload-time = "2024-05-01T19:06:24.748Z" },
-    { url = "https://files.pythonhosted.org/packages/7d/18/66803e632c585f26b0b8839783dd8a0674b7d663e791f4ae2938b57705bb/pymatgen-2024.5.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ef3bb3712bda019099849046da9675050b9a9442b799aa076563376e41b460b2", size = 3523125, upload-time = "2024-05-01T19:06:27.606Z" },
-    { url = "https://files.pythonhosted.org/packages/93/05/4ba91c3de937dd010126d8b1c2b2b2900fd1e8053dcbc20ec32048815d0f/pymatgen-2024.5.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:beb8a49e397e550e34d2bd1a04dfa776430d81e4f5aab9ce2abb1d63f657ba62", size = 4936013, upload-time = "2024-05-01T19:06:30.973Z" },
-    { url = "https://files.pythonhosted.org/packages/68/48/fc46115f9a71af47fea2ca134da95927c860a8fd4b3ef5be0914d4e3c992/pymatgen-2024.5.1-cp312-cp312-win32.whl", hash = "sha256:ae40bc1e54213b06824be8ce3a1cdcc0562acb2f64e36a1cb9c666cf36c65a4e", size = 3472171, upload-time = "2024-05-01T19:06:34.879Z" },
-    { url = "https://files.pythonhosted.org/packages/eb/91/b7ed9f49bd76f236eb6511a526f1bb690830ac20f89c6ff9932c87e52827/pymatgen-2024.5.1-cp312-cp312-win_amd64.whl", hash = "sha256:209b9ae5e61f77be5c9ea7013af893d3606b5b028dc7b2fd0c0d12087a50c01d", size = 3516548, upload-time = "2024-05-01T19:06:38.516Z" },
+    { url = "https://files.pythonhosted.org/packages/95/0d/fbf04fe2d807297e6e3553fa64d57b493b5d9e4732eae736646c4c9bebd7/pymatgen-2025.10.7-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:8a483073e573def8432276c766d91cd7d1c46433d58aad1e1f038bd018d41ea9", size = 3587650, upload-time = "2025-10-07T13:43:42.22Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/e9/d6708454c05834b3ab478948d8fbf6550982430ab1fe045511c3124678e1/pymatgen-2025.10.7-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:f365d1d8c897583bac65b0b8f906b4bd4458122750457dc791d25388b7e74a48", size = 3589241, upload-time = "2025-10-07T13:43:45.62Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/75/337aa5779a21c31920a5e274554ab710a34e167e85f4bb709fa308f6c1b0/pymatgen-2025.10.7-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:83de3725449c205746d3b14c64868d8d03ecbc4f62a9b991400c59e0aa94b660", size = 4566685, upload-time = "2025-10-07T13:43:47.801Z" },
+    { url = "https://files.pythonhosted.org/packages/30/82/dd8378fc26e9abb20d5c31931112d6d1663b5a1b73e835414ff8cde2b211/pymatgen-2025.10.7-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:947bdc5ef053ec3ac328c8be3c431b0a3778a2e3c65853dbefa7ac6d0e101c92", size = 4590876, upload-time = "2025-10-07T13:43:49.919Z" },
+    { url = "https://files.pythonhosted.org/packages/24/72/80f32e2303ea78266da931d05d02b17b0ca5013a48ae15fece81c81db53d/pymatgen-2025.10.7-cp310-cp310-win32.whl", hash = "sha256:248f32c722072f7cb0978215aefc80128f1381d92f2dd5d344b0a1fabfb44ed4", size = 3542733, upload-time = "2025-10-07T13:43:51.955Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/6b/5ed6c926e3c08cfa7f20255ff6f57f2f3713a4b1d141225e940f2b3fbbad/pymatgen-2025.10.7-cp310-cp310-win_amd64.whl", hash = "sha256:2661c2b2793825dceb733f986a94d744cc429b8d5c540b7865778baeba3c1c9b", size = 3572184, upload-time = "2025-10-07T13:43:54.192Z" },
+    { url = "https://files.pythonhosted.org/packages/f1/e5/11d97c51261461b2134816de23d5cf407fe361a9442999c0beab03e36076/pymatgen-2025.10.7-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:370aa89324548742ee674f1255a4daf0a4e98769f90dfdfabf97fa7c79e11f2d", size = 3588589, upload-time = "2025-10-07T13:43:55.855Z" },
+    { url = "https://files.pythonhosted.org/packages/ce/09/b66966cd1db9fd13589221c1dbadfeabe40b88658f1f24c7be6b8907913a/pymatgen-2025.10.7-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:da25604f474f7b6725dfd54ad3aec826c5b7ae16edf794b6b66b3dc86a9931ad", size = 3591165, upload-time = "2025-10-07T13:43:57.587Z" },
+    { url = "https://files.pythonhosted.org/packages/69/eb/0157a27486f3de31fcfcade34f08a5c47d470176db785caf730561592424/pymatgen-2025.10.7-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:c83cc623a46121ce4482f9bec2c8deefbb8a578fb8569cccb645b732410d903d", size = 4631661, upload-time = "2025-10-07T13:43:59.76Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/7e/89033901e5ba97a317cf1d2646bf05ba46a31f133280d8701ea431c342f1/pymatgen-2025.10.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:18c3b66358c8a607d0cfcc57551a0640100024812d16217548dcdb17b42dfa3c", size = 4661416, upload-time = "2025-10-07T13:44:02.146Z" },
+    { url = "https://files.pythonhosted.org/packages/1e/d1/b874b8e8700382b57846267ff39eb8e5ea827931b78e05a725cc5833dd4e/pymatgen-2025.10.7-cp311-cp311-win32.whl", hash = "sha256:45cfc87d3bf29da141e589aef150a6017262a1efbded907889ac4bf3ab3306ae", size = 3541914, upload-time = "2025-10-07T13:44:04.369Z" },
+    { url = "https://files.pythonhosted.org/packages/63/e9/59c8eced18ab89a96e1f0c2396838d7522b778a5c4e0b9185b21f2c5286d/pymatgen-2025.10.7-cp311-cp311-win_amd64.whl", hash = "sha256:13103be858c333f9b23fe190d385c7b4dc0e3824e21abca85d8d274722de7bed", size = 3571879, upload-time = "2025-10-07T13:44:06.117Z" },
+    { url = "https://files.pythonhosted.org/packages/c2/27/05d85f2f0ff743d9a4002a31f978a0e8f8f8e75970934d293cfb87063366/pymatgen-2025.10.7-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:ff89c4b16271fba2f15cf3984f3b27daefca99fe40e222cc8dbbd8bf35c9a47b", size = 3589019, upload-time = "2025-10-07T13:44:07.84Z" },
+    { url = "https://files.pythonhosted.org/packages/59/90/f3bcfb9b801360509469338095e267c85d0e23c3ea9feb2f70c015544d94/pymatgen-2025.10.7-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:69d5865fad4d52f0bbe00df30311d5245bcf4f0e5ed5f6e7e4e6a42b54612e4f", size = 3592345, upload-time = "2025-10-07T13:44:10.217Z" },
+    { url = "https://files.pythonhosted.org/packages/8f/11/256db54fec7d0f1409f9fc972cff779d0e11d436a41ed507ffa1bca4200b/pymatgen-2025.10.7-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a3127e4e3a96e668d66ce16ef65cbb4b641950197ee3f3ab38d4b79f4fc09017", size = 4628206, upload-time = "2025-10-07T13:44:12.307Z" },
+    { url = "https://files.pythonhosted.org/packages/35/cd/305378f0b0b53083fd738f0e7ad449970ad4645ef838364351ca7ef8c981/pymatgen-2025.10.7-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:6e9e88e11509f48dc75090a874122cda19ebe59d3ed9ee2614fb712bb88943fd", size = 4663440, upload-time = "2025-10-07T13:44:14.562Z" },
+    { url = "https://files.pythonhosted.org/packages/f1/78/aa88ff410fc6da6a94e8a43d91c5b26273319d68982fab9e7dda0fbfc014/pymatgen-2025.10.7-cp312-cp312-win32.whl", hash = "sha256:09e47e0899d820fccba673e6911bda850dce20ee1bcd8ffee4849082bb8b4d87", size = 3540066, upload-time = "2025-10-07T13:44:16.242Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/c9/def0dd1d760fdff1afa2bed833a30fc41889c01e09c99e7ce7a76a7395fc/pymatgen-2025.10.7-cp312-cp312-win_amd64.whl", hash = "sha256:b159f9abd6755be106359d77c677be8a71ce882a0ba68a063212c7c168420431", size = 3571319, upload-time = "2025-10-07T13:44:18.43Z" },
 ]
 
 [[package]]
@@ -4896,7 +4981,8 @@ name = "scipy"
 version = "1.15.3"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version < '3.11'" },
@@ -4939,7 +5025,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version >= '3.11'" },
@@ -5169,7 +5256,8 @@ name = "tables"
 version = "3.10.1"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "blosc2", marker = "python_full_version < '3.11'" },
@@ -5205,7 +5293,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "blosc2", marker = "python_full_version >= '3.11'" },
@@ -5281,7 +5370,8 @@ name = "tifffile"
 version = "2025.5.10"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version < '3.11'" },
@@ -5298,7 +5388,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version >= '3.11'" },
@@ -5783,7 +5874,8 @@ name = "xarray"
 version = "2025.6.1"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version < '3.11'" },
@@ -5802,7 +5894,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "numpy", marker = "python_full_version >= '3.11'" },
@@ -5844,7 +5937,8 @@ name = "zarr"
 version = "2.18.3"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version < '3.11' and sys_platform != 'win32'",
+    "python_full_version < '3.11' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "asciitree", marker = "python_full_version < '3.11'" },
@@ -5864,7 +5958,8 @@ source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
     "python_full_version >= '3.12' and sys_platform != 'win32'",
-    "python_full_version == '3.11.*'",
+    "python_full_version == '3.11.*' and sys_platform != 'win32'",
+    "python_full_version == '3.11.*' and sys_platform == 'win32'",
 ]
 dependencies = [
     { name = "asciitree", marker = "python_full_version >= '3.11'" },
