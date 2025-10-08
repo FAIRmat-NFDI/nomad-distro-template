@@ -69,7 +69,7 @@ extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
 constraint-dependencies = ["hyperspy>=1.7.6"]
-prerelease = "disallow"
+prerelease = "explicit"
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
