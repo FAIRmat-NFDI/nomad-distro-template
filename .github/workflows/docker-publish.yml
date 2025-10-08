@@ -194,10 +194,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Start containers
+      - name: Start containers and check app/jupyter container health
         working-directory: tests
         run: |
-          docker compose up -d --quiet-pull --wait
+          if ! docker compose up -d --quiet-pull --wait; then
+            echo "Containers failed health check."
+            echo "Logs for app:"
+            docker logs app
+            echo "Logs for jupyter:"
+            docker logs jupyter
+            exit 1
+          fi
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
