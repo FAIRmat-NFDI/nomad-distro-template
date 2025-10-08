@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10, <3.13"
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'win32'",
@@ -11,7 +11,7 @@ resolution-markers = [
 ]
 
 [options]
-prerelease-mode = "allow"
+prerelease-mode = "explicit"
 
 [manifest]
 constraints = [{ name = "hyperspy", specifier = ">=1.7.6" }]
@@ -231,15 +231,12 @@ wheels = [
 
 [[package]]
 name = "bibtexparser"
-version = "2.0.0b8"
+version = "1.4.3"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
-    { name = "pylatexenc" },
+    { name = "pyparsing" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a3/b6/967e030d0f8359b912a64ce7447db485064862a4d3980cac07b398bc95be/bibtexparser-2.0.0b8.tar.gz", hash = "sha256:11eaaa1fe80154f70092e91fa7e3fed5e5c81021f6c6c09151e36b8533f36994", size = 37746, upload-time = "2024-12-04T20:17:42.177Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cb/4e/226cfbf6c61c38399fc19e5f46db755ffea32f77ef078982c953031c8a3c/bibtexparser-2.0.0b8-py3-none-any.whl", hash = "sha256:eda1e6dbc7bbc040d351c926ead97a36f4734858656f3514a933259878bd37f1", size = 39642, upload-time = "2024-12-04T20:17:40.736Z" },
-]
+sdist = { url = "https://files.pythonhosted.org/packages/92/8d/e296c7af03757debd8fc80df2898cbed4fb69fc61ed2c9b4a1d42e923a9e/bibtexparser-1.4.3.tar.gz", hash = "sha256:a9c7ded64bc137720e4df0b1b7f12734edc1361185f1c9097048ff7c35af2b8f", size = 55582, upload-time = "2024-12-19T20:41:57.754Z" }
 
 [[package]]
 name = "billiard"
@@ -3973,15 +3970,6 @@ wheels = [
 [package.optional-dependencies]
 crypto = [
     { name = "cryptography" },
-]
-
-[[package]]
-name = "pylatexenc"
-version = "3.0a33"
-source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/97/6c/37cf2bfa76f122885acec21d62018fd9503ece009a05ea5d32dd348133e2/pylatexenc-3.0a33.tar.gz", hash = "sha256:087c9d6d280ba1242e01caf0a6436b18e9790e07148eb9430aeaa51b68d2c114", size = 205228, upload-time = "2025-08-26T09:09:26.385Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/c6/43/0a8a0b4b42b9b38f01f255b777bd4697099eb75ea7201444b528794a2a4f/pylatexenc-3.0a33-py3-none-any.whl", hash = "sha256:71221905d8e731c0600cde10af08f16f539723b6ffe17f478e56f5c0208c507a", size = 267673, upload-time = "2025-08-26T09:09:24.832Z" },
 ]
 
 [[package]]
