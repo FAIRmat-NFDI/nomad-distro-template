@@ -30,6 +30,7 @@ env:
     nomad_aitoolkit
     pynxtools_igor
     electronicparsers
+    nomad_simulations
 
 permissions:
   contents: write
