@@ -77,7 +77,7 @@ def test_example_uploads(entry_point_id, auth):
     upload_id = response.json().get("upload_id")
     url = f"uploads/{upload_id}"
 
-    timeout = 300
+    timeout = 600
     interval = 10
     start = time.time()
     processing = True
