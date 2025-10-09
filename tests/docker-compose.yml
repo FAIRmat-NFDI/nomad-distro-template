@@ -156,7 +156,7 @@ services:
         - "http://localhost:8000/-/health"
       interval: 10s
       timeout: 10s
-      retries: 50
+      retries: 60
       start_period: 10s
 
   jupyter:
