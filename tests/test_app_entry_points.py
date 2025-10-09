@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-
 import pytest
 
 from conftest import make_request_with_retry, get_request
@@ -8,29 +7,26 @@ if TYPE_CHECKING:
     from nomad.client import Auth
 
 
-def test_apps_entry_points(auth: "Auth"):
-    # 1. List all app entry points
-    list_resp = make_request_with_retry(get_request, "apps/entry-points", auth)
-    payload = list_resp.json()
+@pytest.fixture(scope="module")
+def apps(auth: "Auth"):
+    """The list of app entrypoints."""
+    resp = make_request_with_retry(get_request, "apps/entry-points", auth)
+    payload = resp.json()
     apps = payload.get("data", [])
     assert apps, "No apps returned by /apps/entry-points"
+    return apps
 
-    failures: list[str] = []
 
-    # 2. For each app, call the detail endpoint
-    for app in apps:
-        app_path = app.get("path")
-        if not app_path:
-            failures.append(f"cannot get path for {app=}")
-            continue
+@pytest.mark.parametrize(
+    "app",
+    [pytest.param(a, id=a.get("path", "<no-path>")) for a in make_request_with_retry(get_request, "apps/entry-points", auth=None).json().get("data", [])],
+)
+def test_app_entry_point(auth: "Auth", app):
+    """Each app entry point should respond successfully."""
+    app_path = app.get("path")
+    if not app_path:
+        pytest.skip(f"App without path: {app}")
 
-        detail_url = f"apps/entry-points/{app_path}"
-        response = make_request_with_retry(
-            get_request, detail_url, auth, check_status=False
-        )
-
-        if response.status_code != 200:
-            failures.append(f"app '{app_path}' failed with error: {response.text}")
-
-    if failures:
-        pytest.fail("\n".join(failures))
+    detail_url = f"apps/entry-points/{app_path}"
+    resp = make_request_with_retry(get_request, detail_url, auth, check_status=False)
+    assert resp.status_code == 200, f"App '{app_path}' failed: {resp.text}"
