@@ -2,7 +2,7 @@ keycloak:
   server_url: "http://keycloak:8080/"
   realm_name: "fairdi_nomad_test"
 client:
-  url: "http://localhost:8000/fairdi/nomad/latest/api"
+  url: "http://localhost:8000/nomad-oasis/api"
   user: "test"
   password: "password"
 services:
