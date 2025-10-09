@@ -175,9 +175,9 @@ jobs:
       app_image: ${{ env.app_IMAGE }}
       jupyter_image: ${{ env.jupyter_IMAGE }}
 
-  # Job 4: Run example upload tests
-  example_upload_tests:
-    name: Run example upload tests
+  # Job 4: Run example upload tests and entrypoint tests
+  run_tests:
+    name: Run example upload tests and entrypoint tests
     needs: build
     runs-on: ubuntu-latest
     env:
