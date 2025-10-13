@@ -4047,17 +4047,13 @@ wheels = [
 
 [[package]]
 name = "pynxtools-em"
-version = "0.4.0"
+version = "0.4.1"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "flatdict" },
-    { name = "h5py" },
     { name = "hyperspy" },
     { name = "kikuchipy" },
     { name = "nionswift" },
-    { name = "numpy" },
-    { name = "pint", version = "0.24.4", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "pint", version = "0.25", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pynxtools" },
     { name = "pyxem" },
     { name = "rosettasciio" },
@@ -4065,9 +4061,9 @@ dependencies = [
     { name = "xmltodict" },
     { name = "xraydb" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3c/a6/09dd5174f2fe58233259d2198c65f4cefbcdda839de005e50af7acf5792c/pynxtools_em-0.4.0.tar.gz", hash = "sha256:2b294804698ea67ea4f083296ae001f3e4bacf6ead18dc8dc30d9d179591b7fe", size = 133216, upload-time = "2025-08-08T15:36:53.624Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b4/c5/63356f0b91ef107341601550f8fef2c75b508f35bce660da72329481b744/pynxtools_em-0.4.1.tar.gz", hash = "sha256:045cdf17511c8ade2c69feb917c34c8a3e9280ef7119546abbc14a75b6d8be75", size = 133105, upload-time = "2025-10-06T21:06:46.372Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2e/1f/c090b7d13d311bf65c555704bf105362c677a4f29baf6072e30d36955233/pynxtools_em-0.4.0-py3-none-any.whl", hash = "sha256:5b75bf109f806ed5538f8c196111a0cd49b599ff8319e346d0224702ffb5075c", size = 224814, upload-time = "2025-08-08T15:36:51.855Z" },
+    { url = "https://files.pythonhosted.org/packages/39/34/b1d2faccb11e0ea218c121b660912170edf7d46ac221354130631de66266/pynxtools_em-0.4.1-py3-none-any.whl", hash = "sha256:ebb6278334f9658850ac14a042477c362623bb4b0e13358383f1161c8b4c9750", size = 224774, upload-time = "2025-10-06T21:06:44.93Z" },
 ]
 
 [[package]]
