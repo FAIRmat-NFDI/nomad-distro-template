@@ -1472,7 +1472,7 @@ wheels = [
 
 [[package]]
 name = "ifes-apt-tc-data-modeling"
-version = "0.3.1"
+version = "0.3.2"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "ase" },
@@ -1480,14 +1480,16 @@ dependencies = [
     { name = "h5py" },
     { name = "numpy" },
     { name = "pandas" },
+    { name = "pint", version = "0.24.4", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "pint", version = "0.25", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "radioactivedecay" },
     { name = "tables", version = "3.10.1", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
     { name = "tables", version = "3.10.2", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/86/b0/32ac54f36d363435cccb61a13594172a865a9816a781a62f6a99858cf70b/ifes_apt_tc_data_modeling-0.3.1.tar.gz", hash = "sha256:34415205d119ec3f5e0b3e75cda2bb31bf973ecae1c90b1ca0c724ae46bf6f7c", size = 3953669, upload-time = "2025-08-18T22:38:24.692Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/78/4b7dfd75b018d38e837b8a88bd67db9834349bb2fb5da4ed56db3f8f01b5/ifes_apt_tc_data_modeling-0.3.2.tar.gz", hash = "sha256:d83a85e23fe54d419843a9569bb029d730dd2288831e0b74c42dcab9d37e2de0", size = 3953863, upload-time = "2025-10-06T18:11:00.895Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/22/57/de0094084f120d588599f320f8aa2ac2ea85cc378f27b29c6509ba612d5d/ifes_apt_tc_data_modeling-0.3.1-py3-none-any.whl", hash = "sha256:3085513d173eab9d60cff2720097036e21f84a6d2378ac70b483d4b0c2726247", size = 107887, upload-time = "2025-08-18T22:38:23.414Z" },
+    { url = "https://files.pythonhosted.org/packages/04/d2/595c51f96c3ddf385e5891831c44fa90754a15551987fc49bb6b20f393d4/ifes_apt_tc_data_modeling-0.3.2-py3-none-any.whl", hash = "sha256:8ddb712fab3783b82ba26ee4b575990ae394f3af03d77ce4a120cae5a8ba2941", size = 107153, upload-time = "2025-10-06T18:10:58.664Z" },
 ]
 
 [[package]]
@@ -4017,20 +4019,15 @@ wheels = [
 
 [[package]]
 name = "pynxtools-apm"
-version = "0.4.0"
+version = "0.4.1"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
-    { name = "flatdict" },
-    { name = "h5py" },
     { name = "ifes-apt-tc-data-modeling" },
-    { name = "numpy" },
-    { name = "pint", version = "0.24.4", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "pint", version = "0.25", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pynxtools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/79/da/d2e21fd89461b54d689ceb537cff8b6159968d8374ebec87263eeb296267/pynxtools_apm-0.4.0.tar.gz", hash = "sha256:b8f7845ee88efc9ef6fb687deeb2db6740982f26bcb320af02edfa40429db311", size = 59943, upload-time = "2025-08-18T22:49:35.775Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bf/c0/f36987fc694c6bbd8bb64ef17f5b94fa7eb2389f0557a1c0b53728aa7461/pynxtools_apm-0.4.1.tar.gz", hash = "sha256:639cc2ff514042588959a7bafa09f45eaf899432a8e827b53c59e2db6dfdd028", size = 59259, upload-time = "2025-10-06T21:07:03.361Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/71/aae78296bfa30b81d4b61e5621ee051f714e1ca0c65971b5395ca8e44314/pynxtools_apm-0.4.0-py3-none-any.whl", hash = "sha256:ec14e505bf836b6c137e776fa7b2ac75bbea8d0a350d742d0ebffe2ed8c9c632", size = 84013, upload-time = "2025-08-18T22:49:34.255Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/3f/98d98711b9e1efa565f521c37b45a5b04ccffeee7329ff2c35a578319ab5/pynxtools_apm-0.4.1-py3-none-any.whl", hash = "sha256:6a299132a1732bfadc3ab4dca660bcf072e1e89ff80ef57dfb4c8f37c2c9a704", size = 83258, upload-time = "2025-10-06T21:07:02.17Z" },
 ]
 
 [[package]]
