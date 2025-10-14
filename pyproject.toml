@@ -41,7 +41,7 @@ plugins = [
   "pynxtools-raman>=0.1.0",
   "pynxtools-spm>=0.1.5",
   "pynxtools-xps>=0.5.3",
-  "pynxtools-xrd>=0.0.6",
+  "pynxtools-xrd>=0.0.6",  
   "nomad-schema-plugin-run>=1.0.1",
   "nomad-schema-plugin-simulation-workflow>=1.0.1",
   "nomad-normalizer-plugin-bandstructure>=1.0",
@@ -67,7 +67,6 @@ extra-index-url = [
 ]
 constraint-dependencies = ["hyperspy>=1.7.6"]
 prerelease = "disallow"
-override-dependencies = ["requests==2.32.5"]
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
