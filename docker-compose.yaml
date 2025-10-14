@@ -213,11 +213,10 @@ services:
 
   # jupyterlab image: (this is only used to pull the image, no service is run for this)
   jupyterlab_image:
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
     platform: linux/amd64
     container_name: nomad_jupyter_image
-    build:
-      context: .
-      target: final
+    pull_policy: always
     entrypoint: ["true"]
     deploy:
       replicas: 0 # Ensures the service isn't started
