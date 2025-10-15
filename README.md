@@ -137,6 +137,18 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
+### Environment Variables
+
+Before running the containers, you should create a `.env` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
+
+At a minimum, you should add a secure secret for the API:
+
+```
+NOMAD_SERVICES_API_SECRET='***'
+```
+
+Make sure the `NOMAD_SERVICES_API_SECRET` is at least 32 characters long.
+
 #### Updating the image
 Any pushes to the main branch of this repository, such as when [adding a plugin](#adding-a-plugin), will trigger a pipeline that generates a new app and jupyter image.
 

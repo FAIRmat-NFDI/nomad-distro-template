@@ -77,6 +77,8 @@ services:
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
+    env_file:
+      - ./.env
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -104,6 +106,8 @@ services:
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_NORTH_HUB_HOST: north
+    env_file:
+      - ./.env
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -146,6 +150,8 @@ services:
       NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
+    env_file:
+      - ./.env
     volumes:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
@@ -175,6 +181,8 @@ services:
       NOMAD_SERVICE: nomad_oasis_logtransfer
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
+    env_file:
+      - ./.env
     depends_on:
       elastic:
         condition: service_healthy
