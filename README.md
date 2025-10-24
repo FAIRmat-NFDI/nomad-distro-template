@@ -74,7 +74,27 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     sudo chown -R 1000 .volumes
     ```
 
-4. Pull the images specified in the `docker-compose.yaml`
+4. Create a file for environment variables
+  
+    Before running the containers, you should create a `.env` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
+
+    At a minimum, you should add a secure secret for the API:
+
+    ```
+    NOMAD_SERVICES_API_SECRET='***'
+    ```
+
+    Make sure the `NOMAD_SERVICES_API_SECRET` is at least 32 characters long.
+
+    If you have bash available you can run this script:
+    
+    ```sh
+    sh generate_env.sh
+    ```
+
+    This will create a `.env` file with a randomly generated 64-character API secret. If the file already exists, you'll be prompted before overwriting it.
+
+5. Pull the images specified in the `docker-compose.yaml`
 
     Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
 
@@ -82,7 +102,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     docker compose pull
     ```
 
-5. Configuring Secure HTTP and HTTPS Connections
+6. Configuring Secure HTTP and HTTPS Connections
 
    By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server—including credentials and sensitive data—can be compromised.
 
@@ -119,13 +139,13 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
    + - ./ssl:/etc/nginx/ssl:ro  # Your certificate files
    ```
 
-6. And run it with docker compose in detached (--detach or -d) mode
+7. And run it with docker compose in detached (--detach or -d) mode
 
     ```sh
     docker compose up -d
     ```
 
-7. (Optional) You can now test that NOMAD is running with
+8. (Optional) You can now test that NOMAD is running with
 
     ```sh
     # HTTP
@@ -135,19 +155,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     curl --insecure https://localhost/nomad-oasis/alive
     ```
 
-7. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
-
-### Environment Variables
-
-Before running the containers, you should create a `.env` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
-
-At a minimum, you should add a secure secret for the API:
-
-```
-NOMAD_SERVICES_API_SECRET='***'
-```
-
-Make sure the `NOMAD_SERVICES_API_SECRET` is at least 32 characters long.
+9. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
 #### Updating the image
 Any pushes to the main branch of this repository, such as when [adding a plugin](#adding-a-plugin), will trigger a pipeline that generates a new app and jupyter image.
