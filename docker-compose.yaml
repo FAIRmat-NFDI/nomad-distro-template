@@ -145,7 +145,7 @@ services:
         max_attempts: 15
         window: 1800s
 
-  # nomad gpu worker (workflows)
+  ## nomad gpu worker (actions)
   # gpu_worker:
   #   restart: unless-stopped
   #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:main
@@ -180,7 +180,7 @@ services:
   #     - ./.volumes/fs:/app/.volumes/fs
   #   command: python -m nomad.cli admin run action-gpu-worker
 
-  # nomad cpu worker (workflows)
+  # # nomad cpu worker (actions)
   # cpu_worker:
   #   restart: unless-stopped
   #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-action:main
@@ -201,13 +201,13 @@ services:
   #         memory: 8G # Maximum 8GB RAM
   #   depends_on:
   #     rabbitmq:
-  # condition: service_healthy
+  #       condition: service_healthy
   #     elastic:
-  # condition: service_healthy
+  #       condition: service_healthy
   #     mongo:
-  # condition: service_healthy
+  #       condition: service_healthy
   #     temporal:
-  # condition: service_healthy
+  #       condition: service_healthy
   #   volumes:
   #     # - ./configs/nomad.yaml:/app/nomad.yaml
   #     - ./.volumes/fs:/app/.volumes/fs
