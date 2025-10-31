@@ -122,6 +122,8 @@ jobs:
         service:
           - app
           - jupyter
+          # - cpu-action
+          # - gpu-action
         include:
           - service: app
             target: final
@@ -129,6 +131,12 @@ jobs:
           - service: jupyter
             target: jupyter
             image_suffix: /jupyter
+          # - service: gpu-action
+          #   target: gpu_action_final
+          #   image_suffix: /gpu-action
+          # - service: cpu-action
+          #   target: cpu_action_final
+          #   image_suffix: /cpu-action
 
     steps:
       - uses: actions/checkout@v4

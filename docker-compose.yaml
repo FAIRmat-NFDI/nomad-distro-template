@@ -145,6 +145,74 @@ services:
         max_attempts: 15
         window: 1800s
 
+  ## nomad gpu worker (actions)
+  # gpu_worker:
+  #   restart: unless-stopped
+  #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:main
+  #   platform: linux/amd64
+  #   container_name: nomad_oasis_gpu_worker
+  #   deploy:
+  #     replicas: 1
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: all # Use all available GPUs
+  #             capabilities: [gpu]
+  #   environment:
+  #     NOMAD_SERVICE: nomad_oasis_gpu_worker
+  #     NOMAD_RABBITMQ_HOST: rabbitmq
+  #     NOMAD_ELASTIC_HOST: elastic
+  #     NOMAD_MONGO_HOST: mongo
+  #     NOMAD_LOGSTASH_HOST: logtransfer
+  #     NOMAD_TEMPORAL_HOST: temporal
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     elastic:
+  #       condition: service_healthy
+  #     mongo:
+  #       condition: service_healthy
+  #     temporal:
+  #       condition: service_healthy
+  #   volumes:
+  #     # - ./configs/nomad.yaml:/app/nomad.yaml
+  #     - ./.volumes/fs:/app/.volumes/fs
+  #   command: python -m nomad.cli admin run action-gpu-worker
+
+  # # nomad cpu worker (actions)
+  # cpu_worker:
+  #   restart: unless-stopped
+  #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-action:main
+  #   platform: linux/amd64
+  #   container_name: nomad_oasis_cpu_worker
+  #   environment:
+  #     NOMAD_SERVICE: nomad_oasis_cpu_worker
+  #     NOMAD_RABBITMQ_HOST: rabbitmq
+  #     NOMAD_ELASTIC_HOST: elastic
+  #     NOMAD_MONGO_HOST: mongo
+  #     NOMAD_LOGSTASH_HOST: logtransfer
+  #     NOMAD_TEMPORAL_HOST: temporal
+  #   deploy:
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         cpus: "2.0" # Maximum 2 CPU cores
+  #         memory: 8G # Maximum 8GB RAM
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     elastic:
+  #       condition: service_healthy
+  #     mongo:
+  #       condition: service_healthy
+  #     temporal:
+  #       condition: service_healthy
+  #   volumes:
+  #     # - ./configs/nomad.yaml:/app/nomad.yaml
+  #     - ./.volumes/fs:/app/.volumes/fs
+  #   command: python -m nomad.cli admin run action-cpu-worker
+
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
