@@ -13,7 +13,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  UV_VERSION: 0.7
+  UV_VERSION: 0.9
   PYTHON_VERSION: 3.12
   JUPYTER_VERSION: "2025-04-14"
   # If you want to include custom documentation, create a fork of the repo below and link the forked repo here
@@ -122,6 +122,8 @@ jobs:
         service:
           - app
           - jupyter
+          # - cpu-action
+          # - gpu-action
         include:
           - service: app
             target: final
@@ -129,6 +131,12 @@ jobs:
           - service: jupyter
             target: jupyter
             image_suffix: /jupyter
+          # - service: gpu-action
+          #   target: gpu_action_final
+          #   image_suffix: /gpu-action
+          # - service: cpu-action
+          #   target: cpu_action_final
+          #   image_suffix: /cpu-action
 
     steps:
       - uses: actions/checkout@v4
@@ -175,9 +183,9 @@ jobs:
       app_image: ${{ env.app_IMAGE }}
       jupyter_image: ${{ env.jupyter_IMAGE }}
 
-  # Job 4: Run example upload tests
-  example_upload_tests:
-    name: Run example upload tests
+  # Job 4: Run example upload tests and entrypoint tests
+  run_tests:
+    name: Run example upload tests and entrypoint tests
     needs: build
     runs-on: ubuntu-latest
     env:
