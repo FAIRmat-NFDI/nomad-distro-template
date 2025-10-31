@@ -125,7 +125,7 @@ services:
       ]
     environment:
       NOMAD_SERVICE: nomad_distro_test
-      NOMAD_SERVICE_MODE: development
+      NOMAD_SERVICES_MODE: development
       NOMAD_SERVICES_API_PORT: 8000
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
       NOMAD_RABBITMQ_HOST: rabbitmq
