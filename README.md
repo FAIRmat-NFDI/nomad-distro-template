@@ -89,7 +89,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     If you have bash available you can run this script:
     
     ```sh
-    sh generate_env.sh
+    sh scripts/generate_env.sh
     ```
 
     This will create a `.env` file with a randomly generated 64-character API secret. If the file already exists, you'll be prompted before overwriting it.
