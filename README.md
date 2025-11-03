@@ -338,7 +338,8 @@ For detailed instructions on backing up the data on your Oasis we recommend read
 [NOMAD documentation on administration](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/administer.html#backups).
 
 As part of this repository there is a bash script for running the mongodump in `scripts/backup-mongo.sh`.
-1. Make sure you are in the top directory of this repository
+1. Make sure you are in the top directory of this repository and that the 
+`mongo` service (container `nomad_oasis_mongo`) is running.
 2. Make the script executable:
 
     ```sh
