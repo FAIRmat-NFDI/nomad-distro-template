@@ -155,11 +155,11 @@ VOLUME /app/.volumes/fs
 
 FROM final AS cpu_action_final
 
-COPY --chown=nomad:${UID} --from=gpu_action_builder /opt/venv /opt/venv
+COPY --chown=nomad:${UID} --from=cpu_action_builder /opt/venv /opt/venv
 
 FROM final AS gpu_action_final
 
-COPY --chown=nomad:${UID} --from=cpu_action_builder /opt/venv /opt/venv
+COPY --chown=nomad:${UID} --from=gpu_action_builder /opt/venv /opt/venv
 
 
 FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter_builder
