@@ -374,7 +374,7 @@ From the top directory of this repository, run:
     ```
 
 > [!CAUTION]
-> This will only dump the elasticsearch index onto the server. It is still up to you
+> This will only dump the NOMAD mongo data onto the server. It is still up to you
 > to setup a proper backup of the dump in the `.volumes/mongo` directory as well as all
 > the raw files in the `.volumes/fs` directory.
 
