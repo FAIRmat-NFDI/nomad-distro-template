@@ -2,7 +2,10 @@
 
 # Script to generate a .env file with a random API secret
 
-ENV_FILE=".env"
+# Get the directory where the script is located and go to parent directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+ENV_FILE="$PARENT_DIR/.env"
 
 # Check if .env file already exists
 if [ -f "$ENV_FILE" ]; then
@@ -18,10 +21,15 @@ fi
 # Generate a random 64-character API secret using openssl
 API_SECRET=$(openssl rand -hex 32)
 
-# Create the .env file
-cat > "$ENV_FILE" << EOF
+# Create the .env file and check for errors
+if ! cat > "$ENV_FILE" << EOF
 NOMAD_SERVICES_API_SECRET='$API_SECRET'
 EOF
+then
+    echo "Error: Failed to write to $ENV_FILE" >&2
+    echo "Please check write permissions for the directory: $PARENT_DIR" >&2
+    exit 1
+fi
 
 echo "✓ $ENV_FILE file created successfully!"
 echo "✓ Generated a secure 64-character API secret."
