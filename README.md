@@ -35,13 +35,16 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 
 In this README you will find instructions for:
 1. [Deploying the distribution](#deploying-the-distribution)
-2. [Adding a plugin](#adding-a-plugin)
-3. [Using the jupyter image](#the-jupyter-image)
-4. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
-5. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
-6. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-7. [Backing up the Oasis](#backing-up-the-oasis)
-8. [Solving common issues](#faqtrouble-shooting)
+2. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
+3. [Adding a plugin](#adding-a-plugin)
+4. [Using the jupyter image](#the-jupyter-image)
+5. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
+6. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
+7. [Customizing Documentation](#customizing-documentation)
+8. [Backing up the Oasis](#backing-up-the-oasis)
+9. [Enabling NOMAD Actions](#enabling-nomad-actions)
+10. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+11. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -167,7 +170,7 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
     docker compose down
     ```
 
-    and then repeat steps 4. and 5. above.
+    and then repeat steps 5. and 7. above.
 
 2. You can remove unused images to free up space by running
 
@@ -203,7 +206,7 @@ volumes:
   # - ./configs/nomad.yaml:/app/nomad.yaml
 ```
 
-To run the new image you can follow steps 5. and 6. [above](#for-a-new-oasis).
+To run the new image you can follow steps 5. and 7. [above](#for-a-new-oasis).
 
 ## Configuring Worker Replicas and Resource Limits
 
@@ -378,6 +381,22 @@ From the top directory of this repository, run:
 > to setup a proper backup of the dump in the `.volumes/mongo` directory as well as all
 > the raw files in the `.volumes/fs` directory.
 
+## Enabling NOMAD Actions
+
+To enable NOMAD Actions, you need to decide whether you need a CPU worker, a GPU worker, or both, and then make the following changes:
+
+1.  **Enable the required worker service(s) in `docker-compose.yaml`:**
+
+    Uncomment the `cpu_worker` service, the `gpu_worker` service, or both in the `docker-compose.yaml` file depending on your needs.
+
+2.  **Enable the corresponding build step(s) in the Docker publish workflow:**
+
+    In the `.github/workflows/docker-publish.yml` file, uncomment the build step(s) corresponding to the worker(s) you enabled in the `docker-compose.yaml` file.
+
+3.  **Adjust deployment resources:**
+
+    If necessary, adjust the deployment resources (e.g., CPU, memory, replicas) for the enabled worker service(s) in the `docker-compose.yaml` file to match your server's capacity.
+
 ## Updating the distribution from the template
 
 In order to update an existing distribution with any potential changes in the template you can add a new `git remote` for the template and merge with that one while allowing for unrelated histories:
@@ -421,19 +440,3 @@ Most likely you have not made the package public or provided a personal access t
 You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
 or how to configure a PAT (if you want to keep the distribution private) in the GitHub
 docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
-
-## Enabling NOMAD Actions
-
-To enable NOMAD Actions, you need to decide whether you need a CPU worker, a GPU worker, or both, and then make the following changes:
-
-1.  **Enable the required worker service(s) in `docker-compose.yaml`:**
-
-    Uncomment the `cpu_worker` service, the `gpu_worker` service, or both in the `docker-compose.yaml` file depending on your needs.
-
-2.  **Enable the corresponding build step(s) in the Docker publish workflow:**
-
-    In the `.github/workflows/docker-publish.yml` file, uncomment the build step(s) corresponding to the worker(s) you enabled in the `docker-compose.yaml` file.
-
-3.  **Adjust deployment resources:**
-
-    If necessary, adjust the deployment resources (e.g., CPU, memory, replicas) for the enabled worker service(s) in the `docker-compose.yaml` file to match your server's capacity.
