@@ -151,6 +151,8 @@ services:
   #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:main
   #   platform: linux/amd64
   #   container_name: nomad_oasis_gpu_worker
+  #   env_file:
+  #     - ./.env
   #   deploy:
   #     replicas: 1
   #     resources:
@@ -186,6 +188,8 @@ services:
   #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-action:main
   #   platform: linux/amd64
   #   container_name: nomad_oasis_cpu_worker
+  #   env_file:
+  #     - ./.env
   #   environment:
   #     NOMAD_SERVICE: nomad_oasis_cpu_worker
   #     NOMAD_RABBITMQ_HOST: rabbitmq
