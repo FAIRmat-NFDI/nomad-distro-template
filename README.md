@@ -40,7 +40,8 @@ In this README you will find instructions for:
 4. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
 5. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
 6. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-7. [Solving common issues](#faqtrouble-shooting)
+7. [Backing up the Oasis](#backing-up-the-oasis)
+8. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -330,6 +331,45 @@ By default, documentation is built using the [nomad-docs](https://github.com/FAI
 
 This setup ensures that your custom documentation is used when building your Oasis.
 
+
+## Backing up the Oasis
+
+For detailed instructions on backing up the data on your Oasis we recommend reading the
+[NOMAD documentation on administration](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/administer.html#backups).
+
+As part of this repository there is a bash script for running the mongodump in `scripts/backup-mongo.sh`.
+1. Make sure you are in the top directory of this repository
+2. Make the script executable:
+
+    ```sh
+    chmod +x scripts/backup-mongo.sh
+    ```
+
+3. Run the script once to make sure the current user has the correct permissions:
+
+    ```sh
+    ./scripts/backup-mongo.sh
+    ```
+
+4. Check that a `nomad_oasis_v1` mongodump was created in `.volumes/mongo` and that the
+dump was added to the logfile.
+
+    ```sh
+    ls .volumes/mongo
+    cat .volumes/mongo/backup.log
+    ```
+
+5. (Optional) Add the script to the crontab to run for example every night at 2 am.
+From the top directory of this repository, run:
+
+    ```sh
+    (crontab -l 2>/dev/null; echo "0 2 * * * $(realpath scripts/backup-mongo.sh)") | crontab -
+    ```
+
+> [!CAUTION]
+> This will only dump the elasticsearch index onto the server. It is still up to you
+> to setup a proper backup of the dump in the `.volumes/mongo` directory as well as all
+> the raw files in the `.volumes/fs` directory.
 
 ## Updating the distribution from the template
 
