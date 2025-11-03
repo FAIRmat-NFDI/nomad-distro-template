@@ -367,6 +367,12 @@ From the top directory of this repository, run:
     (crontab -l 2>/dev/null; echo "0 2 * * * $(realpath scripts/backup-mongo.sh)") | crontab -
     ```
 
+    Finally, check that the cronjob was added:
+
+    ```sh
+    crontab -l
+    ```
+
 > [!CAUTION]
 > This will only dump the elasticsearch index onto the server. It is still up to you
 > to setup a proper backup of the dump in the `.volumes/mongo` directory as well as all
