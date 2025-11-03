@@ -70,7 +70,7 @@ services:
     environment:
       POSTGRES_PASSWORD: temporal
       POSTGRES_USER: temporal
-    image: postgres:16
+    image: docker.io/postgres:16
     volumes:
       - postgresql:/var/lib/postgresql/data
 
