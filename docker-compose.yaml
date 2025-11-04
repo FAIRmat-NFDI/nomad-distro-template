@@ -98,6 +98,25 @@ services:
       retries: 5
       start_period: 15s
 
+  temporal_ui:
+    container_name: nomad_oasis_temporal_ui
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_CORS_ORIGINS=localhost:4173 # todo: change this
+      - TEMPORAL_AUTH_CALLBACK_URL=http://localhost:4173/auth/sso/callback # change this
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_AUTH_LABEL=fairdi_nomad_prod
+      - TEMPORAL_AUTH_CLIENT_SECRET="test"
+      - TEMPORAL_AUTH_ENABLED=true
+      - TEMPORAL_AUTH_TYPE=oidc
+      - TEMPORAL_DISABLE_WRITE_ACTIONS=true
+      - TEMPORAL_AUTH_PROVIDER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod
+      - TEMPORAL_AUTH_ISSUER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod
+      - TEMPORAL_AUTH_CLIENT_ID=nomad_public
+      - TEMPORAL_AUTH_SCOPES=openid,email,profile
+    image: temporalio/ui:2.34.0
+
   # nomad worker (processing)
   worker:
     restart: unless-stopped
