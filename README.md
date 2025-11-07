@@ -234,6 +234,8 @@ Adjust these values based on your server's available resources to optimize perfo
 
 ## Adding a plugin
 
+By default, no plugins are included in this distribution. You can find a list of available NOMAD plugins [here](https://nomad-lab.eu/prod/v1/oasis/gui/search/plugins). For a list of official plugins provided by FAIRmat, please see [here](https://github.com/FAIRmat-NFDI/.github/blob/main/profile/README.md).
+
 To add a new plugin to the docker image you should add it to the plugins table in the [`pyproject.toml`](pyproject.toml) file.
 
 Here you can put either plugins distributed to PyPI, e.g.
