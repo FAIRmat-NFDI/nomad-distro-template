@@ -79,7 +79,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     ```
 
 4. Create a file for environment variables
-  
+
     Before running the containers, you should create a `.env` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
 
     At a minimum, you should add a secure secret for the API:
@@ -91,9 +91,9 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     Make sure the `NOMAD_SERVICES_API_SECRET` is at least 32 characters long.
 
     If you have bash available you can run this script:
-    
+
     ```sh
-    sh scripts/generate-env.sh
+    bash scripts/generate-env.sh
     ```
 
     This will create a `.env` file with a randomly generated 64-character API secret. If the file already exists, you'll be prompted before overwriting it.
