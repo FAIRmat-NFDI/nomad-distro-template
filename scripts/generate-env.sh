@@ -3,8 +3,7 @@
 # Script to generate a .env file with a random API secret
 
 # Get the directory where the script is located and go to parent directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+PARENT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 ENV_FILE="$PARENT_DIR/.env"
 
 # Check if .env file already exists
@@ -32,6 +31,6 @@ then
 fi
 
 echo "✓ $ENV_FILE file created successfully!"
-echo "✓ Generated a secure 64-character API secret."
+echo "✓ Generated a 64-character API secret."
 echo ""
 echo "You can now run 'docker compose up -d' to start NOMAD Oasis."
