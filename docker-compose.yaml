@@ -358,6 +358,79 @@ services:
     deploy:
       replicas: 0 # Ensures the service isn't started
 
+  # monitoring stack
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--storage.tsdb.retention.time=30d"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: grafana
+    volumes:
+      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost/nomad-oasis/grafana # TODO: Change this
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_NAME=Keycloak
+      - GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP=true
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=nomad_public
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=test
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/auth
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/token
+      - GF_AUTH_GENERIC_OAUTH_API_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/userinfo
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    env_file:
+      - ./.env
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+
+  temporal_ui:
+    container_name: nomad_oasis_temporal_ui
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_CORS_ORIGINS=localhost/nomad-oasis/temporal # TODO: change this
+      - TEMPORAL_AUTH_CALLBACK_URL=http://localhost/nomad-oasis/temporal/auth/sso/callback # TODO: change this
+      - TEMPORAL_UI_PUBLIC_PATH=/nomad-oasis/temporal
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_AUTH_LABEL=fairdi_nomad_prod
+      - TEMPORAL_AUTH_CLIENT_SECRET="test"
+      - TEMPORAL_AUTH_ENABLED=true
+      - TEMPORAL_AUTH_TYPE=oidc
+      - TEMPORAL_DISABLE_WRITE_ACTIONS=true
+      - TEMPORAL_AUTH_PROVIDER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod
+      - TEMPORAL_AUTH_ISSUER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod
+      - TEMPORAL_AUTH_CLIENT_ID=nomad_public
+      - TEMPORAL_AUTH_SCOPES=openid,email,profile
+    env_file:
+      - ./.env
+    image: temporalio/ui:2.34.0
+    restart: unless-stopped
+
 volumes:
   mongo:
     name: "nomad_oasis_mongo"
@@ -369,6 +442,10 @@ volumes:
     name: "nomad_oasis_keycloak"
   postgresql:
     name: "nomad_oasis_postgresql"
+  prometheus_data:
+    name: "nomad_oasis_prometheus"
+  grafana_data:
+    name: "nomad_oasis_grafana"
 networks:
   default:
     name: nomad_oasis_network
