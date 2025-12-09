@@ -3548,14 +3548,14 @@ wheels = [
 
 [[package]]
 name = "nomad-normalizer-plugin-soap"
-version = "1.0.1"
+version = "1.0.2"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "nomad-lab" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/23/b2a69d31a58f5cf265cb3268c4389db76e900ea423033ccd99b54bcf89ea/nomad_normalizer_plugin_soap-1.0.1.tar.gz", hash = "sha256:d65c8fb281f20130461fa9f77f00d163e5bad215e753311da6531d8b9c3f4712", size = 228583, upload-time = "2025-03-17T14:19:54.953Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c9/77/d9c753bd00a5e3df36ae837f930818e997fecc6a842c485c6661f3e83c82/nomad_normalizer_plugin_soap-1.0.2.tar.gz", hash = "sha256:6c135a7738e991e27e92b27a67c247007313cdd5bfd042f2dcc4ef8fb91b9609", size = 228588, upload-time = "2025-10-30T18:52:48.345Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/25/30/0f14ccac20a0113eab2256506dbae7af36085168d89f3fcb0fb49b3968e4/nomad_normalizer_plugin_soap-1.0.1-py3-none-any.whl", hash = "sha256:756e437d8a1ae95e9634f1aecc861af88a26681ab50df066e214194f6e890b0e", size = 9167, upload-time = "2025-03-17T14:19:53.421Z" },
+    { url = "https://files.pythonhosted.org/packages/67/05/5a846c25f4e783ecfa30acec6403895dec78b2064217a52bdada59674549/nomad_normalizer_plugin_soap-1.0.2-py3-none-any.whl", hash = "sha256:36806a9e0f66b5d835ad031621008a58987e2625ee97d49899211293a17f7044", size = 9188, upload-time = "2025-10-30T18:52:46.933Z" },
 ]
 
 [[package]]
