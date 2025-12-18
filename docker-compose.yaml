@@ -86,7 +86,7 @@ services:
       - POSTGRES_SEEDS=postgresql
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
-    image: docker.io/temporalio/auto-setup:1.28
+    image: docker.io/temporalio/auto-setup:1.29.1
     healthcheck:
       test: >
         bash -c '
