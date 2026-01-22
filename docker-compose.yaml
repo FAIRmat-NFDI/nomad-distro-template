@@ -135,6 +135,7 @@ services:
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_TEMPORAL_HOST: temporal
+      NOMAD_TEMPORAL_PROMETHEUS_BIND_ADDRESS: 0.0.0.0:9400
     env_file:
       - ./.env
     depends_on:
