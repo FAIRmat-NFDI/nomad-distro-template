@@ -338,9 +338,21 @@ services:
       - "--web.console.templates=/usr/share/prometheus/consoles"
       - "--storage.tsdb.retention.time=30d"
     volumes:
+      - ./monitoring/prometheus/targets.json:/etc/prometheus/targets.json
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
     restart: unless-stopped
+
+  prometheus-discovery:
+    image: docker:24-cli
+    container_name: prometheus-discovery
+    volumes:
+      - ./monitoring/prometheus/targets.json:/etc/prometheus/targets.json
+      - ./scripts/generate-prometheus-targets.sh:/generate-prometheus-targets.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: sh -c "while true; do sh /generate-prometheus-targets.sh; sleep 30; done"
 
   grafana:
     image: grafana/grafana:10.2.2
@@ -349,7 +361,6 @@ services:
       - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
       - grafana_data:/var/lib/grafana
     environment:
-      - GF_SERVER_ROOT_URL=http://localhost/nomad-oasis/grafana # TODO: Change this
       - GF_AUTH_GENERIC_OAUTH_ENABLED=true
       - GF_AUTH_GENERIC_OAUTH_NAME=Keycloak
       - GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP=true
@@ -362,6 +373,8 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     env_file:
       - ./.env
+    ports:
+      - "3000:3000"
     restart: unless-stopped
 
   cadvisor:
@@ -382,22 +395,12 @@ services:
     depends_on:
       - temporal
     environment:
-      - TEMPORAL_CORS_ORIGINS=localhost/nomad-oasis/temporal # TODO: change this
-      - TEMPORAL_AUTH_CALLBACK_URL=http://localhost/nomad-oasis/temporal/auth/sso/callback # TODO: change this
-      - TEMPORAL_UI_PUBLIC_PATH=/nomad-oasis/temporal
       - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_AUTH_LABEL=fairdi_nomad_prod
-      - TEMPORAL_AUTH_CLIENT_SECRET="test"
-      - TEMPORAL_AUTH_ENABLED=true
-      - TEMPORAL_AUTH_TYPE=oidc
-      - TEMPORAL_DISABLE_WRITE_ACTIONS=true
-      - TEMPORAL_AUTH_PROVIDER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod
-      - TEMPORAL_AUTH_ISSUER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod
-      - TEMPORAL_AUTH_CLIENT_ID=nomad_public
-      - TEMPORAL_AUTH_SCOPES=openid,email,profile
     env_file:
       - ./.env
     image: temporalio/ui:2.34.0
+    ports:
+      - "8080:8080"
     restart: unless-stopped
 
 volumes:
