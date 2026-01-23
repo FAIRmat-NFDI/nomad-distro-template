@@ -1,0 +1,343 @@
+mongodb:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/mongodb
+    tag: "latest"
+  persistence:
+    enabled: false
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 30
+    failureThreshold: 10
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 10
+  auth:
+    enabled: false
+
+elasticsearch:
+  enabled: true
+  replicas: 1
+  minimumMasterNodes: 1
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      memory: "2Gi"
+  clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
+  esConfig:
+    elasticsearch.yml: |
+      cluster.routing.allocation.disk.threshold_enabled: false
+
+nomad:
+  enabled: true
+
+  config:
+    services:
+      api_host: nomad-oasis.local
+      api_base_path: /nomad-oasis
+      api_port: 80
+      https: false
+      upload_limit: 10
+      admin_user_id: ""
+
+    fs:
+      staging_external: /data/nomad/staging
+      public_external: /data/nomad/public
+      north_home_external: /data/nomad/north/users
+      tmp: /data/nomad/tmp
+      prefix_size: 1
+      nomad: /nomad
+      working_directory: /app
+
+    mongo:
+      db_name: nomad_oasis
+      port: 27017
+
+    elastic:
+      port: 9200
+      timeout: 60
+      bulk_timeout: 600
+      bulk_size: 1000
+      entries_per_material_cap: 1000
+
+    logstash:
+      enabled: false
+      tcp_port: 5000
+
+    temporal:
+      enabled: true
+      namespace: default
+
+    meta:
+      service: app
+      homepage: http://localhost/nomad-oasis
+      source_url: https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-distro
+      maintainer_email: support@nomad-lab.eu
+      footer_links: []
+      beta:
+        label: oasis
+        isTest: false
+        isBeta: false
+        usesBetaData: false
+        officialUrl: https://nomad-lab.eu/prod/v1/gui
+
+    process:
+      reuse_parser: true
+      index_materials: true
+      rfc3161_skip_published: false
+
+    reprocess:
+      rematch_published: true
+      reprocess_existing_entries: true
+      use_original_parser: false
+      add_matched_entries_to_published: false
+      delete_unmatched_published_entries: false
+      index_individual_entries: false
+
+    celery:
+      routing: queue
+      timeout: 7200
+      acks_late: false
+
+    logging:
+      app:
+        console_loglevel: DEBUG
+        logstash_loglevel: INFO
+      worker:
+        console_loglevel: INFO
+        logstash_loglevel: INFO
+
+    mail:
+      enabled: false
+      host: localhost
+      port: 25
+      from_address: support@nomad-lab.eu
+
+    client:
+      user: admin
+
+    keycloak:
+      server_url: "https://nomad-lab.eu/fairdi/keycloak/auth/"
+      realm_name: "fairdi_nomad_test"
+      username: admin
+      client_id: "nomad_public"
+
+    datacite:
+      enabled: false
+
+    north:
+      enabled: true
+      hub_service_api_token: secret-token
+      hub_host: nomad-oasis-jupyterhub-hub
+      hub_port: 8081
+
+    gui:
+      debug: false
+      gzip: true
+
+    oasis:
+      is_oasis: true
+      uses_central_user_management: false
+
+  image:
+    repository: gitlab-registry.mpcdf.mpg.de/nomad-lab/nomad-distro
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  proxy:
+    replicaCount: 1
+    timeout: 60
+    editTimeout: 60
+    connectionTimeout: 10
+    image:
+      repository: nginx
+      tag: 1.27.4-alpine
+      pullPolicy: IfNotPresent
+    command: [nginx]
+    args: [-g, daemon off;]
+    service:
+      type: ClusterIP
+      port: 80
+
+  app:
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 8000
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+
+  worker:
+    replicaCount: 1
+    terminationGracePeriodSeconds: 300
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+
+  infrastructure:
+    mongo:
+      host: ""  # defaults to {{ .Release.Name }}-mongodb
+    elastic:
+      host: ""  # defaults to elasticsearch-master
+    rabbitmq:
+      host: ""  # defaults to {{ .Release.Name }}-rabbitmq
+    logstash:
+      host: ""
+
+  secrets:
+    api:
+      existingSecret: ""
+      key: password
+      value: ""
+      autoGenerate: true
+
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "32g"
+    tls: []
+
+  service:
+    type: ClusterIP
+    port: 80
+
+temporal:
+  enabled: true
+  server:
+    replicaCount: 1
+    config:
+      publicClient:
+        hostPort: "nomad-oasis-temporal-frontend:7233"
+      persistence:
+        default:
+          driver: "sql"
+          sql:
+            driver: "postgres12"
+            host: "nomad-oasis-postgresql"
+            port: 5432
+            database: "temporal"
+            user: "temporal"
+            password: "temporal"
+        visibility:
+          driver: "sql"
+          sql:
+            driver: "postgres12"
+            host: "nomad-oasis-postgresql"
+            port: 5432
+            database: "temporal_visibility"
+            user: "temporal"
+            password: "temporal"
+  worker:
+    # Temporal's internal system worker (for archival, batch ops) - not needed for NOMAD
+    # Disabled due to known SDK client timeout issue in Temporal helm chart 0.72.0
+    replicaCount: 0
+  schema:
+    createDatabase:
+      enabled: false
+    setup:
+      enabled: true
+    update:
+      enabled: true
+  cassandra:
+    enabled: false
+  elasticsearch:
+    enabled: false
+  prometheus:
+    enabled: false
+  grafana:
+    enabled: false
+  web:
+    enabled: true
+    replicaCount: 1
+    service:
+      type: ClusterIP
+
+postgresql:
+  enabled: true
+  image:
+    repository: bitnamilegacy/postgresql
+  global:
+    postgresql:
+      auth:
+        postgresPassword: postgres
+        username: temporal
+        password: temporal
+  primary:
+    initdb:
+      scripts:
+        01-init.sql: |-
+          CREATE DATABASE "temporal";
+          CREATE DATABASE "temporal_visibility";
+
+jupyterhub:
+  enabled: true
+  fullnameOverride: "nomad-oasis-jupyterhub"
+  hub:
+    baseUrl: "/nomad-oasis/north"
+    config:
+      GenericOAuthenticator:
+        client_id: nomad_public
+        oauth_callback_url: http://nomad-oasis.local/nomad-oasis/north/hub/oauth_callback
+        authorize_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_test/protocol/openid-connect/auth
+        token_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_test/protocol/openid-connect/token
+        userdata_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_test/protocol/openid-connect/userinfo
+    extraEnv:
+      NOMAD_OASIS_URL: "http://nomad-oasis-proxy/nomad-oasis"
+    db:
+      type: sqlite-memory
+  singleuser:
+    podNameTemplate: "nomad-oasis-north-{username}--{servername}"
+    uid: 1000
+    fsGid: 100
+    storage:
+      type: none
+    defaultUrl: "/lab"
+    image:
+      name: jupyter/minimal-notebook
+      tag: latest
+    cpu:
+      limit: 1
+      guarantee: 0.25
+    memory:
+      limit: 2G
+      guarantee: 512M
+  proxy:
+    service:
+      type: ClusterIP
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - nomad-oasis.local
+    pathType: Prefix
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  prePuller:
+    hook:
+      enabled: false
+    continuous:
+      enabled: false
+
+keda:
+  enabled: false

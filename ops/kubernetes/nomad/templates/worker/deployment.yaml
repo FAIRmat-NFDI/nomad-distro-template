@@ -1,0 +1,198 @@
+{{- if .Values.nomad.enabled -}}
+{{- $config := .Values.nomad.config -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nomad.fullname" . }}-worker
+  labels:
+    {{- include "nomad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: worker
+spec:
+  {{- if not .Values.nomad.worker.autoscaling.enabled }}
+  replicas: {{ .Values.nomad.worker.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "nomad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: worker
+  template:
+    metadata:
+      {{- with .Values.nomad.worker.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+        {{- if $.Values.roll }}
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- end }}
+      {{- else }}
+      {{- if .Values.roll }}
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+      {{- end }}
+      {{- end }}
+      labels:
+        {{- include "nomad.labels" . | nindent 8 }}
+        {{- with .Values.nomad.worker.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        app.kubernetes.io/component: worker
+    spec:
+      {{- with .Values.nomad.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "nomad.serviceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.nomad.worker.terminationGracePeriodSeconds | default 300 }}
+      {{- with .Values.nomad.worker.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-worker
+          {{- with .Values.nomad.worker.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.nomad.image.repository }}:{{ .Values.nomad.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nomad.image.pullPolicy }}
+          {{- with .Values.nomad.worker.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /app/nomad.yaml
+              name: nomad-conf
+              subPath: nomad.yaml
+            - mountPath: /app/.volumes/fs/public
+              name: public-volume
+            - mountPath: /app/.volumes/fs/staging
+              name: staging-volume
+            - mountPath: /nomad
+              name: nomad-volume
+            {{- with .Values.nomad.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.nomad.worker.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: MPLCONFIGDIR
+              value: /tmp/matplotlib
+            - name: CELERY_ACKS_LATE
+              value: "True"
+            - name: NOMAD_META_SERVICE
+              value: "worker"
+            - name: NOMAD_CONSOLE_LOG_LEVEL
+              value: "{{ $config.logging.worker.console_loglevel }}"
+            - name: NOMAD_LOGSTASH_LEVEL
+              value: "{{ $config.logging.worker.logstash_loglevel }}"
+            - name: NOMAD_CELERY_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            {{- if or .Values.nomad.secrets.api.existingSecret .Values.nomad.secrets.api.value .Values.nomad.secrets.api.autoGenerate }}
+            - name: NOMAD_SERVICES_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nomad.secretName.api" . }}
+                  key: {{ .Values.nomad.secrets.api.key }}
+            {{- end }}
+            {{- if or .Values.nomad.secrets.keycloak.clientSecret.existingSecret .Values.nomad.secrets.keycloak.clientSecret.value }}
+            - name: NOMAD_KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nomad.secretName.keycloakClient" . }}
+                  key: {{ .Values.nomad.secrets.keycloak.clientSecret.key }}
+            {{- end }}
+            {{- if or .Values.nomad.secrets.keycloak.password.existingSecret .Values.nomad.secrets.keycloak.password.value }}
+            - name: NOMAD_KEYCLOAK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nomad.secretName.keycloakPassword" . }}
+                  key: {{ .Values.nomad.secrets.keycloak.password.key }}
+            {{- end }}
+          {{- if $config.temporal.enabled }}
+          # See https://keithtenzer.com/temporal/Deploying_Temporal_Worker_on_Kubernetes/#liveliness-and-readiness-probes
+          # for rationale on using 'ls /' as a liveness/readiness probe for Temporal workers.
+          command: ["python", "-m", "nomad.cli", "admin", "run", "action-internal-worker"]
+          readinessProbe:
+            exec:
+              command:
+              - ls
+              - /
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          livenessProbe:
+            exec:
+              command:
+              - ls
+              - /
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          {{- else }}
+          command: ["python", "-m", "celery", "-A", "nomad.processing", "worker", "-n", "$(NOMAD_CELERY_NODE_NAME)" {{ if .Values.nomad.worker.processes }}, "-c", "{{ .Values.nomad.worker.processes }}"{{ end }}{{ if .Values.nomad.worker.maxTasksPerChild }}, "--max-tasks-per-child", "{{ .Values.nomad.worker.maxTasksPerChild }}"{{ end }}]
+          livenessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - NOMAD_LOGSTASH_LEVEL=WARNING python -m celery -A nomad.processing status | grep "${NOMAD_CELERY_NODE_NAME}:.*OK"
+            initialDelaySeconds: 300
+            periodSeconds: 120
+            timeoutSeconds: 60
+          readinessProbe:
+            exec:
+              command:
+              - bash
+              - -c
+              - NOMAD_LOGSTASH_LEVEL=WARNING python -m celery -A nomad.processing status | grep "${NOMAD_CELERY_NODE_NAME}:.*OK"
+            initialDelaySeconds: 300
+            periodSeconds: 120
+            timeoutSeconds: 60
+          {{- end }}
+      volumes:
+      {{- with .Values.nomad.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nomad.worker.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        - name: nomad-conf
+          configMap:
+            name: {{ include "nomad.fullname" . }}-configmap
+        - name: public-volume
+          hostPath:
+            path: {{ $config.fs.public_external }}
+            # type: Directory
+        - name: staging-volume
+          {{ if (eq .Values.nomad.worker.storage "memory") }}
+          emptyDir:
+            medium: 'Memory'
+          {{ else }}
+          hostPath:
+            path: {{ $config.fs.staging_external }}
+            # type: Directory
+          {{ end }}
+        - name: nomad-volume
+          hostPath:
+            path: {{ $config.fs.nomad }}
+            # type: Directory
+
+      {{- with .Values.nomad.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nomad.worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nomad.worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

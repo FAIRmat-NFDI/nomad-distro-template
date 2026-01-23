@@ -1,0 +1,203 @@
+{{- if .Values.nomad.enabled -}}
+{{- $config := .Values.nomad.config -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nomad.fullname" . }}-app
+  labels:
+    {{- include "nomad.labels" . | nindent 4 }}
+    app.kubernetes.io/component: app
+spec:
+  replicas: {{ .Values.nomad.app.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "nomad.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      {{- with .Values.nomad.app.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+        {{- if $.Values.roll }}
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- end }}
+      {{- else }}
+      {{- if .Values.roll }}
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+      {{- end }}
+      {{- end }}
+      labels:
+        {{- include "nomad.labels" . | nindent 8 }}
+        {{- with .Values.nomad.app.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        app.kubernetes.io/component: app
+    spec:
+      {{- with .Values.nomad.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "nomad.serviceAccountName" . }}
+      {{- with .Values.nomad.app.podSecurityContext }}
+      securityContext:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}-app
+          {{- with .Values.nomad.app.securityContext }}
+          securityContext:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.nomad.image.repository }}:{{ .Values.nomad.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nomad.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.nomad.app.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "{{ $config.services.api_base_path }}/alive"
+              port: 8000
+            initialDelaySeconds: 300
+            periodSeconds: 15
+            timeoutSeconds: {{ add .Values.nomad.proxy.timeout 15}}
+          readinessProbe:
+            httpGet:
+              path: "{{ $config.services.api_base_path }}/alive"
+              port: 8000
+            initialDelaySeconds: 300
+            periodSeconds: 15
+            timeoutSeconds: {{ add .Values.nomad.proxy.timeout 15 }}
+          {{- with .Values.nomad.app.resources }}
+          resources:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: /app/nomad.yaml
+              name: nomad-conf
+              subPath: nomad.yaml
+            - mountPath: /app/uvicorn.log.conf
+              name: uvicorn-log-conf
+              subPath: uvicorn.log.conf
+            - mountPath: /app/.volumes/fs/public
+              name: public-volume
+            - mountPath: /app/.volumes/fs/staging
+              name: staging-volume
+            - mountPath: /app/.volumes/fs/north/users
+              name: north-home-volume
+            - mountPath: /nomad
+              name: nomad-volume
+            {{- with .Values.nomad.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.nomad.app.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: MPLCONFIGDIR
+              value: /tmp/matplotlib
+            - name: NOMAD_META_SERVICE
+              value: "app"
+            - name: NOMAD_CONSOLE_LOGLEVEL
+              value: "{{ $config.logging.app.console_loglevel }}"
+            - name: NOMAD_LOGSTASH_LEVEL
+              value: "{{ $config.logging.app.logstash_loglevel }}"
+            {{- if or .Values.nomad.secrets.api.existingSecret .Values.nomad.secrets.api.value .Values.nomad.secrets.api.autoGenerate }}
+            - name: NOMAD_SERVICES_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nomad.secretName.api" . }}
+                  key: {{ .Values.nomad.secrets.api.key }}
+            {{- end }}
+            {{- if or .Values.nomad.secrets.keycloak.clientSecret.existingSecret .Values.nomad.secrets.keycloak.clientSecret.value }}
+            - name: NOMAD_KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nomad.secretName.keycloakClient" . }}
+                  key: {{ .Values.nomad.secrets.keycloak.clientSecret.key }}
+            {{- end }}
+            {{- if or .Values.nomad.secrets.client.password.existingSecret .Values.nomad.secrets.client.password.value }}
+            - name: NOMAD_CLIENT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.nomad.secrets.client.password.existingSecret }} {{ .Values.nomad.secrets.client.password.existingSecret }}{{- else }} {{ include "nomad.fullname" . }}-client-password-secret{{- end }}
+                  key: {{ .Values.nomad.secrets.client.password.key }}
+            {{- end }}
+            {{- if or .Values.nomad.secrets.keycloak.password.existingSecret .Values.nomad.secrets.keycloak.password.value }}
+            - name: NOMAD_KEYCLOAK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nomad.secretName.keycloakPassword" . }}
+                  key: {{ .Values.nomad.secrets.keycloak.password.key }}
+            {{- end }}
+            {{- if and $config.datacite.enabled (or .Values.nomad.secrets.datacite.existingSecret .Values.nomad.secrets.datacite.value) }}
+            - name: NOMAD_DATACITE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.nomad.secrets.datacite.existingSecret }} {{ .Values.nomad.secrets.datacite.existingSecret }}{{- else }} {{ include "nomad.fullname" . }}-datacite-secret{{- end }}
+                  key: {{ .Values.nomad.secrets.datacite.key }}
+            - name: NOMAD_DATACITE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{- if .Values.nomad.secrets.datacite.existingSecret }} {{ .Values.nomad.secrets.datacite.existingSecret }}{{- else }} {{ include "nomad.fullname" . }}-datacite-secret{{- end }}
+                  key: user
+            {{- end }}
+            {{- if and $config.north.enabled (or .Values.nomad.secrets.north.hubServiceApiToken.existingSecret .Values.nomad.secrets.north.hubServiceApiToken.value) }}
+            - name: NOMAD_NORTH_HUB_SERVICE_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "nomad.secretName.north" . }}
+                  key: {{ .Values.nomad.secrets.north.hubServiceApiToken.key }}
+            {{- end }}
+          command: ["python", "-m", "nomad.cli", "admin", "run", "app", "--log-config", "uvicorn.log.conf", "--with-gui", "--host", "0.0.0.0"]
+      volumes:
+        {{- with .Values.nomad.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.nomad.app.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - name: uvicorn-log-conf
+          configMap:
+            name: {{ include "nomad.fullname" . }}-configmap-app-uvicorn-log-config
+        - name: app-run-script
+          configMap:
+            name: {{ include "nomad.fullname" . }}-app-run-script
+        - name: nomad-conf
+          configMap:
+            name: {{ include "nomad.fullname" . }}-configmap
+        - name: public-volume
+          hostPath:
+            path: {{ $config.fs.public_external }}
+            # type: Directory
+        - name: staging-volume
+          {{ if (eq .Values.nomad.worker.storage "memory") }}
+          emptyDir:
+            medium: 'Memory'
+          {{ else }}
+          hostPath:
+            path: {{ $config.fs.staging_external }}
+            # type: Directory
+          {{ end }}
+        - name: north-home-volume
+          hostPath:
+            path: {{ $config.fs.north_home_external }}
+            # type: Directory
+        - name: nomad-volume
+          hostPath:
+            path: {{ $config.fs.nomad }}
+            # type: Directory
+      {{- with .Values.nomad.app.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nomad.app.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nomad.app.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end}}

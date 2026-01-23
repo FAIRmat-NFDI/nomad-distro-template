@@ -35,16 +35,17 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 
 In this README you will find instructions for:
 1. [Deploying the distribution](#deploying-the-distribution)
-2. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
-3. [Adding a plugin](#adding-a-plugin)
-4. [Using the jupyter image](#the-jupyter-image)
-5. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
-6. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
-7. [Customizing Documentation](#customizing-documentation)
-8. [Backing up the Oasis](#backing-up-the-oasis)
-9. [Enabling NOMAD Actions](#enabling-nomad-actions)
-10. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-11. [Solving common issues](#faqtrouble-shooting)
+2. [Deploying on Kubernetes](#deploying-on-kubernetes)
+3. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
+4. [Adding a plugin](#adding-a-plugin)
+5. [Using the jupyter image](#the-jupyter-image)
+6. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
+7. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
+8. [Customizing Documentation](#customizing-documentation)
+9. [Backing up the Oasis](#backing-up-the-oasis)
+10. [Enabling NOMAD Actions](#enabling-nomad-actions)
+11. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+12. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -207,6 +208,104 @@ volumes:
 ```
 
 To run the new image you can follow steps 5. and 7. [above](#for-a-new-oasis).
+
+## Deploying on Kubernetes
+
+For production deployments or when you need better scalability, you can deploy NOMAD Oasis on Kubernetes using the provided Helm chart.
+
+### Overview
+
+The Helm chart (`ops/kubernetes/nomad/`) provides a complete deployment including:
+- NOMAD app and worker services
+- MongoDB for metadata storage
+- Elasticsearch for search functionality
+- Temporal for workflow orchestration
+- JupyterHub (NORTH) for interactive computing
+- Nginx proxy with proper routing
+
+### Quick Start (Minikube)
+
+```bash
+# Start minikube with adequate resources
+minikube start --cpus=6 --memory=12288
+minikube addons enable ingress
+
+# Create data directories
+minikube ssh -- 'sudo mkdir -p /data/nomad/{public,staging,tmp,north/users} && sudo chmod -R 777 /data/nomad'
+
+# Update Helm dependencies
+helm dependency update ./ops/kubernetes/nomad
+
+# Create namespace and install
+kubectl create namespace nomad-oasis
+helm install nomad-oasis ./ops/kubernetes/nomad \
+  -f ./ops/kubernetes/nomad/examples/oasis-minikube-values.yaml \
+  -n nomad-oasis
+
+# Add to /etc/hosts and start tunnel
+echo "$(minikube ip) nomad-oasis.local" | sudo tee -a /etc/hosts
+minikube tunnel
+```
+
+Access the GUI at: http://nomad-oasis.local/nomad-oasis/gui/
+
+### Configuration
+
+The chart uses a clean configuration structure under `nomad.config`:
+
+```yaml
+nomad:
+  config:
+    services:
+      api_host: nomad-oasis.local
+      api_base_path: /nomad-oasis
+    keycloak:
+      server_url: https://nomad-lab.eu/fairdi/keycloak/auth/
+      realm_name: fairdi_nomad_test
+      client_id: nomad_public
+    north:
+      enabled: true
+```
+
+### Enabling NORTH (JupyterHub)
+
+To enable interactive computing environments:
+
+```yaml
+nomad:
+  config:
+    north:
+      enabled: true
+      hub_service_api_token: "your-secure-token"
+
+jupyterhub:
+  enabled: true
+  hub:
+    baseUrl: "/nomad-oasis/north"
+    config:
+      GenericOAuthenticator:
+        client_id: nomad_public
+        oauth_callback_url: http://your-host/nomad-oasis/north/hub/oauth_callback
+        authorize_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_test/protocol/openid-connect/auth
+        token_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_test/protocol/openid-connect/token
+        userdata_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_test/protocol/openid-connect/userinfo
+```
+
+Create the required secret:
+```bash
+kubectl create secret generic nomad-hub-service-api-token \
+  --from-literal=token=$(openssl rand -hex 32) -n nomad-oasis
+```
+
+### Helper Scripts
+
+The repository includes helper scripts in `ops/kubernetes/scripts/`:
+
+- `minikube-setup.sh` - Automated minikube setup and installation
+- `check-status.sh` - Diagnostic script to verify deployment health
+- `dev-utils.sh` - Shell aliases for common operations
+
+For detailed documentation, see [ops/kubernetes/nomad/README.md](ops/kubernetes/nomad/README.md).
 
 ## Configuring Worker Replicas and Resource Limits
 

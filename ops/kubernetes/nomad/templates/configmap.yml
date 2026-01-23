@@ -1,0 +1,220 @@
+{{- if .Values.nomad.enabled -}}
+{{- $config := .Values.nomad.config -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "nomad.fullname" . }}-configmap
+  labels:
+    app.kubernetes.io/name: {{ include "nomad.name" . }}-configmap
+    {{- include "nomad.labels" . | nindent 4 }}
+data:
+  nomad.yaml: |
+{{- $computed := dict }}
+
+{{- $meta := dict
+    "deployment" .Release.Name
+    "service" $config.meta.service
+    "homepage" $config.meta.homepage
+    "source_url" $config.meta.source_url
+    "maintainer_email" $config.meta.maintainer_email
+}}
+{{- if $config.meta.footer_links }}
+{{- $_ := set $meta "footer_links" $config.meta.footer_links }}
+{{- end }}
+{{- if $config.meta.beta }}
+{{- $_ := set $meta "beta" $config.meta.beta }}
+{{- end }}
+{{- $_ := set $computed "meta" $meta }}
+
+{{- $services := dict
+    "api_host" $config.services.api_host
+    "api_port" $config.services.api_port
+    "api_base_path" $config.services.api_base_path
+    "https" $config.services.https
+    "admin_user_id" $config.services.admin_user_id
+    "upload_limit" $config.services.upload_limit
+}}
+{{- $_ := set $computed "services" $services }}
+
+{{- $fs := dict
+    "tmp" ".volumes/fs/staging/tmp"
+    "staging_external" $config.fs.staging_external
+    "public_external" $config.fs.public_external
+    "north_home_external" $config.fs.north_home_external
+    "prefix_size" $config.fs.prefix_size
+    "working_directory" $config.fs.working_directory
+}}
+{{- if $config.fs.archive_version_suffix }}
+{{- $_ := set $fs "archive_version_suffix" $config.fs.archive_version_suffix }}
+{{- end }}
+{{- $_ := set $computed "fs" $fs }}
+
+{{- $mongoHost := .Values.nomad.infrastructure.mongo.host }}
+{{- if not $mongoHost }}
+{{- $mongoHost = printf "%s-mongodb" .Release.Name }}
+{{- end }}
+{{- $secret := (lookup "v1" "Secret" .Release.Namespace (print .Release.Name "-mongodb")) }}
+{{- if $secret }}
+{{- $mongoHost = printf "mongodb://root:%s@%s" (index $secret.data "mongodb-root-password" | b64dec) $mongoHost }}
+{{- else }}
+{{- $mongoHost = printf "mongodb://%s" $mongoHost }}
+{{- end }}
+{{- $dbname := $config.mongo.db_name }}
+{{- $mongo := dict
+    "host" $mongoHost
+    "port" $config.mongo.port
+    "db_name" $dbname
+}}
+{{- $_ := set $computed "mongo" $mongo }}
+
+{{- $elasticHost := .Values.nomad.infrastructure.elastic.host }}
+{{- if not $elasticHost }}
+{{- $elasticHost = "elasticsearch-master" }}
+{{- end }}
+{{- $elastic := dict
+    "host" $elasticHost
+    "port" $config.elastic.port
+    "timeout" $config.elastic.timeout
+    "bulk_timeout" $config.elastic.bulk_timeout
+    "bulk_size" $config.elastic.bulk_size
+    "entries_per_material_cap" $config.elastic.entries_per_material_cap
+    "entries_index" (printf "%s_entries_v1" $dbname)
+    "materials_index" (printf "%s_materials_v1" $dbname)
+}}
+{{- $_ := set $computed "elastic" $elastic }}
+
+{{- $rabbitmqHost := .Values.nomad.infrastructure.rabbitmq.host }}
+{{- if not $rabbitmqHost }}
+{{- $rabbitmqHost = printf "%s-rabbitmq" .Release.Name }}
+{{- end }}
+{{- $rabbitmq := dict "host" $rabbitmqHost }}
+{{- $_ := set $computed "rabbitmq" $rabbitmq }}
+
+{{- $logstashHost := .Values.nomad.infrastructure.logstash.host }}
+{{- if not $logstashHost }}
+{{- $logstashHost = printf "%s-logstash" .Release.Name }}
+{{- end }}
+{{- $logstash := dict
+    "enabled" $config.logstash.enabled
+    "host" $logstashHost
+    "tcp_port" $config.logstash.tcp_port
+}}
+{{- $_ := set $computed "logstash" $logstash }}
+
+{{- if $config.temporal.enabled }}
+{{- $temporalHost := printf "%s-temporal-frontend" .Release.Name }}
+{{- $temporal := dict
+    "enabled" true
+    "host" $temporalHost
+    "namespace" $config.temporal.namespace
+}}
+{{- if $config.temporal.graceful_shutdown_timeout }}
+{{- $_ := set $temporal "graceful_shutdown_timeout" $config.temporal.graceful_shutdown_timeout }}
+{{- end }}
+{{- if $config.temporal.processing_timeouts }}
+{{- $_ := set $temporal "processing_timeouts" $config.temporal.processing_timeouts }}
+{{- end }}
+{{- $_ := set $computed "temporal" $temporal }}
+{{- end }}
+
+{{- $north := dict
+    "enabled" $config.north.enabled
+    "hub_host" (default $config.services.api_host $config.north.hub_host)
+    "hub_port" (default $config.services.api_port $config.north.hub_port)
+    "hub_service_api_token" $config.north.hub_service_api_token
+}}
+{{- if $config.north.tools }}
+{{- $_ := set $north "tools" $config.north.tools }}
+{{- end }}
+{{- $_ := set $computed "north" $north }}
+
+{{- if $config.process }}
+{{- $process := dict
+    "reuse_parser" $config.process.reuse_parser
+    "index_materials" $config.process.index_materials
+    "rfc3161_skip_published" $config.process.rfc3161_skip_published
+}}
+{{- $_ := set $computed "process" $process }}
+{{- end }}
+
+{{- if $config.reprocess }}
+{{- $reprocess := dict
+    "rematch_published" $config.reprocess.rematch_published
+    "reprocess_existing_entries" $config.reprocess.reprocess_existing_entries
+    "use_original_parser" $config.reprocess.use_original_parser
+    "add_matched_entries_to_published" $config.reprocess.add_matched_entries_to_published
+    "delete_unmatched_published_entries" $config.reprocess.delete_unmatched_published_entries
+    "index_individual_entries" $config.reprocess.index_individual_entries
+}}
+{{- $_ := set $computed "reprocess" $reprocess }}
+{{- end }}
+
+{{- if $config.celery }}
+{{- $celery := dict
+    "routing" $config.celery.routing
+    "timeout" $config.celery.timeout
+    "acks_late" $config.celery.acks_late
+}}
+{{- $_ := set $computed "celery" $celery }}
+{{- end }}
+
+{{- if $config.mail }}
+{{- $mail := dict
+    "enabled" $config.mail.enabled
+    "host" $config.mail.host
+    "port" $config.mail.port
+    "from_address" $config.mail.from_address
+    "user" $config.mail.user
+    "password" $config.mail.password
+    "cc_address" $config.mail.cc_address
+}}
+{{- $_ := set $computed "mail" $mail }}
+{{- end }}
+
+{{- if $config.client }}
+{{- $client := dict
+    "user" $config.client.user
+}}
+{{- $_ := set $computed "client" $client }}
+{{- end }}
+
+{{- if $config.keycloak }}
+{{- $keycloak := dict
+    "server_url" $config.keycloak.server_url
+    "realm_name" $config.keycloak.realm_name
+    "username" $config.keycloak.username
+    "client_id" $config.keycloak.client_id
+}}
+{{- $_ := set $computed "keycloak" $keycloak }}
+{{- end }}
+
+{{- if $config.datacite }}
+{{- $_ := set $computed "datacite" $config.datacite }}
+{{- end }}
+
+{{- if $config.oasis }}
+{{- $_ := set $computed "oasis" $config.oasis }}
+{{- end }}
+
+{{- if $config.ui }}
+{{- $_ := set $computed "ui" $config.ui }}
+{{- end }}
+{{- if $config.gui.config }}
+{{- $_ := set $computed "ui" $config.gui.config }}
+{{- end }}
+
+{{- if $config.archive }}
+{{- $_ := set $computed "archive" $config.archive }}
+{{- end }}
+
+{{- if $config.plugins }}
+{{- $_ := set $computed "plugins" $config.plugins }}
+{{- end }}
+
+{{- if $config.normalize }}
+{{- $_ := set $computed "normalize" $config.normalize }}
+{{- end }}
+
+{{- /* Output as YAML */ -}}
+{{ $computed | toYaml | nindent 4 }}
+{{- end }}
