@@ -37,14 +37,12 @@ location @redirect_to_index {
 
 location /nomad-oasis/docs/ {
     proxy_intercept_errors on;
-    error_page 404 = /nomad-oasis/docs/404.html;
+    error_page 404 = @docs404redirect;
     proxy_pass http://app:8000;
 }
 
-location = /nomad-oasis/docs/404.html {
-    internal;
-    proxy_pass http://app:8000;
-    proxy_intercept_errors off;
+location @docs404redirect {
+    return 302 /nomad-oasis/docs/404.html;
 }
 
 location ~ \/gui\/(service-worker\.js|meta\.json)$ {
