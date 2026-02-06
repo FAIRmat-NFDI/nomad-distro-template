@@ -1,23 +1,4 @@
 services:
-  # broker for celery
-  rabbitmq:
-    restart: unless-stopped
-    image: docker.io/rabbitmq:3.11.5-alpine
-    container_name: nomad_oasis_rabbitmq
-    environment:
-      - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
-      - RABBITMQ_DEFAULT_USER=rabbitmq
-      - RABBITMQ_DEFAULT_PASS=rabbitmq
-      - RABBITMQ_DEFAULT_VHOST=/
-    volumes:
-      - rabbitmq:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "--silent", "--quiet", "ping"]
-      interval: 10s
-      timeout: 10s
-      retries: 30
-      start_period: 10s
-
   # the search engine
   elastic:
     restart: unless-stopped
@@ -105,17 +86,15 @@ services:
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
-      NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_TEMPORAL_HOST: temporal
+      NOMAD_TEMPORAL_PROMETHEUS_BIND_ADDRESS: 0.0.0.0:9400
     env_file:
       - ./.env
     depends_on:
       temporal:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
       elastic:
         condition: service_healthy
@@ -163,14 +142,11 @@ services:
   #             capabilities: [gpu]
   #   environment:
   #     NOMAD_SERVICE: nomad_oasis_gpu_worker
-  #     NOMAD_RABBITMQ_HOST: rabbitmq
   #     NOMAD_ELASTIC_HOST: elastic
   #     NOMAD_MONGO_HOST: mongo
   #     NOMAD_LOGSTASH_HOST: logtransfer
   #     NOMAD_TEMPORAL_HOST: temporal
   #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
   #     elastic:
   #       condition: service_healthy
   #     mongo:
@@ -192,7 +168,6 @@ services:
   #     - ./.env
   #   environment:
   #     NOMAD_SERVICE: nomad_oasis_cpu_worker
-  #     NOMAD_RABBITMQ_HOST: rabbitmq
   #     NOMAD_ELASTIC_HOST: elastic
   #     NOMAD_MONGO_HOST: mongo
   #     NOMAD_LOGSTASH_HOST: logtransfer
@@ -204,8 +179,6 @@ services:
   #         cpus: "2.0" # Maximum 2 CPU cores
   #         memory: 8G # Maximum 8GB RAM
   #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
   #     elastic:
   #       condition: service_healthy
   #     mongo:
@@ -227,7 +200,6 @@ services:
       NOMAD_SERVICE: nomad_oasis_app
       NOMAD_SERVICES_API_PORT: 80
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
@@ -237,8 +209,6 @@ services:
       - ./.env
     depends_on:
       temporal:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
       elastic:
         condition: service_healthy
@@ -276,7 +246,6 @@ services:
       NOMAD_NORTH_HUB_HOST: north
       NOMAD_SERVICES_API_HOST: app
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
     env_file:
@@ -358,17 +327,95 @@ services:
     deploy:
       replicas: 0 # Ensures the service isn't started
 
+  # monitoring stack
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--storage.tsdb.retention.time=30d"
+    volumes:
+      - ./monitoring/prometheus/targets.json:/etc/prometheus/targets.json
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  prometheus-discovery:
+    image: docker:24-cli
+    container_name: prometheus-discovery
+    volumes:
+      - ./monitoring/prometheus/targets.json:/etc/prometheus/targets.json
+      - ./scripts/generate-prometheus-targets.sh:/generate-prometheus-targets.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: sh -c "while true; do sh /generate-prometheus-targets.sh; sleep 30; done"
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: grafana
+    volumes:
+      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+      - GF_AUTH_GENERIC_OAUTH_NAME=Keycloak
+      - GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP=true
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=nomad_public
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=test
+      - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/auth
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/token
+      - GF_AUTH_GENERIC_OAUTH_API_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/userinfo
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    env_file:
+      - ./.env
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+
+  temporal_ui:
+    container_name: nomad_oasis_temporal_ui
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    env_file:
+      - ./.env
+    image: temporalio/ui:2.34.0
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
 volumes:
   mongo:
     name: "nomad_oasis_mongo"
   elastic:
     name: "nomad_oasis_elastic"
-  rabbitmq:
-    name: "nomad_oasis_rabbitmq"
   keycloak:
     name: "nomad_oasis_keycloak"
   postgresql:
     name: "nomad_oasis_postgresql"
+  prometheus_data:
+    name: "nomad_oasis_prometheus"
+  grafana_data:
+    name: "nomad_oasis_grafana"
 networks:
   default:
     name: nomad_oasis_network
