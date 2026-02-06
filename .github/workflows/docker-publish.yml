@@ -140,6 +140,14 @@ jobs:
           #   image_suffix: /cpu-action
 
     steps:
+      - name: Move Docker storage to /mnt/docker
+        run: |
+          sudo systemctl stop docker
+          sudo mkdir -p /mnt/docker
+          sudo mv /var/lib/docker /mnt/docker
+          sudo ln -s /mnt/docker /var/lib/docker
+          sudo systemctl start docker
+          
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref || github.ref_name }}
@@ -199,7 +207,15 @@ jobs:
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           submodules: true
-
+          
+      - name: Move Docker storage to /mnt/docker
+        run: |
+          sudo systemctl stop docker
+          sudo mkdir -p /mnt/docker
+          sudo mv /var/lib/docker /mnt/docker
+          sudo ln -s /mnt/docker /var/lib/docker
+          sudo systemctl start docker
+          
       - uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
