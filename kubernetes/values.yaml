@@ -1,0 +1,111 @@
+# Example values override for deploying this NOMAD Oasis distribution on Kubernetes.
+# Use this file with the NOMAD Helm chart from:
+#   https://github.com/FAIRmat-NFDI/nomad-helm-charts
+#
+# Install with:
+#   helm install nomad-oasis <nomad-helm-chart> -f values.yaml -n nomad-oasis
+
+nomad:
+  enabled: true
+
+  image:
+    # Point to this distribution's container image
+    repository: ghcr.io/fairmat-nfdi/nomad-distro-template
+    tag: main
+    pullPolicy: Always
+
+  config:
+    services:
+      api_host: my-oasis.example.com
+      api_base_path: /nomad-oasis
+      api_port: 80
+      https: false
+      upload_limit: 10
+
+    oasis:
+      is_oasis: true
+      uses_central_user_management: true
+
+    keycloak:
+      server_url: "https://nomad-lab.eu/fairdi/keycloak/auth/"
+      realm_name: "fairdi_nomad_prod"
+      client_id: "nomad_public"
+
+    mongo:
+      db_name: nomad_oasis_v1
+
+    elastic:
+      entries_index: nomad_oasis_entries_v1
+      materials_index: nomad_oasis_materials_v1
+
+    north:
+      enabled: false
+      # hub_service_api_token: "your-secure-token"
+
+    temporal:
+      enabled: true
+      namespace: default
+
+    meta:
+      deployment: "oasis"
+      deployment_url: "https://my-oasis.example.com/nomad-oasis"
+      maintainer_email: "me@example.com"
+
+  app:
+    replicaCount: 1
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+
+  worker:
+    replicaCount: 1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+
+  proxy:
+    replicaCount: 1
+
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "32g"
+    tls: []
+
+mongodb:
+  enabled: true
+  auth:
+    enabled: false
+  persistence:
+    enabled: true
+
+elasticsearch:
+  enabled: true
+  replicas: 1
+  minimumMasterNodes: 1
+
+temporal:
+  enabled: true
+  server:
+    replicaCount: 1
+  cassandra:
+    enabled: false
+  elasticsearch:
+    enabled: false
+  prometheus:
+    enabled: false
+  grafana:
+    enabled: false
+
+postgresql:
+  enabled: true
+
+jupyterhub:
+  enabled: false

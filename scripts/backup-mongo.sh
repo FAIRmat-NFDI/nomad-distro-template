@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Configuration
-BACKUP_DIR="$PARENT_DIR/.volumes/mongo"
+BACKUP_DIR="$PARENT_DIR/docker/.volumes/mongo"
 CONTAINER_NAME="nomad_oasis_mongo"
 DATABASE_NAME="nomad_oasis_v1"
 

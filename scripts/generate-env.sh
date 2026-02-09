@@ -2,9 +2,9 @@
 
 # Script to generate a .env file with a random API secret
 
-# Get the directory where the script is located and go to parent directory
-PARENT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-ENV_FILE="$PARENT_DIR/.env"
+# Get the docker directory (scripts/ is a sibling of docker/)
+DOCKER_DIR="$(cd "$(dirname "$0")/../docker" && pwd)"
+ENV_FILE="$DOCKER_DIR/.env"
 
 # Check if .env file already exists
 if [ -f "$ENV_FILE" ]; then
@@ -26,11 +26,11 @@ NOMAD_SERVICES_API_SECRET='$API_SECRET'
 EOF
 then
     echo "Error: Failed to write to $ENV_FILE" >&2
-    echo "Please check write permissions for the directory: $PARENT_DIR" >&2
+    echo "Please check write permissions for the directory: $DOCKER_DIR" >&2
     exit 1
 fi
 
 echo "✓ $ENV_FILE file created successfully!"
 echo "✓ Generated a 64-character API secret."
 echo ""
-echo "You can now run 'docker compose up -d' to start NOMAD Oasis."
+echo "You can now run 'cd docker && docker compose up -d' to start NOMAD Oasis."

@@ -1,6 +1,7 @@
 ![docker image](https://github.com/FAIRmat-NFDI/nomad-distro-template/actions/workflows/docker-publish.yml/badge.svg)
 
-# NOMAD Oasis Distribution *Template*
+# NOMAD Oasis Distribution _Template_
+
 This repository is a template for creating your own custom NOMAD Oasis distribution image.
 Click [here](https://github.com/new?template_name=nomad-distro-template&template_owner=FAIRmat-NFDI)
 to use this template, or click the `Use this template` button in the upper right corner of
@@ -34,204 +35,34 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 > ⚙️ next to "About" on the main GitHub page for this repository.
 
 In this README you will find instructions for:
+
 1. [Deploying the distribution](#deploying-the-distribution)
-2. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
-3. [Adding a plugin](#adding-a-plugin)
-4. [The jupyter image](#the-jupyter-image)
-5. [Using Docker image via plugin](#using-docker-image-via-plugin)
-6. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
-7. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
-8. [Customizing Documentation](#customizing-documentation)
-9. [Backing up the Oasis](#backing-up-the-oasis)
-10. [Enabling NOMAD Actions](#enabling-nomad-actions)
-11. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-12. [Solving common issues](#faqtrouble-shooting)
+2. [Adding a plugin](#adding-a-plugin)
+3. [The Jupyter image](#the-jupyter-image)
+4. [Using Docker image via plugin](#using-docker-image-via-plugin)
+5. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
+6. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
+7. [Customizing Documentation](#customizing-documentation)
+8. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+9. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
-Below are instructions for how to deploy this NOMAD Oasis distribution
-[for a new Oasis](#for-a-new-oasis) and [for an existing Oasis](#for-an-existing-oasis)
+This distribution can be deployed using either Docker Compose or Kubernetes with Helm.
 
-### For a new Oasis
+### Docker Compose
 
-1. Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
-   Docker nowadays comes with `docker compose` built in. Prior, you needed to
-   install the stand-alone [docker-compose](https://docs.docker.com/compose/install/).
+For instructions on deploying with Docker Compose (recommended for single-server setups),
+see the [`docker/`](docker/) folder and its [README](docker/README.md).
 
-2. Clone the repository or download the repository as a zip file.
+### Kubernetes
 
-    ```sh
-    git clone https://github.com/FAIRmat-NFDI/nomad-distro-template.git
-    cd nomad-distro-template
-    ```
-
-    or
-
-    ```sh
-    curl-L -o nomad-distro-template.zip "https://github.com/FAIRmat-NFDI/nomad-distro-template/archive/main.zip"
-    unzip nomad-distro-template.zip
-    cd nomad-distro-template
-    ```
-
-3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
-
-    ```sh
-    sudo chown -R 1000 .volumes
-    ```
-
-4. Create a file for environment variables
-
-    Before running the containers, you should create a `.env` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
-
-    At a minimum, you should add a secure secret for the API:
-
-    ```
-    NOMAD_SERVICES_API_SECRET='***'
-    ```
-
-    Make sure the `NOMAD_SERVICES_API_SECRET` is at least 32 characters long.
-
-    If you have bash available you can run this script:
-
-    ```sh
-    bash scripts/generate-env.sh
-    ```
-
-    This will create a `.env` file with a randomly generated 64-character API secret. If the file already exists, you'll be prompted before overwriting it.
-
-5. Pull the images specified in the `docker-compose.yaml`
-
-    Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
-
-    ```sh
-    docker compose pull
-    ```
-
-6. Configuring Secure HTTP and HTTPS Connections
-
-   By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server—including credentials and sensitive data—can be compromised.
-
-   HTTPS requires a TLS certificate, which must be renewed periodically. Depending on your setup, you have several options:
-
-   1. You already have a certificate.
-
-      In this case, you just need the certificate and key files.
-
-   2. Free certificate from Let's Encrypt
-
-      [Let's Encrypt](https://letsencrypt.org/) provides free TLS certificates for those with a domain name. Follow their tutorials for instructions on generating a certificate.
-
-   3. Self-signed certificate
-
-      For testing, you can create a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate). Note that self-signed certificates are not recommended for production since they are not trusted by browsers. You can generate one with:
-
-      ```sh
-      mkdir ssl
-      openssl req -x509 -nodes -days 365 \
-        -newkey rsa:2048 \
-        -keyout ./ssl/selfsigned.key \
-        -out ./ssl/selfsigned.crt \
-        -subj "/CN=localhost"
-      ```
-
-   To start using a TLS certificate, update the `proxy` configuration in `docker-compose.yml`:
-   ```diff
-   - # HTTP
-   - - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
-
-   + # HTTPS
-   + - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
-   + - ./ssl:/etc/nginx/ssl:ro  # Your certificate files
-   ```
-
-7. And run it with docker compose in detached (--detach or -d) mode
-
-    ```sh
-    docker compose up -d
-    ```
-
-8. (Optional) You can now test that NOMAD is running with
-
-    ```sh
-    # HTTP
-    curl localhost/nomad-oasis/alive
-
-    # HTTPS (--insecure flag is only needed for a self-signed certificate)
-    curl --insecure https://localhost/nomad-oasis/alive
-    ```
-
-9. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
-
-#### Updating the image
-Any pushes to the main branch of this repository, such as when [adding a plugin](#adding-a-plugin), will trigger a pipeline that generates a new app and jupyter image.
-
-1. To update your local image you need to shut down NOMAD using
-
-    ```sh
-    docker compose down
-    ```
-
-    and then repeat steps 5. and 7. above.
-
-2. You can remove unused images to free up space by running
-
-    ```sh
-    docker image prune -a
-    ```
-
-#### NOMAD Remote Tools Hub (NORTH)
-
-To run NORTH (the NOMAD Remote Tools Hub), the `hub` container needs to run docker and
-the container has to be run under the docker group. You need to replace the default group
-id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker group id.
-Run `id` if you are a docker user, or `getent group | grep docker` to find your
-systems docker gid. The user id 1000 is used as the nomad user inside all containers.
-
-Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
+For instructions on deploying on Kubernetes using the
+[NOMAD Helm chart](https://github.com/FAIRmat-NFDI/nomad-helm-charts),
+see the [`kubernetes/`](kubernetes/) folder and its [README](kubernetes/README.md).
 
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
 [https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
-
-### For an existing Oasis
-
-If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/fairmat-nfdi/nomad-distro-template:main` for the services
-`worker`, `app`, `north`, and `logtransfer`.
-
-If you want to use the `nomad.yaml` from this repository you also need to comment out
-the inclusion of the `nomad.yaml` under the volumes key of those services in the
-`docker-compose.yaml`.
-
-```yaml
-volumes:
-  # - ./configs/nomad.yaml:/app/nomad.yaml
-```
-
-To run the new image you can follow steps 5. and 7. [above](#for-a-new-oasis).
-
-## Configuring Worker Replicas and Resource Limits
-
-The `docker-compose.yaml` file is configured to run four worker replicas by default, with each limited to 4 CPU cores and 8GB of RAM. You can adjust these values to match the capacity of your server.
-
-The relevant configuration is located in the `worker` service definition within the `docker-compose.yaml` file:
-
-```yaml
-services:
-  worker:
-    ...
-    deploy:
-      replicas: 4
-      resources:
-        limits:
-          cpus: "4.0" # Maximum 4 CPU cores
-          memory: 8G # Maximum 8GB RAM
-```
-
--   `replicas`: The number of container instances to run for the worker service.
--   `cpus`: The maximum number of CPU cores the container can use.
--   `memory`: The maximum amount of memory the container can use.
-
-Adjust these values based on your server's available resources to optimize performance.
 
 ## Adding a plugin
 
@@ -282,7 +113,7 @@ be generated.
 ## The Jupyter image
 
 In addition to the Docker image for running the oasis, this repository also builds a custom NORTH image for running a jupyter hub with the installed plugins.
-This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) during the initialization of this repository and should therefore already be available in your Oasis under "Analyze / NOMAD Remote Tools Hub / jupyter"
+This image has been added to the [`docker/configs/nomad.yaml`](docker/configs/nomad.yaml) during the initialization of this repository and should therefore already be available in your Oasis under "Analyze / NOMAD Remote Tools Hub / jupyter"
 
 We currently use `quay.io/jupyter/base-notebook:2025-04-14` as our base image for Jupyter (see Dockerfile). While it includes the necessary Python packages, it does not come with `R` or `Julia` pre-installed.
 If you need support for those languages, you can switch to `quay.io/jupyter/datascience-notebook:2025-04-04`, which includes both `R` and `Julia`.
@@ -328,7 +159,7 @@ If you need to disable tests for specific plugins, update the **PLUGIN_TESTS_PLU
 
 ## Set Up Regular Package Updates with Dependabot
 
-Dependabot is already configured in the repository’s CI setup, but you need to enable it manually in the repository settings.
+Dependabot is already configured in the repository's CI setup, but you need to enable it manually in the repository settings.
 
 To enable Dependabot, go to Settings > Code security and analysis in your GitHub repository. From there, turn on Dependabot alerts and version updates. Once enabled, Dependabot will automatically check for dependency updates and create pull requests when new versions are available.
 
@@ -343,63 +174,6 @@ By default, documentation is built using the [nomad-docs](https://github.com/FAI
 3. Update the `NOMAD_DOCS_REPO` variable in the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file to point to the URL of your forked repository.
 
 This setup ensures that your custom documentation is used when building your Oasis.
-
-
-## Backing up the Oasis
-
-For detailed instructions on backing up the data on your Oasis we recommend reading the
-[NOMAD documentation on administration](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/administer.html#backups).
-
-As part of this repository there is a bash script for running the mongodump in `scripts/backup-mongo.sh`.
-1. Make sure you are in the top directory of this repository and that the `mongo` service (container `nomad_oasis_mongo`) is running.
-
-2. Run the script:
-
-    ```sh
-    bash scripts/backup-mongo.sh
-    ```
-
-3. Check that a `nomad_oasis_v1` mongodump was created in `.volumes/mongo` and that the
-dump was added to the logfile.
-
-    ```sh
-    ls .volumes/mongo
-    cat .volumes/mongo/backup.log
-    ```
-
-4. (Optional) Add the script to the crontab to run for example every night at 2 am.
-From the top directory of this repository, run:
-
-    ```sh
-    (crontab -l 2>/dev/null; echo "0 2 * * * bash $(realpath scripts/backup-mongo.sh)") | crontab -
-    ```
-
-    Finally, check that the cronjob was added:
-
-    ```sh
-    crontab -l
-    ```
-
-> [!CAUTION]
-> This will only dump the NOMAD mongo data onto the server. It is still up to you
-> to setup a proper backup of the dump in the `.volumes/mongo` directory as well as all
-> the raw files in the `.volumes/fs` directory.
-
-## Enabling NOMAD Actions
-
-To enable NOMAD Actions, you need to decide whether you need a CPU worker, a GPU worker, or both, and then make the following changes:
-
-1.  **Enable the required worker service(s) in `docker-compose.yaml`:**
-
-    Uncomment the `cpu_worker` service, the `gpu_worker` service, or both in the `docker-compose.yaml` file depending on your needs.
-
-2.  **Enable the corresponding build step(s) in the Docker publish workflow:**
-
-    In the `.github/workflows/docker-publish.yml` file, uncomment the build step(s) corresponding to the worker(s) you enabled in the `docker-compose.yaml` file.
-
-3.  **Adjust deployment resources:**
-
-    If necessary, adjust the deployment resources (e.g., CPU, memory, replicas) for the enabled worker service(s) in the `docker-compose.yaml` file to match your server's capacity.
 
 ## Updating the distribution from the template
 
@@ -419,10 +193,10 @@ git checkout --theirs .github/workflows/docker-publish.yml
 ```
 
 The lock file merge conflicts can be resolved to use your versions instead of the template repository resolution.
+
 ```sh
 git checkout --ours uv.lock
 ```
-
 
 For detailed instructions on how to resolve the merge conflicts between different version we refer you to the latest template release [notes](https://github.com/FAIRmat-NFDI/nomad-distro-template/releases/latest)
 
