@@ -49,6 +49,12 @@ jobs:
           export image_name="${{ github.repository }}"
           sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" nomad.yaml
 
+        # Replaces the template repository name in the kubernetes values with the new one
+      - name: Update kubernetes values.yaml
+        run: |
+          export image_name="${{ github.repository }}"
+          sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" kubernetes/values.yaml
+
         # Replaces the template repository name in the pyproject.toml with the new one
       - name: Update pyproject.toml
         run: |

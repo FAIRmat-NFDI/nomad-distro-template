@@ -49,6 +49,11 @@ In this README you will find instructions for:
 ## Deploying the distribution
 
 This distribution can be deployed using either Docker Compose or Kubernetes with Helm.
+To keep only the deployment method you need, run:
+
+```sh
+bash scripts/setup.sh
+```
 
 ### Docker Compose
 
