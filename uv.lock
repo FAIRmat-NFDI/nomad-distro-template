@@ -13,9 +13,6 @@ resolution-markers = [
 [options]
 prerelease-mode = "explicit"
 
-[manifest]
-constraints = [{ name = "flatdict", specifier = "==4.0.0" }]
-
 [[package]]
 name = "aiofiles"
 version = "24.1.0"
