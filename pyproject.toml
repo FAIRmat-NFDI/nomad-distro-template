@@ -70,7 +70,9 @@ extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
 prerelease = "explicit"
-extra-build-dependencies = { flatdict = ["setuptools"] }  # https://github.com/gmr/flatdict/issues/60
+constraint-dependencies = [
+    "flatdict==4.0.0",  # https://github.com/gmr/flatdict/issues/60
+]
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
