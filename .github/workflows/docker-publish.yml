@@ -160,7 +160,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ github.repository }}${{ matrix.image_suffix }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           build-args: |
