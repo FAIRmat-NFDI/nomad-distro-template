@@ -36,6 +36,9 @@ location @redirect_to_index {
 }
 
 location /nomad-oasis/docs/ {
+    # TODO: temp fix: redirect /docs/ to /docs/index.html
+    rewrite ^/nomad-oasis/docs/$ /nomad-oasis/docs/index.html break;
+
     proxy_intercept_errors on;
     error_page 404 = @docs404redirect;
     proxy_pass http://app:8000;
