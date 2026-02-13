@@ -19,10 +19,9 @@ env:
   # If you want to include custom documentation, create a fork of the repo below and link the forked repo here
   NOMAD_DOCS_REPO: https://github.com/FAIRmat-NFDI/nomad-docs.git
   NOMAD_DOCS_REPO_REF: "main"
-  # If you want to skip the tests for some plugins, add them to the list below
-  PLUGIN_TESTS_PLUGINS_TO_SKIP: |
-    workflowparsers
-    simulationworkflowschema
+  # If you want to skip the tests for some plugins, add them here as a single string where
+  # each plugin is separated by whitespace
+  PLUGIN_TESTS_PLUGINS_TO_SKIP: ""
 
 permissions:
   contents: write
