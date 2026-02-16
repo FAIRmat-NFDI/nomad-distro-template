@@ -38,13 +38,14 @@ In this README you will find instructions for:
 2. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
 3. [Adding a plugin](#adding-a-plugin)
 4. [Using the jupyter image](#the-jupyter-image)
-5. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
-6. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
-7. [Customizing Documentation](#customizing-documentation)
-8. [Backing up the Oasis](#backing-up-the-oasis)
-9. [Enabling NOMAD Actions](#enabling-nomad-actions)
-10. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-11. [Solving common issues](#faqtrouble-shooting)
+5. [Using the Docker image via plugin](#use-docker-image-via-plugin)
+6. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
+7. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
+8. [Customizing Documentation](#customizing-documentation)
+9. [Backing up the Oasis](#backing-up-the-oasis)
+10. [Enabling NOMAD Actions](#enabling-nomad-actions)
+11. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+12. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -244,6 +245,7 @@ Here you can put either plugins distributed to PyPI, e.g.
 [project.optional-dependencies]
 plugins = [
   "nomad-material-processing>=1.0.0",
+  "nomad-north-jupyter>=0.1.0",
 ]
 ```
 
@@ -307,6 +309,13 @@ jupyter = [
   "jupyter-flex",
 ]
 ```
+
+## Use Docker image via plugin
+
+The recommended way to integrate the Jupyter Docker image into your NOMAD Oasis is through the plugin entry point system. This approach is cleaner, more maintainable, and automatically handles all necessary configurations.
+
+[`nomad-north-jupyter`](https://github.com/FAIRmat-NFDI/nomad-north-jupyter) is a NOMAD plugin that provides a containerized JupyterLab environment for interactive analysis within the NOMAD NORTH (NOMAD Oasis Remote Tools Hub). It can be used with `nomad-distro-template`, `nomad-distro-dev`, and production NOMAD instances. This plugin has been added to this distribution by default via `pyproject.toml`. In `nomad.yaml`, the `NORTHTool` entry point is reconfigured to show how to further customize the Jupyter NORTH tool image and settings (see [full documentation](https://github.com/FAIRmat-NFDI/nomad-north-jupyter?tab=readme-ov-file#nomad-north-jupyter)).
+
 
 ## Automated Unit and Example Upload Tests in CI
 

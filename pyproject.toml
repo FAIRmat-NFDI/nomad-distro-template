@@ -28,7 +28,9 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 
 [project.optional-dependencies]
 # Add your plugins to the list below.
-plugins = []
+plugins = [
+  "nomad-north-jupyter>=0.1.0"
+  ]
 jupyter = ["jupyter-events"]
 gpu-action = []
 cpu-action = []
