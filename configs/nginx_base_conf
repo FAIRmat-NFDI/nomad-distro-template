@@ -35,6 +35,19 @@ location @redirect_to_index {
     proxy_pass http://app:8000;
 }
 
+location /nomad-oasis/docs/ {
+    # TODO: temp fix: redirect /docs/ to /docs/index.html
+    rewrite ^/nomad-oasis/docs/$ /nomad-oasis/docs/index.html break;
+
+    proxy_intercept_errors on;
+    error_page 404 = @docs404redirect;
+    proxy_pass http://app:8000;
+}
+
+location @docs404redirect {
+    return 302 /nomad-oasis/docs/404.html;
+}
+
 location ~ \/gui\/(service-worker\.js|meta\.json)$ {
     add_header Last-Modified $date_gmt;
     add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
