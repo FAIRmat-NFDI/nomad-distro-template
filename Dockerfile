@@ -4,7 +4,7 @@
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/engine/reference/builder/
 
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.14
 ARG UV_VERSION=0.7
 ARG JUPYTER_VERSION=2025-04-14
 
@@ -43,6 +43,8 @@ RUN apt-get update \
  && apt-get install --yes --quiet --no-install-recommends \
        libgomp1 \
        libmagic1 \
+       pkg-config \
+       libhdf5-dev \
        curl \
        zip \
        unzip \
@@ -67,19 +69,20 @@ ENV RUNTIME=docker
 
 WORKDIR /app
 
-RUN apt-get update \
- && apt-get install --yes --quiet --no-install-recommends \
-      libgomp1 \
-      libmagic1 \
-      file \
-      gcc \
-      build-essential \
-      curl \
-      zip \
-      unzip \
-      git \
- && rm -rf /var/lib/apt/lists/*
-
+ RUN apt-get update \
+  && apt-get install --yes --quiet --no-install-recommends \
+       libgomp1 \
+       libmagic1 \
+       file \
+       gcc \
+       build-essential \
+       pkg-config \
+       libhdf5-dev \
+       curl \
+       zip \
+       unzip \
+       git \
+  && rm -rf /var/lib/apt/lists/*
 # Install UV
 COPY --from=uv_image /uv /bin/uv
 
@@ -130,7 +133,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM base_final AS final
 
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.14
 
 COPY --chown=nomad:${UID} --from=builder /opt/venv /opt/venv
 COPY --chown=nomad:${UID} scripts/run.sh .
