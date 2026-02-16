@@ -29,7 +29,7 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 [project.optional-dependencies]
 # Add your plugins to the list below.
 plugins = [
-  "nomad-north-jupyter>=0.1.0"
+ "nomad-north-jupyter @ git+https://github.com/fairmat-nfdi/nomad-north-jupyter.git@v0.1.0" 
   ]
 jupyter = ["jupyter-events"]
 gpu-action = []
