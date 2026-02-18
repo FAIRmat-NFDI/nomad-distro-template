@@ -20,9 +20,7 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-dependencies = [
-  "nomad-lab[infrastructure]>=1.4.1",
-]
+dependencies = ["nomad-lab[infrastructure]>=1.4.1"]
 
 
 [project.urls]
@@ -42,8 +40,7 @@ extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
 prerelease = "explicit"
-# https://github.com/gmr/flatdict/issues/60
-extra-build-dependencies = { flatdict = ["setuptools<82.0.0"] }
+constraint-dependencies = ["flatdict>=4.1.0"]
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
