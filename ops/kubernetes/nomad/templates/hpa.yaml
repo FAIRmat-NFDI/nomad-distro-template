@@ -1,0 +1,46 @@
+{{- if .Values.nomad.worker.autoscaling.enabled }}
+{{- $config := .Values.nomad.config -}}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "nomad.fullname" . }}-worker
+  labels:
+    {{- include "nomad.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    name: {{ include "nomad.fullname" . }}-worker
+  minReplicaCount: {{ .Values.nomad.worker.autoscaling.minReplicas }}
+  maxReplicaCount: {{ .Values.nomad.worker.autoscaling.maxReplicas }}
+  cooldownPeriod: {{ .Values.nomad.worker.autoscaling.cooldownPeriod | default 600 }}
+  initialCooldownPeriod: {{ .Values.nomad.worker.autoscaling.initialCooldownPeriod | default 600 }}
+  triggers:
+  - type: temporal
+    metadata:
+      endpoint: "{{ printf "%s-temporal-frontend.%s.svc.cluster.local" .Release.Name .Release.Namespace }}:7233"
+      namespace: "{{ $config.temporal.namespace }}"
+      taskQueue: "{{ .Values.nomad.worker.autoscaling.temporal.taskQueue }}"
+      targetQueueSize: {{ .Values.nomad.worker.autoscaling.targetQueueSize | quote }}
+      queueTypes: "{{ .Values.nomad.worker.autoscaling.temporal.queueTypes }}"
+    authenticationRef:
+      name: {{ include "nomad.fullname" . }}-worker-auth
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: {{ .Values.nomad.worker.autoscaling.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.stabilizationWindowSeconds }}
+          policies:
+{{- toYaml .Values.nomad.worker.autoscaling.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies | nindent 10 }}
+---
+
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ include "nomad.fullname" . }}-worker-auth
+  labels:
+    {{- include "nomad.labels" . | nindent 4 }}
+spec:
+  secretTargetRef:
+  - parameter: nomadApiSecret
+    name: {{ include "nomad.secretName.api" . }}
+    key: {{ .Values.nomad.secrets.api.key }}
+{{- end }}
