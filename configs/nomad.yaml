@@ -6,20 +6,12 @@ oasis:
   is_oasis: true
   uses_central_user_management: true
 
-# north:
-#   jupyterhub_crypt_key: "978bfb2e13a8448a253c629d8dd84ff89587f30e635b753153960930cad9d36d"
-#   tools:
-#     options:
-#       jupyter:
-#         image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
-
 plugins:
   entry_points:
     options:
       nomad_north_jupyter.north_tools.jupyter_north_tool:north_tool_entry_point:
         north_tool:
-          image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
-          display_name: "Jupyter"
+          image: ghcr.io/fairmat-nfdi/nomad-north-jupyter:latest
 
 meta:
   deployment: "oasis"
