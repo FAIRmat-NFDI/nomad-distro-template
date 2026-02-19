@@ -14,7 +14,7 @@ resolution-markers = [
 prerelease-mode = "explicit"
 
 [manifest]
-constraints = [{ name = "flatdict", specifier = ">=4.1.0" }]
+constraints = [{ name = "optimade", specifier = "==1.4.0" }]
 
 [[package]]
 name = "aiofiles"
@@ -2406,17 +2406,18 @@ wheels = [
 
 [[package]]
 name = "optimade"
-version = "1.2.4"
+version = "1.4.0"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "lark" },
     { name = "pydantic", extra = ["email"] },
     { name = "pydantic-settings" },
+    { name = "pyyaml" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5b/f8/7633aa93cd797285d5c8d8233100f664bf43244b4b097ac4b567b2411bae/optimade-1.2.4.tar.gz", hash = "sha256:ae7c25be62d8fcc94589db1319830b3cd4640f37937d65c970102fd80729efad", size = 193470, upload-time = "2025-03-21T17:44:06.365Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e1/90/fe549bc0af54d2bcd210eb79edb1aa6a8327d5cb98b2bb8f31c4ffe05138/optimade-1.4.0.tar.gz", hash = "sha256:76b09ed4866b0b88b7478647dcff809e418491309e7f99908aff406aaf8f88b9", size = 194234, upload-time = "2026-02-10T00:02:56.704Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/7b/5058b9977597096cc4962eb7b9ef42586fa982cfbdf21ee8fee0e58360d4/optimade-1.2.4-py3-none-any.whl", hash = "sha256:4df85602e9f3ef2943b9fd033f2a2eb54b494d7efa5e8f5999326969b1a8a2f4", size = 241722, upload-time = "2025-03-21T17:44:04.131Z" },
+    { url = "https://files.pythonhosted.org/packages/6b/4c/7be72b6e5ee66715c11a337f10909b419bdb35445b33e93bf515df466aa6/optimade-1.4.0-py3-none-any.whl", hash = "sha256:cb42cf9b8b9e499125a7b75e6008d1b86478450f517a0c285f9fca56977958b0", size = 241058, upload-time = "2026-02-10T00:02:54.606Z" },
 ]
 
 [package.optional-dependencies]
