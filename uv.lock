@@ -2222,12 +2222,16 @@ dev = [
 jupyter = [
     { name = "jupyter-events" },
 ]
+plugins = [
+    { name = "nomad-north-jupyter" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
     { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'" },
     { name = "nomad-lab", extras = ["infrastructure"], specifier = ">=1.4.1" },
+    { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.1" },
 ]
 provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
 
@@ -2318,6 +2322,18 @@ infrastructure = [
     { name = "uvicorn", extra = ["standard"] },
     { name = "validators" },
     { name = "zipstream-ng" },
+]
+
+[[package]]
+name = "nomad-north-jupyter"
+version = "0.2.1"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "nomad-lab" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/17/a1/4ba909dca4fab557641f322d8927e2220fb2806638180688ca7d2bb860f8/nomad_north_jupyter-0.2.1.tar.gz", hash = "sha256:0b451614725af6024e39a7e0a633104b8a5c1f88cf04a88b6b4cec4bee6bd428", size = 108835, upload-time = "2026-02-18T21:22:06.695Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b2/d7/3912e69f2e9d6bb77b030411151e920e333a1894b81e02a69b2193f3230a/nomad_north_jupyter-0.2.1-py3-none-any.whl", hash = "sha256:8d7afaa16ce3e1750b9d9a0d48f9ec14722faf58653a9b063dbf0ecde257372b", size = 9868, upload-time = "2026-02-18T21:22:05.122Z" },
 ]
 
 [[package]]

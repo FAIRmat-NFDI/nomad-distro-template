@@ -47,7 +47,7 @@ jobs:
       - name: Update nomad.yaml
         run: |
           export image_name="${{ github.repository }}"
-          sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" configs/nomad.yaml
+          sed -i "s|fairmat-nfdi/nomad-north-jupyter:latest|${image_name,,}/jupyter:main|g" configs/nomad.yaml
 
         # Replaces the template repository name in the pyproject.toml with the new one
       - name: Update pyproject.toml

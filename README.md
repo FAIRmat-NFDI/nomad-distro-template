@@ -37,14 +37,15 @@ In this README you will find instructions for:
 1. [Deploying the distribution](#deploying-the-distribution)
 2. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
 3. [Adding a plugin](#adding-a-plugin)
-4. [Using the jupyter image](#the-jupyter-image)
-5. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
-6. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
-7. [Customizing Documentation](#customizing-documentation)
-8. [Backing up the Oasis](#backing-up-the-oasis)
-9. [Enabling NOMAD Actions](#enabling-nomad-actions)
-10. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-11. [Solving common issues](#faqtrouble-shooting)
+4. [The jupyter image](#the-jupyter-image)
+5. [Using Docker image via plugin](#using-docker-image-via-plugin)
+6. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
+7. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
+8. [Customizing Documentation](#customizing-documentation)
+9. [Backing up the Oasis](#backing-up-the-oasis)
+10. [Enabling NOMAD Actions](#enabling-nomad-actions)
+11. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+12. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -244,6 +245,7 @@ Here you can put either plugins distributed to PyPI, e.g.
 [project.optional-dependencies]
 plugins = [
   "nomad-material-processing>=1.0.0",
+  "nomad-north-jupyter>=0.1.0",
 ]
 ```
 
@@ -282,7 +284,7 @@ be generated.
 In addition to the Docker image for running the oasis, this repository also builds a custom NORTH image for running a jupyter hub with the installed plugins.
 This image has been added to the [`configs/nomad.yaml`](configs/nomad.yaml) during the initialization of this repository and should therefore already be available in your Oasis under "Analyze / NOMAD Remote Tools Hub / jupyter"
 
-We currently use `quay.io/jupyter/base-notebook:2025-04-14` as our base image for Jupyter. While it includes the necessary Python packages, it does not come with `R` or `Julia` pre-installed.
+We currently use `quay.io/jupyter/base-notebook:2025-04-14` as our base image for Jupyter (see Dockerfile). While it includes the necessary Python packages, it does not come with `R` or `Julia` pre-installed.
 If you need support for those languages, you can switch to `quay.io/jupyter/datascience-notebook:2025-04-04`, which includes both `R` and `Julia`.
 The Jupyter image does not include `gcc` or `build-essential` by default. If you want to allow users to install Python packages that require compilation while running a notebook, you'll need to install these tools in the [Dockerfile](./Dockerfile#L172) or switch the base image to `quay.io/jupyter/datascience-notebook:2025-04-04`.
 However, including these packages can increase the image size and may introduce security risks if arbitrary code is compiled at runtime.
@@ -307,6 +309,12 @@ jupyter = [
   "jupyter-flex",
 ]
 ```
+
+## Using Docker image via plugin
+
+The recommended way to integrate the Docker image e.g., Jupyter into your NOMAD Oasis is through the plugin entry point system. This approach is cleaner, more maintainable, and automatically handles all necessary configurations.
+
+[`nomad-north-jupyter`](https://github.com/FAIRmat-NFDI/nomad-north-jupyter) is a NOMAD plugin that provides a containerized JupyterLab environment for interactive analysis within NORTH (NOMAD Remote Tools Hub). This plugin has been added to this distribution by default via `pyproject.toml`. In `nomad.yaml`, the `NORTHTool` entry point is configured to use the [custom Jupyter image](#the-jupyter-image) built in this repository.
 
 ## Automated Unit and Example Upload Tests in CI
 
