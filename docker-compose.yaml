@@ -249,7 +249,7 @@ services:
     volumes:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
-    command: ./run.sh
+    command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 $@
     healthcheck:
       test:
         - "CMD"
