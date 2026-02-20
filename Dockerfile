@@ -40,17 +40,17 @@ FROM base AS base_final
 WORKDIR /app
 
 RUN apt-get update \
- && apt-get install --yes --quiet --no-install-recommends \
-       libgomp1 \
-       libmagic1 \
-       curl \
-       zip \
-       unzip \
-       nodejs \
-       npm \
-       && npm install -g configurable-http-proxy@^4.2.0 \
-       # clean cache and logs
-       && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+    && apt-get install --yes --quiet --no-install-recommends \
+    libgomp1 \
+    libmagic1 \
+    curl \
+    zip \
+    unzip \
+    nodejs \
+    npm \
+    && npm install -g configurable-http-proxy@^4.2.0 \
+    # clean cache and logs
+    && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
 # Activate the virtualenv in the container
 # See here for more information:
@@ -68,17 +68,17 @@ ENV RUNTIME=docker
 WORKDIR /app
 
 RUN apt-get update \
- && apt-get install --yes --quiet --no-install-recommends \
-      libgomp1 \
-      libmagic1 \
-      file \
-      gcc \
-      build-essential \
-      curl \
-      zip \
-      unzip \
-      git \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install --yes --quiet --no-install-recommends \
+    libgomp1 \
+    libmagic1 \
+    file \
+    gcc \
+    build-essential \
+    curl \
+    zip \
+    unzip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install UV
 COPY --from=uv_image /uv /bin/uv
@@ -133,15 +133,15 @@ FROM base_final AS final
 ARG PYTHON_VERSION=3.12
 
 COPY --chown=nomad:${UID} --from=builder /opt/venv /opt/venv
-COPY configs/nomad.yaml nomad.yaml
+COPY nomad.yaml nomad.yaml
 COPY pyproject.toml uv.lock /opt/
 COPY --chown=nomad:${UID} --from=docs /app/built_docs /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/app/static/docs
 
 RUN mkdir -p /app/.volumes/fs \
- && chown -R nomad:${UID} /app \
- && chown -R nomad:${UID} /opt/venv \
- && mkdir nomad \
- && cp /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/jupyterhub_config.py nomad/
+    && chown -R nomad:${UID} /app \
+    && chown -R nomad:${UID} /opt/venv \
+    && mkdir nomad \
+    && cp /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/jupyterhub_config.py nomad/
 
 
 USER nomad
@@ -173,18 +173,18 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 USER root
 
 RUN apt-get update \
- && apt-get install --yes --quiet --no-install-recommends \
-      libgomp1 \
-      libmagic1 \
-      file \
-      gcc \
-      build-essential \
-      curl \
-      zip \
-      unzip \
-      git \
-      # clean cache and logs
-      && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+    && apt-get install --yes --quiet --no-install-recommends \
+    libgomp1 \
+    libmagic1 \
+    file \
+    gcc \
+    build-essential \
+    curl \
+    zip \
+    unzip \
+    git \
+    # clean cache and logs
+    && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
@@ -208,21 +208,21 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 USER root
 
 RUN apt-get update \
- && apt-get install --yes --quiet --no-install-recommends \
-      libgomp1 \
-      libmagic1 \
-      file \
-      curl \
-      zip \
-      unzip \
-      git \
-      # `nbconvert` dependencies
-      # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
-      texlive-xetex \
-      texlive-fonts-recommended \
-      texlive-plain-generic \
-      # clean cache and logs
-      && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
+    && apt-get install --yes --quiet --no-install-recommends \
+    libgomp1 \
+    libmagic1 \
+    file \
+    curl \
+    zip \
+    unzip \
+    git \
+    # `nbconvert` dependencies
+    # https://nbconvert.readthedocs.io/en/latest/install.html#installing-tex
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-plain-generic \
+    # clean cache and logs
+    && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER ${NB_UID}
