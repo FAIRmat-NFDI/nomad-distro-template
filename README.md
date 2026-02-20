@@ -37,14 +37,17 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 In this README you will find instructions for:
 
 1. [Deploying the distribution](#deploying-the-distribution)
-2. [Adding a plugin](#adding-a-plugin)
-3. [The Jupyter image](#the-jupyter-image)
-4. [Using Docker image via plugin](#using-docker-image-via-plugin)
-5. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
-6. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
-7. [Customizing Documentation](#customizing-documentation)
-8. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-9. [Solving common issues](#faqtrouble-shooting)
+2. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
+3. [Adding a plugin](#adding-a-plugin)
+4. [The Jupyter image](#the-jupyter-image)
+5. [Using Docker image via plugin](#using-docker-image-via-plugin)
+6. [Automated unit and example upload tests in CI](#automated-unit-and-example-upload-tests-in-ci)
+7. [Setup regular package updates with Dependabot](#set-up-regular-package-updates-with-dependabot)
+8. [Customizing Documentation](#customizing-documentation)
+9. [Backing up the Oasis](#backing-up-the-oasis)
+10. [Enabling NOMAD Actions](#enabling-nomad-actions)
+11. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
+12. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying the distribution
 
@@ -198,7 +201,7 @@ getent group | grep docker  # otherwise
 
 The user id `1000` is the nomad user inside all containers.
 
-#### Configuring Worker Replicas and Resource Limits
+## Configuring Worker Replicas and Resource Limits
 
 The `docker-compose.yaml` runs four worker replicas by default, each limited to 4 CPU cores
 and 8 GB RAM:
@@ -216,7 +219,7 @@ services:
 
 Adjust these values to match your server's capacity.
 
-#### Backing up the Oasis
+## Backing up the Oasis
 
 See the [NOMAD documentation on backups](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/administer.html#backups).
 
@@ -240,7 +243,7 @@ Optionally schedule nightly backups via cron:
 (crontab -l 2>/dev/null; echo "0 2 * * * bash $(realpath ../scripts/backup-mongo.sh)") | crontab -
 ```
 
-#### Enabling NOMAD Actions
+## Enabling NOMAD Actions
 
 1. Uncomment the `cpu_worker` and/or `gpu_worker` service(s) in `docker-compose.yaml`.
 2. Enable the corresponding build step(s) in `.github/workflows/docker-publish.yml`.

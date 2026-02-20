@@ -69,6 +69,26 @@ nomad:
       limits:
         memory: "4Gi"
 
+  # To enable NOMAD Actions, increase replicaCount for cpuworker and/or gpuworker.
+  cpuworker:
+    replicaCount: 0
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "8Gi"
+        cpu: "2"
+
+  gpuworker:
+    replicaCount: 0
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "8Gi"
+
   proxy:
     replicaCount: 1
 
