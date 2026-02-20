@@ -97,18 +97,40 @@ FROM builder AS docs
 WORKDIR /app
 
 ARG NOMAD_DOCS_REPO="https://github.com/FAIRmat-NFDI/nomad-docs.git"
-ARG NOMAD_DOCS_REPO_REF="main"
+ARG NOMAD_DOCS_REPO_REF=""
 
-RUN set -ex && \
-    echo "Cloning from: ${NOMAD_DOCS_REPO}; branch: ${NOMAD_DOCS_REPO_REF}" && \
-    git clone --branch "${NOMAD_DOCS_REPO_REF}" "${NOMAD_DOCS_REPO}" docs
-
+# Clones the documentation repository, checks out the version matching nomad-lab
+# (unless a specific NOMAD_DOCS_REPO_REF is provided), installs it, and builds the documentation.
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv run --with nomad-docs --directory docs mkdocs build \
-    && mkdir -p built_docs \
-    && cp -r docs/site/* built_docs
+    set -ex && \
+    # Clone the documentation repository \
+    echo "Cloning from: ${NOMAD_DOCS_REPO}" && \
+    git clone "${NOMAD_DOCS_REPO}" docs_repo && cd docs_repo && \
+    # Determine which version to build \
+    if [ -n "${NOMAD_DOCS_REPO_REF}" ]; then \
+        # Use explicitly provided ref \
+        echo "Checking out provided ref: ${NOMAD_DOCS_REPO_REF}"; \
+        git checkout "${NOMAD_DOCS_REPO_REF}"; \
+    else \
+        # Match documentation version to nomad-lab version \
+        NOMAD_VERSION=$(uv tree --package nomad-lab | grep "^nomad-lab v" | sed 's/^nomad-lab //'); \
+        echo "Detected nomad-lab version: ${NOMAD_VERSION}"; \
+        if git rev-parse --verify "refs/tags/${NOMAD_VERSION}" >/dev/null 2>&1; then \
+            echo "Tag ${NOMAD_VERSION} found. Checking out."; \
+            git checkout "${NOMAD_VERSION}"; \
+        else \
+            echo "Tag ${NOMAD_VERSION} not found. Checking out main branch."; \
+            git checkout main; \
+        fi; \
+    fi && \
+    # Install and build documentation \
+    uv pip install . && \
+    PYTHONPATH=src uv run --no-sync mkdocs build && \
+    # Move built site to final destination \
+    mkdir -p /app/built_docs && \
+    cp -r site/* /app/built_docs
 
 FROM builder AS gpu_action_builder
 
