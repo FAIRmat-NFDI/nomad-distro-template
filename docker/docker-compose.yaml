@@ -122,7 +122,7 @@ services:
       mongo:
         condition: service_healthy
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
+      # - ../nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run action-internal-worker
     healthcheck:
@@ -178,7 +178,7 @@ services:
   #     temporal:
   #       condition: service_healthy
   #   volumes:
-  #     # - ./configs/nomad.yaml:/app/nomad.yaml
+  #     # - ../nomad.yaml:/app/nomad.yaml
   #     - ./.volumes/fs:/app/.volumes/fs
   #   command: python -m nomad.cli admin run action-gpu-worker
 
@@ -213,7 +213,7 @@ services:
   #     temporal:
   #       condition: service_healthy
   #   volumes:
-  #     # - ./configs/nomad.yaml:/app/nomad.yaml
+  #     # - ../nomad.yaml:/app/nomad.yaml
   #     - ./.volumes/fs:/app/.volumes/fs
   #   command: python -m nomad.cli admin run action-cpu-worker
 
@@ -247,7 +247,7 @@ services:
       north:
         condition: service_started
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
+      # - ../nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 $@
     healthcheck:
@@ -282,7 +282,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
+      # - ../nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
       - /var/run/docker.sock:/var/run/docker.sock
     user: "1000:991"
@@ -318,7 +318,7 @@ services:
       mongo:
         condition: service_healthy
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
+      # - ../nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run logtransfer
     profiles: ["with_logtransfer"]
