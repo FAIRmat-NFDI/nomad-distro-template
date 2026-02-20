@@ -20,7 +20,7 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-dependencies = ["nomad-lab[infrastructure]>=1.4.1"]
+dependencies = ["nomad-lab[infrastructure]==1.4.2.dev47+ga555d8912"]
 
 
 [project.urls]
@@ -40,7 +40,7 @@ extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
 prerelease = "explicit"
-constraint-dependencies = ["optimade==1.4.0"]
+override-dependencies = ["optimade==1.4.0"]
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
