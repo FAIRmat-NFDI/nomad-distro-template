@@ -77,11 +77,6 @@ services:
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=postgresql
       - SQL_PASSWORD=temporal
-      - ES_HOST=elastic
-      - ES_PORT=9200
-      - ES_SCHEME=http
-      - ES_VERSION=v7
-      - ES_VISIBILITY_INDEX=temporal_visibility_v1_dev
     volumes:
       - ./scripts:/scripts
     entrypoint: ["/bin/sh"]
@@ -101,13 +96,8 @@ services:
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=postgresql
-      - ENABLE_ES=true
-      - ES_SEEDS=elastic
-      - ES_VERSION=v7
-      - BIND_ON_IP=0.0.0.0
+      - BIND_ON_IP=0.0.0.0 # TODO: is this needed?
       - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
-    ports:
-      - "7233:7233"
     volumes:
       - ./dynamicconfig:/etc/temporal/config/dynamicconfig
     healthcheck:
