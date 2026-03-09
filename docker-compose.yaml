@@ -122,18 +122,6 @@ services:
     entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
     command: ["create_namespace"]
 
-  temporal-ui:
-    container_name: temporal-ui
-    depends_on:
-      temporal:
-        condition: service_healthy
-    environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
-    image: temporalio/ui:2.34.0
-    ports:
-      - 8080:8080
-
   # nomad worker (processing)
   worker:
     restart: unless-stopped
