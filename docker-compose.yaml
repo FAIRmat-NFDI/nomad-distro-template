@@ -68,8 +68,6 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
-      elastic:
-        condition: service_healthy
     environment:
       - DB=postgres12
       - DB_PORT=5432
@@ -80,7 +78,7 @@ services:
     volumes:
       - ./scripts:/scripts
     entrypoint: ["/bin/sh"]
-    command: /scripts/setup-postgres-es.sh
+    command: /scripts/setup-postgres.sh
 
   temporal:
     image: temporalio/server:1.30.1
@@ -96,10 +94,12 @@ services:
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=postgresql
-      - BIND_ON_IP=0.0.0.0 # TODO: is this needed?
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+      - BIND_ON_IP=0.0.0.0
       - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
     volumes:
-      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+      - ./configs/development-sql.yaml:/etc/temporal/config/dynamicconfig/development-sql.yaml
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "7233"]
       interval: 5s
