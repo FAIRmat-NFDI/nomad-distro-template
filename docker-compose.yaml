@@ -4,24 +4,18 @@ services:
     restart: unless-stopped
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
     container_name: nomad_oasis_elastic
-    ports:
-      - "9200:9200"
     environment:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - discovery.type=single-node
-      - cluster.routing.allocation.disk.threshold_enabled=true
-      - cluster.routing.allocation.disk.watermark.low=512mb
-      - cluster.routing.allocation.disk.watermark.high=256mb
-      - cluster.routing.allocation.disk.watermark.flood_stage=128mb
-      - xpack.security.enabled=false
     volumes:
       - elastic:/usr/share/elasticsearch/data
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          "curl -f http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s || exit 1",
-        ]
+        - "CMD"
+        - "curl"
+        - "--fail"
+        - "--silent"
+        - "http://elastic:9200/_cat/health"
       interval: 10s
       timeout: 10s
       retries: 30
@@ -54,8 +48,6 @@ services:
 
   postgresql:
     container_name: nomad_oasis_postgresql
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: temporal
       POSTGRES_USER: temporal
@@ -99,6 +91,8 @@ services:
     image: temporalio/server:1.30.1
     container_name: nomad_oasis_temporal
     depends_on:
+      postgresql:
+        condition: service_healthy
       temporal-admin-tools:
         condition: service_completed_successfully
     environment:
