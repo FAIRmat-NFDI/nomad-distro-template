@@ -61,9 +61,9 @@ services:
       retries: 60
       start_period: 30s
 
-  temporal-setup:
+  temporal-setup-db:
     image: temporalio/admin-tools:1.30
-    container_name: temporal-setup
+    container_name: temporal-setup-db
     restart: on-failure:6
     depends_on:
       postgresql:
@@ -75,11 +75,25 @@ services:
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=postgresql
       - SQL_PASSWORD=temporal
+    volumes:
+      - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
+    entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+    command: ["setup_db"]
+
+  temporal-create-namespace:
+    image: temporalio/admin-tools:1.30
+    container_name: temporal-create-namespace
+    restart: on-failure:5
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - DEFAULT_NAMESPACE=default
     volumes:
       - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
     entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+    command: ["create_namespace"]
 
   temporal:
     image: temporalio/server:1.30
@@ -87,6 +101,8 @@ services:
     depends_on:
       postgresql:
         condition: service_healthy
+      temporal-setup-db:
+        condition: service_completed_successfully
     environment:
       - DB=postgres12
       - DB_PORT=5432
