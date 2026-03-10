@@ -98,7 +98,7 @@ services:
       - BIND_ON_IP=0.0.0.0
       - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
     volumes:
-      - ./configs/development-sql.yaml:/etc/temporal/config/dynamicconfig/development-sql.yaml
+      - ./configs/_temporal-sql.yaml:/etc/temporal/config/dynamicconfig/development-sql.yaml
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "7233"]
       interval: 5s
