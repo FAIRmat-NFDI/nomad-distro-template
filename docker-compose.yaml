@@ -54,11 +54,55 @@ services:
     image: docker.io/postgres:16
     volumes:
       - postgresql:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+
+  temporal-setup-db:
+    image: temporalio/admin-tools:1.30
+    container_name: temporal-setup-db
+    restart: on-failure:6
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - SQL_PASSWORD=temporal
+    volumes:
+      - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
+    entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+    command: ["setup_db"]
+
+  temporal-create-namespace:
+    image: temporalio/admin-tools:1.30
+    container_name: temporal-create-namespace
+    restart: on-failure:5
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - DEFAULT_NAMESPACE=default
+    volumes:
+      - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
+    entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+    command: ["create_namespace"]
 
   temporal:
+    image: temporalio/server:1.30
     container_name: nomad_oasis_temporal
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
+      temporal-setup-db:
+        condition: service_completed_successfully
     environment:
       - DB=postgres12
       - DB_PORT=5432
@@ -67,17 +111,16 @@ services:
       - POSTGRES_SEEDS=postgresql
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
-    image: docker.io/temporalio/auto-setup:1.28
+      - BIND_ON_IP=0.0.0.0
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    volumes:
+      - ./configs/_temporal-sql.yaml:/etc/temporal/config/dynamicconfig/development-sql.yaml
     healthcheck:
-      test: >
-        bash -c '
-          temporal operator cluster health --address $$(hostname -i):7233 |
-          grep -q "SERVING"
-        '
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
+      test: ["CMD", "nc", "-z", "localhost", "7233"]
+      interval: 5s
+      timeout: 3s
+      start_period: 30s
+      retries: 60
 
   # nomad worker (processing)
   worker:
