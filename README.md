@@ -127,11 +127,11 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
       For testing, you can create a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate). Note that self-signed certificates are not recommended for production since they are not trusted by browsers. You can generate one with:
 
       ```sh
-      mkdir ssl
+      mkdir tls
       openssl req -x509 -nodes -days 365 \
         -newkey rsa:2048 \
-        -keyout ./ssl/selfsigned.key \
-        -out ./ssl/selfsigned.crt \
+        -keyout ./tls/selfsigned.key \
+        -out ./tls/selfsigned.crt \
         -subj "/CN=localhost"
       ```
 
@@ -142,7 +142,8 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
    + # HTTPS
    + - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
-   + - ./ssl:/etc/nginx/ssl:ro  # Your certificate files
+   + - ./tls/selfsigned.crt:/etc/nginx/tls/mounted-nomad-oasis.crt:ro  # Path to your TLS certificate
+   + - ./tls/selfsigned.key:/etc/nginx/tls/mounted-nomad-oasis.key:ro  # Path to your TLS private key
    ```
 
 7. And run it with docker compose in detached (--detach or -d) mode
