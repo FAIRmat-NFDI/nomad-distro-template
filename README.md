@@ -142,8 +142,8 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
    + # HTTPS
    + - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
-   + - ./ssl/selfsigned.crt:/etc/nginx/ssl/selfsigned.crt:ro  # Path to your TLS certificate
-   + - ./ssl/selfsigned.key:/etc/nginx/ssl/selfsigned.key:ro  # Path to your TLS private key
+   + - ./ssl/selfsigned.crt:/etc/nginx/ssl/mounted-nomad-oasis.crt:ro  # Path to your TLS certificate
+   + - ./ssl/selfsigned.key:/etc/nginx/ssl/mounted-nomad-oasis.key:ro  # Path to your TLS private key
    ```
 
 7. And run it with docker compose in detached (--detach or -d) mode
