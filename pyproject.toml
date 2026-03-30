@@ -20,7 +20,7 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-dependencies = ["nomad-lab[infrastructure]>=1.4.1"]
+dependencies = ["nomad-lab[infrastructure]==1.4.2.dev176"]
 
 
 [project.urls]
@@ -28,9 +28,7 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 
 [project.optional-dependencies]
 # Add your plugins to the list below.
-plugins = [
- "nomad-north-jupyter>=0.2.1"
-  ]
+plugins = ["nomad-north-jupyter>=0.2.1"]
 jupyter = ["jupyter-events"]
 gpu-action = []
 cpu-action = []
