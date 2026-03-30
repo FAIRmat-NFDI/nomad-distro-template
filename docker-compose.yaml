@@ -235,7 +235,7 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:pr-213
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
