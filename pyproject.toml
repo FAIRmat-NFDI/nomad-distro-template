@@ -43,6 +43,7 @@ extra-index-url = [
 ]
 prerelease = "explicit"
 constraint-dependencies = ["flatdict>=4.1.0"]
+override-dependencies = ["oauthenticator>=16.3.1"]
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]

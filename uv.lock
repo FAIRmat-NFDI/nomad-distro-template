@@ -15,6 +15,7 @@ prerelease-mode = "explicit"
 
 [manifest]
 constraints = [{ name = "flatdict", specifier = ">=4.1.0" }]
+overrides = [{ name = "oauthenticator", specifier = ">=16.3.1" }]
 
 [[package]]
 name = "aiofiles"
@@ -2370,17 +2371,20 @@ wheels = [
 
 [[package]]
 name = "oauthenticator"
-version = "15.1.0"
+version = "17.4.0"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "jsonschema" },
     { name = "jupyterhub" },
+    { name = "pyjwt" },
     { name = "requests" },
     { name = "ruamel-yaml" },
+    { name = "tornado" },
+    { name = "traitlets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1f/a0/0fc870a69dacb2187d6508bdfc78bc4cf53bbc78527cf3f8ede890354aff/oauthenticator-15.1.0.tar.gz", hash = "sha256:d1d9873c9b66e1af973291968b9573d25378bd8c647f30d73b8d8fb27b1a0b85", size = 49472, upload-time = "2022-09-08T08:55:07.473Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b2/55/d0d2c37985c3272dd016b753296bb33d7b8e748ea009fdf0d85e3c1a867a/oauthenticator-17.4.0.tar.gz", hash = "sha256:b1025d725dc406977299c87fedea2006fcabac3bea9d4e17f690d4dad044923e", size = 208707, upload-time = "2026-03-26T19:39:07.541Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dc/6b/6d929c788bf5fb66618dc8cf4ac2db453159cd3dbafc1c86d62dc26ae358/oauthenticator-15.1.0-py3-none-any.whl", hash = "sha256:ad1b0da201f2bf2ab0b97a90ec350ddaefc7e9909ddb7e4f22c1d15b42f19b21", size = 66211, upload-time = "2022-09-08T08:55:06.293Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/fb/dc63bbec406e4dd7eecf1def43348ae27d94f9444e8a86d55af46e284080/oauthenticator-17.4.0-py3-none-any.whl", hash = "sha256:2b59a8d71f0e2822fad243837eb325b4d12b365c6aedfd3cc88f73e9f00486e8", size = 85980, upload-time = "2026-03-26T19:39:06.258Z" },
 ]
 
 [[package]]
