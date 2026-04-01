@@ -2326,14 +2326,14 @@ infrastructure = [
 
 [[package]]
 name = "nomad-north-jupyter"
-version = "0.2.1"
+version = "0.2.5"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "nomad-lab" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/17/a1/4ba909dca4fab557641f322d8927e2220fb2806638180688ca7d2bb860f8/nomad_north_jupyter-0.2.1.tar.gz", hash = "sha256:0b451614725af6024e39a7e0a633104b8a5c1f88cf04a88b6b4cec4bee6bd428", size = 108835, upload-time = "2026-02-18T21:22:06.695Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/90/0b/e4360dc765663d2bbb9f72644aa53658753069b8d66dc0519bc1c6f7ad79/nomad_north_jupyter-0.2.5.tar.gz", hash = "sha256:a95dfdc36aee30ef3186a6db65ced8727f45e94fff81e341888392d37b7d7da9", size = 114680, upload-time = "2026-03-27T09:03:11.811Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b2/d7/3912e69f2e9d6bb77b030411151e920e333a1894b81e02a69b2193f3230a/nomad_north_jupyter-0.2.1-py3-none-any.whl", hash = "sha256:8d7afaa16ce3e1750b9d9a0d48f9ec14722faf58653a9b063dbf0ecde257372b", size = 9868, upload-time = "2026-02-18T21:22:05.122Z" },
+    { url = "https://files.pythonhosted.org/packages/75/b8/149924231b5384b2d13038178422b3b1843c0d1eebab61c72867a2dba5ff/nomad_north_jupyter-0.2.5-py3-none-any.whl", hash = "sha256:afda15a820bbf90d02e2d97433538aa244c91bade60c4a99f9dd17264a31e89e", size = 14531, upload-time = "2026-03-27T09:03:10.363Z" },
 ]
 
 [[package]]
