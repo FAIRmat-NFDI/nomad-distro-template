@@ -49,8 +49,7 @@ dev = ["nomad-lab[infrastructure, dev]==1.4.2rc1"]
 extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
-prerelease = "allow"
-constraint-dependencies = ["flatdict>=4.1.0"]
+prerelease = "explicit"
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
