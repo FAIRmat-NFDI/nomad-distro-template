@@ -44,7 +44,7 @@ services:
   # the user data db
   mongo:
     restart: unless-stopped
-    image: mongo:5.0.6
+    image: mongo:8.0
     container_name: mongo
     environment:
       - MONGO_DATA_DIR=/data/db
@@ -56,7 +56,7 @@ services:
     healthcheck:
       test:
         - "CMD"
-        - "mongo"
+        - "mongosh"
         - "mongo:27017/test"
         - "--quiet"
         - "--eval"

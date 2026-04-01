@@ -24,7 +24,7 @@ services:
   # the user data db
   mongo:
     restart: unless-stopped
-    image: docker.io/mongo:5.0.6
+    image: docker.io/mongo:8.0
     container_name: nomad_oasis_mongo
     environment:
       - MONGO_DATA_DIR=/data/db
@@ -36,7 +36,7 @@ services:
     healthcheck:
       test:
         - "CMD"
-        - "mongo"
+        - "mongosh"
         - "mongo:27017/test"
         - "--quiet"
         - "--eval"
