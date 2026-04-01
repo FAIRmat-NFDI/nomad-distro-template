@@ -20,8 +20,12 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
+<<<<<<< HEAD
 dependencies = ["nomad-lab[infrastructure]>=1.4.2rc1"]
 
+=======
+dependencies = ["nomad-lab[infrastructure]==1.4.2rc1"]
+>>>>>>> 0d0cf19 (Changed nomad and plugin versions.)
 
 [project.urls]
 repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
@@ -30,18 +34,22 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 # Add your plugins to the list below.
 plugins = [
  "nomad-north-jupyter>=0.2.5"
+<<<<<<< HEAD
   ]
+=======
+]
+>>>>>>> 0d0cf19 (Changed nomad and plugin versions.)
 jupyter = ["jupyter-events"]
 gpu-action = []
 cpu-action = []
 
-dev = ["nomad-lab[infrastructure, dev]"]
+dev = ["nomad-lab[infrastructure, dev]==1.4.2rc1"]
 
 [tool.uv]
 extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
-prerelease = "explicit"
+prerelease = "allow"
 constraint-dependencies = ["flatdict>=4.1.0"]
 
 [tool.setuptools.packages.find]
