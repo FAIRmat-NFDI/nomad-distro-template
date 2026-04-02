@@ -1,5 +1,5 @@
 services:
-  api_host: "localhost"
+  api_host: "highmagnetos.toulouse-lncmi.cnrs.fr"
   api_base_path: "/nomad-oasis"
 
 oasis:
@@ -15,8 +15,8 @@ plugins:
 
 meta:
   deployment: "oasis"
-  deployment_url: "https://my-oasis.org/api"
-  maintainer_email: "me@my-oasis.org"
+  deployment_url: "https://highmagnetos.toulouse-lncmi.cnrs.fr"
+  maintainer_email: "nicolas.bruyant@lncmi.cnrs.fr"
 
 logstash:
   enabled: false

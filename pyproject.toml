@@ -29,13 +29,17 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 [project.optional-dependencies]
 # Add your plugins to the list below.
 plugins = [
- "nomad-north-jupyter>=0.2.1"
+ "nomad-north-jupyter>=0.2.1",
+ "nomad-material-processing>=1.0.0"
   ]
-jupyter = ["jupyter-events"]
+jupyter = ["jupyter-events", "pymagnetos"]
 gpu-action = []
 cpu-action = []
 
-dev = ["nomad-lab[infrastructure, dev]"]
+dev = [
+  "nomad-lab[infrastructure, dev]",
+  "nomad-parser-plugins-electronic[dev]==1.0.13",
+]
 
 [tool.uv]
 extra-index-url = [
