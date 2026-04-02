@@ -1,21 +1,9 @@
-![docker image](https://github.com/FAIRmat-NFDI/nomad-distro-template/actions/workflows/docker-publish.yml/badge.svg)
+![docker image](https://github.com/Bruyant/nomad-oasis-lncmi/actions/workflows/docker-publish.yml/badge.svg)
 
-# NOMAD Oasis Distribution *Template*
-This repository is a template for creating your own custom NOMAD Oasis distribution image.
-Click [here](https://github.com/new?template_name=nomad-distro-template&template_owner=FAIRmat-NFDI)
-to use this template, or click the `Use this template` button in the upper right corner of
-the main GitHub page for this template.
 
-> [!CAUTION]
-> The templated repository will run a GitHub action on creation which might take a few minutes.
-> After the workflow finishes you should refresh the page and this message should disappear.
-> If this message persists you might need to trigger the workflow manually by navigating to the
-> "Actions" tab at the top, clicking "Template Repository Initialization" on the left side,
-> and triggering it by clicking "Run workflow" under the "Run workflow" button on the right.
+# Bruyant's NOMAD Oasis Distribution
 
-# FAIRmat-NFDI's NOMAD Oasis Distribution
-
-This is the NOMAD Oasis distribution of FAIRmat-NFDI.
+This is the NOMAD Oasis distribution of Bruyant.
 Below are instructions for how to [deploy this distribution](#deploying-the-distribution)
 and how to customize it through [adding plugins](#adding-a-plugin).
 
@@ -61,16 +49,16 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 2. Clone the repository or download the repository as a zip file.
 
     ```sh
-    git clone https://github.com/FAIRmat-NFDI/nomad-distro-template.git
-    cd nomad-distro-template
+    git clone https://github.com/Bruyant/nomad-oasis-lncmi.git
+    cd nomad-oasis-lncmi
     ```
 
     or
 
     ```sh
-    curl-L -o nomad-distro-template.zip "https://github.com/FAIRmat-NFDI/nomad-distro-template/archive/main.zip"
-    unzip nomad-distro-template.zip
-    cd nomad-distro-template
+    curl-L -o nomad-oasis-lncmi.zip "https://github.com/Bruyant/nomad-oasis-lncmi/archive/main.zip"
+    unzip nomad-oasis-lncmi.zip
+    cd nomad-oasis-lncmi
     ```
 
 3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
@@ -195,7 +183,7 @@ You can find more details on setting up and maintaining an Oasis in the NOMAD do
 ### For an existing Oasis
 
 If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/fairmat-nfdi/nomad-distro-template:main` for the services
+your `docker-compose.yaml` with `ghcr.io/bruyant/nomad-oasis-lncmi:main` for the services
 `worker`, `app`, `north`, and `logtransfer`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out
@@ -235,7 +223,7 @@ Adjust these values based on your server's available resources to optimize perfo
 
 ## Adding a plugin
 
-By default, no plugins are included in this distribution. You can find a list of available NOMAD plugins [here](https://nomad-lab.eu/prod/v1/oasis/gui/search/plugins). For a list of official plugins provided by FAIRmat, please see [here](https://github.com/FAIRmat-NFDI/.github/blob/main/profile/README.md). For inspiration, you can also check the list of [plugins that are installed on the production NOMAD deployment hosted by FAIRmat](https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-distro/-/raw/main/pyproject.toml?ref_type=heads).
+By default, no plugins are included in this distribution. You can find a list of available NOMAD plugins [here](https://nomad-lab.eu/prod/v1/oasis/gui/search/plugins). For a list of official plugins provided by FAIRmat, please see [here](https://github.com/Bruyant/.github/blob/main/profile/README.md). For inspiration, you can also check the list of [plugins that are installed on the production NOMAD deployment hosted by FAIRmat](https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-distro/-/raw/main/pyproject.toml?ref_type=heads).
 
 To add a new plugin to the docker image you should add it to the plugins table in the [`pyproject.toml`](pyproject.toml) file.
 
@@ -294,7 +282,7 @@ Note that the `base-notebook` image is more lightweight and uses less disk space
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
 ```sh
-docker pull ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+docker pull ghcr.io/bruyant/nomad-oasis-lncmi/jupyter:main
 ```
 
 If you want additional python packages to be available to all users in the jupyter hub you can add those to the jupyter table in the [`pyproject.toml`](pyproject.toml):
@@ -314,7 +302,7 @@ jupyter = [
 
 The recommended way to integrate the Docker image e.g., Jupyter into your NOMAD Oasis is through the plugin entry point system. This approach is cleaner, more maintainable, and automatically handles all necessary configurations.
 
-[`nomad-north-jupyter`](https://github.com/FAIRmat-NFDI/nomad-north-jupyter) is a NOMAD plugin that provides a containerized JupyterLab environment for interactive analysis within NORTH (NOMAD Remote Tools Hub). This plugin has been added to this distribution by default via `pyproject.toml`. In `nomad.yaml`, the `NORTHTool` entry point is configured to use the [custom Jupyter image](#the-jupyter-image) built in this repository.
+[`nomad-north-jupyter`](https://github.com/Bruyant/nomad-north-jupyter) is a NOMAD plugin that provides a containerized JupyterLab environment for interactive analysis within NORTH (NOMAD Remote Tools Hub). This plugin has been added to this distribution by default via `pyproject.toml`. In `nomad.yaml`, the `NORTHTool` entry point is configured to use the [custom Jupyter image](#the-jupyter-image) built in this repository.
 
 ## Automated Unit and Example Upload Tests in CI
 
@@ -336,9 +324,9 @@ This automated process helps ensure that your dependencies stay up to date, impr
 
 ## Customizing Documentation
 
-By default, documentation is built using the [nomad-docs](https://github.com/FAIRmat-NFDI/nomad-docs) repository. However, if you'd like to customize the documentation for your Oasis instance, you can easily do so.
+By default, documentation is built using the [nomad-docs](https://github.com/Bruyant/nomad-docs) repository. However, if you'd like to customize the documentation for your Oasis instance, you can easily do so.
 
-1. First, [fork the nomad-docs repository](https://github.com/FAIRmat-NFDI/nomad-docs/fork).
+1. First, [fork the nomad-docs repository](https://github.com/Bruyant/nomad-docs/fork).
 2. Make your desired changes in your fork.
 3. Update the `NOMAD_DOCS_REPO` variable in the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file to point to the URL of your forked repository.
 
@@ -437,7 +425,7 @@ Ideally all workflows should be triggered automatically but you might need to ru
 
 ## FAQ/Trouble shooting
 
-_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/FAIRmat-NFDI/nomad-distro-template/manifests/main": unauthorized`
+_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/Bruyant/nomad-oasis-lncmi/manifests/main": unauthorized`
 _when trying to pull my docker image._
 
 Most likely you have not made the package public or provided a personal access token (PAT).

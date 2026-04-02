@@ -101,7 +101,7 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/bruyant/nomad-oasis-lncmi:main
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -148,7 +148,7 @@ services:
   ## nomad gpu worker (actions)
   # gpu_worker:
   #   restart: unless-stopped
-  #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:main
+  #   image: ghcr.io/bruyant/nomad-oasis-lncmi/gpu-action:main
   #   platform: linux/amd64
   #   container_name: nomad_oasis_gpu_worker
   #   env_file:
@@ -185,7 +185,7 @@ services:
   # # nomad cpu worker (actions)
   # cpu_worker:
   #   restart: unless-stopped
-  #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-action:main
+  #   image: ghcr.io/bruyant/nomad-oasis-lncmi/cpu-action:main
   #   platform: linux/amd64
   #   container_name: nomad_oasis_cpu_worker
   #   env_file:
@@ -220,7 +220,7 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/bruyant/nomad-oasis-lncmi:main
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
@@ -265,7 +265,7 @@ services:
   # nomad remote tools hub (JupyterHUB, e.g. for AI Toolkit)
   north:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/bruyant/nomad-oasis-lncmi:main
     platform: linux/amd64
     container_name: nomad_oasis_north
     environment:
@@ -303,7 +303,7 @@ services:
   # to enable the logtransfer service run "docker compose --profile with_logtransfer up"
   logtransfer:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/bruyant/nomad-oasis-lncmi:main
     platform: linux/amd64
     container_name: nomad_oasis_logtransfer
     environment:
@@ -350,7 +350,7 @@ services:
 
   # jupyterlab image: (this is only used to pull the image, no service is run for this)
   jupyterlab_image:
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+    image: ghcr.io/bruyant/nomad-oasis-lncmi/jupyter:main
     platform: linux/amd64
     container_name: nomad_jupyter_image
     pull_policy: always
