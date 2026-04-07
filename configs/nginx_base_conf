@@ -18,6 +18,7 @@ gzip_types
 
 location / {
     proxy_pass http://app:8000;
+    proxy_set_header X-Forwarded-Proto $scheme;
 }
 
 location ~ /nomad-oasis\/?(gui)?$ {
