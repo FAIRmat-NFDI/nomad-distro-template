@@ -32,7 +32,7 @@ plugins = [
  "nomad-north-jupyter>=0.2.1",
  "nomad-material-processing>=1.0.0"
   ]
-jupyter = ["jupyter-events", "pymagnetos"]
+jupyter = ["jupyter-events"]
 gpu-action = []
 cpu-action = []
 
