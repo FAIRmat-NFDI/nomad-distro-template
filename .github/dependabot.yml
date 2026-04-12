@@ -7,6 +7,7 @@ version: 2
 updates:
   - package-ecosystem: "uv"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     allow:
@@ -16,6 +17,7 @@ updates:
   - package-ecosystem: "docker"
     # Look for a `Dockerfile` in the `root` directory
     directory: "/"
+    target-branch: "develop"
     # Check for updates once a week
     schedule:
       interval: "weekly"
@@ -23,6 +25,6 @@ updates:
   # Update action versions
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "develop"
     schedule:
-      interval: "weekly" 
-
+      interval: "weekly"
