@@ -10,6 +10,8 @@ updates:
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
     allow:
       - dependency-type: all
 
@@ -21,6 +23,8 @@ updates:
     # Check for updates once a week
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
 
   # Update action versions
   - package-ecosystem: "github-actions"
@@ -28,3 +32,5 @@ updates:
     target-branch: "develop"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
