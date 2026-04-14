@@ -24,18 +24,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # Replaces the template repository name in the README with the new one
+      # Renders the README for the newly created repository using explicit placeholders
       - name: Update README
         run: |
-          sed -i "/# NOMAD Oasis Distribution/,/button on the right./d" README.md
-          export image_name="${{ github.repository }}"
-          sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" README.md
-          sed -i "s|FAIRmat-NFDI/nomad-distro-template|${{ github.repository }}|g" README.md
-          sed -i "s|FAIRmat-NFDI|${{ github.repository_owner }}|g" README.md
-          sed -i "s|nomad-distro-template|${{ github.event.repository.name }}|g" README.md
-          sed -i "s|template https://github.com/${{ github.repository }}|template https://github.com/FAIRmat-NFDI/nomad-distro-template|g" README.md
-          sed -i "s|${{ github.repository }}/releases/latest|FAIRmat-NFDI/nomad-distro-template/releases/latest|g" README.md
-          sed -i "s|@ git+https://github.com/${{ github.repository_owner }}|@ git+https://github.com/FAIRmat-NFDI|g" README.md
+          python3 scripts/render_readme.py --repository "${{ github.repository }}"
 
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
