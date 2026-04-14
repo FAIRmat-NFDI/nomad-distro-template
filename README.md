@@ -1,4 +1,4 @@
-<!-- Generated from README.template.md by scripts/render_readme.py. -->
+<!-- Generated from README.md.j2 via jinja2-cli. -->
 ![docker image](https://github.com/FAIRmat-NFDI/nomad-distro-template/actions/workflows/docker-publish.yml/badge.svg)
 
 # NOMAD Oasis Distribution *Template*
@@ -111,7 +111,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 6. Configuring Secure HTTP and HTTPS Connections
 
-   By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server—including credentials and sensitive data—can be compromised.
+   By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server-including credentials and sensitive data-can be compromised.
 
    HTTPS requires a TLS certificate, which must be renewed periodically. Depending on your setup, you have several options:
 
@@ -405,7 +405,7 @@ If you need to disable tests for specific plugins, update the **PLUGIN_TESTS_PLU
 
 ## Set Up Regular Package Updates with Dependabot
 
-Dependabot is already configured in the repository’s CI setup, but you need to enable it manually in the repository settings.
+Dependabot is already configured in the repository's CI setup, but you need to enable it manually in the repository settings.
 
 To enable Dependabot, go to Settings > Code security and analysis in your GitHub repository. From there, turn on Dependabot alerts and version updates. Once enabled, Dependabot will automatically check for dependency updates and create pull requests when new versions are available.
 
@@ -420,7 +420,6 @@ By default, documentation is built using the [nomad-docs](https://github.com/FAI
 3. Update the `NOMAD_DOCS_REPO` variable in the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file to point to the URL of your forked repository.
 
 This setup ensures that your custom documentation is used when building your Oasis.
-
 
 ## Backing up the Oasis
 
@@ -499,7 +498,6 @@ The lock file merge conflicts can be resolved to use your versions instead of th
 ```sh
 git checkout --ours uv.lock
 ```
-
 
 For detailed instructions on how to resolve the merge conflicts between different version we refer you to the latest template release [notes](https://github.com/FAIRmat-NFDI/nomad-distro-template/releases/latest)
 

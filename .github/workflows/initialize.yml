@@ -10,6 +10,8 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
+  UV_VERSION: 0.9
+  PYTHON_VERSION: 3.12
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
@@ -24,10 +26,26 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # Renders the README for the newly created repository using explicit placeholders
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Renders the README for the newly created repository from the Jinja template
       - name: Update README
         run: |
-          python3 scripts/render_readme.py --repository "${{ github.repository }}"
+          export image_name="${{ github.repository }}"
+          uvx --from jinja2-cli jinja2 --strict README.md.j2 \
+            -D repository="${{ github.repository }}" \
+            -D repository_owner="${{ github.repository_owner }}" \
+            -D repository_name="${{ github.event.repository.name }}" \
+            -D image_name="${image_name,,}" \
+            -D include_template_section="false" \
+            > README.md
 
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
