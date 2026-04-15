@@ -1,6 +1,6 @@
-<!-- Generated from README.md.j2 via jinja2-cli. -->
 ![docker image](https://github.com/FAIRmat-NFDI/nomad-distro-template/actions/workflows/docker-publish.yml/badge.svg)
 
+<!-- TEMPLATE-ONLY:START -->
 # NOMAD Oasis Distribution *Template*
 This repository is a template for creating your own custom NOMAD Oasis distribution image.
 Click [here](https://github.com/new?template_name=nomad-distro-template&template_owner=FAIRmat-NFDI)
@@ -13,7 +13,7 @@ the main GitHub page for this template.
 > If this message persists you might need to trigger the workflow manually by navigating to the
 > "Actions" tab at the top, clicking "Template Repository Initialization" on the left side,
 > and triggering it by clicking "Run workflow" under the "Run workflow" button on the right.
-
+<!-- TEMPLATE-ONLY:END -->
 # FAIRmat-NFDI's NOMAD Oasis Distribution
 
 This is the NOMAD Oasis distribution of FAIRmat-NFDI.
