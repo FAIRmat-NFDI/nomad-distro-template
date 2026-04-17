@@ -15,9 +15,6 @@ resolution-markers = [
 [options]
 prerelease-mode = "explicit"
 
-[manifest]
-constraints = [{ name = "flatdict", specifier = ">=4.1.0" }]
-
 [[package]]
 name = "aiofiles"
 version = "25.1.0"
@@ -2668,15 +2665,15 @@ plugins = [
 [package.metadata]
 requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
-    { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'" },
-    { name = "nomad-lab", extras = ["infrastructure"], specifier = ">=1.4.2rc1" },
+    { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = "==1.4.2" },
+    { name = "nomad-lab", extras = ["infrastructure"], specifier = "==1.4.2" },
     { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.5" },
 ]
 provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
 
 [[package]]
 name = "nomad-lab"
-version = "1.4.2rc1"
+version = "1.4.2"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "ase" },
@@ -2724,9 +2721,9 @@ dependencies = [
     { name = "xarray", version = "2025.6.1", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
     { name = "xarray", version = "2026.2.0", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/18ffebbe8091f1547fff57283ca8df75070b0fd999bc1049d67277f63b9c1005/nomad_lab-1.4.2rc1.tar.gz", hash = "sha256:18ffebbe8091f1547fff57283ca8df75070b0fd999bc1049d67277f63b9c1005" }
+sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/f3effff6f14c2fde0aef7c513ac6572aee8d07b3f043c58647148429ea029808/nomad_lab-1.4.2.tar.gz", hash = "sha256:f3effff6f14c2fde0aef7c513ac6572aee8d07b3f043c58647148429ea029808" }
 wheels = [
-    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/da24b891dd06a16bf9e24e7ef627e376c98f78a6a6ea507dbf7cc69292589834/nomad_lab-1.4.2rc1-py3-none-any.whl", hash = "sha256:da24b891dd06a16bf9e24e7ef627e376c98f78a6a6ea507dbf7cc69292589834" },
+    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/e167de33df01df94ecdb6e5f576f8791900581b27bfa8693010478a7cf2ccc0d/nomad_lab-1.4.2-py3-none-any.whl", hash = "sha256:e167de33df01df94ecdb6e5f576f8791900581b27bfa8693010478a7cf2ccc0d" },
 ]
 
 [package.optional-dependencies]
