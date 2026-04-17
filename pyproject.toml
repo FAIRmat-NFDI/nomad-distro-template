@@ -34,7 +34,7 @@ jupyter = ["jupyter-events"]
 gpu-action = []
 cpu-action = []
 
-dev = ["nomad-lab[infrastructure, dev]==1.4.2rc1"]
+dev = ["nomad-lab[infrastructure, dev]==1.4.2"]
 
 [tool.uv]
 extra-index-url = [
