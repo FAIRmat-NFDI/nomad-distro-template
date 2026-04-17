@@ -9,7 +9,7 @@ oasis:
 plugins:
   entry_points:
     options:
-      nomad_north_jupyter.north_tools.jupyter_north_tool:north_tool_entry_point:
+      nomad_north_jupyter.north_tools:jupyter:
         north_tool:
           image: ghcr.io/fairmat-nfdi/nomad-north-jupyter:latest
 
