@@ -1,23 +1,4 @@
 services:
-  # broker for celery
-  rabbitmq:
-    restart: unless-stopped
-    image: docker.io/rabbitmq:3.11.5-alpine
-    container_name: nomad_oasis_rabbitmq
-    environment:
-      - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
-      - RABBITMQ_DEFAULT_USER=rabbitmq
-      - RABBITMQ_DEFAULT_PASS=rabbitmq
-      - RABBITMQ_DEFAULT_VHOST=/
-    volumes:
-      - rabbitmq:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "--silent", "--quiet", "ping"]
-      interval: 10s
-      timeout: 10s
-      retries: 30
-      start_period: 10s
-
   # the search engine
   elastic:
     restart: unless-stopped
@@ -43,7 +24,7 @@ services:
   # the user data db
   mongo:
     restart: unless-stopped
-    image: docker.io/mongo:5.0.6
+    image: docker.io/mongo:8.0
     container_name: nomad_oasis_mongo
     environment:
       - MONGO_DATA_DIR=/data/db
@@ -55,7 +36,7 @@ services:
     healthcheck:
       test:
         - "CMD"
-        - "mongo"
+        - "mongosh"
         - "mongo:27017/test"
         - "--quiet"
         - "--eval"
@@ -73,11 +54,55 @@ services:
     image: docker.io/postgres:16
     volumes:
       - postgresql:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+
+  temporal-setup-db:
+    image: temporalio/admin-tools:1.30
+    container_name: temporal-setup-db
+    restart: on-failure:6
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - SQL_PASSWORD=temporal
+    volumes:
+      - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
+    entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+    command: ["setup_db"]
+
+  temporal-create-namespace:
+    image: temporalio/admin-tools:1.30
+    container_name: temporal-create-namespace
+    restart: on-failure:5
+    depends_on:
+      temporal:
+        condition: service_healthy
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - DEFAULT_NAMESPACE=default
+    volumes:
+      - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
+    entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+    command: ["create_namespace"]
 
   temporal:
+    image: temporalio/server:1.30
     container_name: nomad_oasis_temporal
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
+      temporal-setup-db:
+        condition: service_completed_successfully
     environment:
       - DB=postgres12
       - DB_PORT=5432
@@ -86,17 +111,16 @@ services:
       - POSTGRES_SEEDS=postgresql
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
-    image: docker.io/temporalio/auto-setup:1.28
+      - BIND_ON_IP=0.0.0.0
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+    volumes:
+      - ./configs/_temporal-sql.yaml:/etc/temporal/config/dynamicconfig/development-sql.yaml
     healthcheck:
-      test: >
-        bash -c '
-          temporal operator cluster health --address $$(hostname -i):7233 |
-          grep -q "SERVING"
-        '
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
+      test: ["CMD", "nc", "-z", "localhost", "7233"]
+      interval: 5s
+      timeout: 3s
+      start_period: 30s
+      retries: 60
 
   # nomad worker (processing)
   worker:
@@ -105,7 +129,6 @@ services:
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
-      NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
@@ -114,8 +137,6 @@ services:
       - ./.env
     depends_on:
       temporal:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
       elastic:
         condition: service_healthy
@@ -163,14 +184,11 @@ services:
   #             capabilities: [gpu]
   #   environment:
   #     NOMAD_SERVICE: nomad_oasis_gpu_worker
-  #     NOMAD_RABBITMQ_HOST: rabbitmq
   #     NOMAD_ELASTIC_HOST: elastic
   #     NOMAD_MONGO_HOST: mongo
   #     NOMAD_LOGSTASH_HOST: logtransfer
   #     NOMAD_TEMPORAL_HOST: temporal
   #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
   #     elastic:
   #       condition: service_healthy
   #     mongo:
@@ -192,7 +210,6 @@ services:
   #     - ./.env
   #   environment:
   #     NOMAD_SERVICE: nomad_oasis_cpu_worker
-  #     NOMAD_RABBITMQ_HOST: rabbitmq
   #     NOMAD_ELASTIC_HOST: elastic
   #     NOMAD_MONGO_HOST: mongo
   #     NOMAD_LOGSTASH_HOST: logtransfer
@@ -204,8 +221,6 @@ services:
   #         cpus: "2.0" # Maximum 2 CPU cores
   #         memory: 8G # Maximum 8GB RAM
   #   depends_on:
-  #     rabbitmq:
-  #       condition: service_healthy
   #     elastic:
   #       condition: service_healthy
   #     mongo:
@@ -227,7 +242,6 @@ services:
       NOMAD_SERVICE: nomad_oasis_app
       NOMAD_SERVICES_API_PORT: 80
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_LOGSTASH_HOST: logtransfer
@@ -237,8 +251,6 @@ services:
       - ./.env
     depends_on:
       temporal:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
       elastic:
         condition: service_healthy
@@ -276,7 +288,6 @@ services:
       NOMAD_NORTH_HUB_HOST: north
       NOMAD_SERVICES_API_HOST: app
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
     env_file:
@@ -334,9 +345,10 @@ services:
       - ./configs/nginx_base_conf:/etc/nginx/conf.d/nginx_base_conf:ro
       # HTTP
       - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
-      # HTTPS (you need to have an SSL certificate)
+      # HTTPS (you need to have a TLS certificate)
       # - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
-      # - ./ssl:/etc/nginx/ssl:ro
+      # - ./tls/selfsigned.crt:/etc/nginx/tls/mounted-nomad-oasis.crt:ro  # Path to your TLS certificate
+      # - ./tls/selfsigned.key:/etc/nginx/tls/mounted-nomad-oasis.key:ro  # Path to your TLS private key
     depends_on:
       app:
         condition: service_healthy
@@ -363,8 +375,6 @@ volumes:
     name: "nomad_oasis_mongo"
   elastic:
     name: "nomad_oasis_elastic"
-  rabbitmq:
-    name: "nomad_oasis_rabbitmq"
   keycloak:
     name: "nomad_oasis_keycloak"
   postgresql:
