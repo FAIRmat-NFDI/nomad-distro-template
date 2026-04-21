@@ -10,7 +10,7 @@ classifiers = [
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
+ # "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
@@ -30,7 +30,8 @@ repository = "https://github.com/bruyant/nomad-oasis-lncmi"
 # Add your plugins to the list below.
 plugins = [
  "nomad-north-jupyter>=0.2.1",
- "nomad-material-processing>=1.0.0"
+ "nomad-material-processing>=1.0.0",
+ "nomad_tools_pymagnetos @ git+https://github.com/Bruyant/nomad_tools_pymagnetos.git@v0.1"
   ]
 jupyter = ["jupyter-events"]
 gpu-action = []
