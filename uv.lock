@@ -2496,6 +2496,7 @@ jupyter = [
 plugins = [
     { name = "nomad-material-processing" },
     { name = "nomad-north-jupyter" },
+    { name = "nomad-tools-pymagnetos" },
 ]
 
 [package.metadata]
@@ -2506,6 +2507,7 @@ requires-dist = [
     { name = "nomad-material-processing", marker = "extra == 'plugins'", specifier = ">=1.0.0" },
     { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.1" },
     { name = "nomad-parser-plugins-electronic", extras = ["dev"], marker = "extra == 'dev'", specifier = "==1.0.13" },
+    { name = "nomad-tools-pymagnetos", marker = "extra == 'plugins'", git = "https://github.com/Bruyant/nomad_tools_pymagnetos.git?rev=v0.1" },
 ]
 provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
 
@@ -2696,6 +2698,16 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/42/e5/86fe1e8375d3d78b146c9fea39452b41978b61321595936a277ba76c16cb/nomad_schema_plugin_simulation_workflow-1.0.11.tar.gz", hash = "sha256:99cc4fa65b9c0649d7985399688b6fecbb933d97dfcc0f4db59c33aba758bcc8", size = 8866822, upload-time = "2025-10-30T14:25:07.675Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/30/9b9050f57a0d0df22b60a43562ca99f82820c9fe262c2d2619c49cf61845/nomad_schema_plugin_simulation_workflow-1.0.11-py3-none-any.whl", hash = "sha256:5084ebabaa3b8954d998ee16f353b8ec09278af5f8aadce557777a65ed41f479", size = 55657, upload-time = "2025-10-30T14:25:06.141Z" },
+]
+
+[[package]]
+name = "nomad-tools-pymagnetos"
+version = "0.1.0"
+source = { git = "https://github.com/Bruyant/nomad_tools_pymagnetos.git?rev=v0.1#463883af508663c989048830c5a872e1411932ad" }
+dependencies = [
+    { name = "nomad-lab" },
+    { name = "pydantic" },
+    { name = "temporalio" },
 ]
 
 [[package]]
