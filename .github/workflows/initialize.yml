@@ -10,6 +10,8 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
+  UV_VERSION: 0.9
+  PYTHON_VERSION: 3.12
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
@@ -24,25 +26,26 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # Removes template-only content and updates the README with the new repository details
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Renders the README for the newly created repository from the Jinja template
       - name: Update README
         run: |
-          export repository="${{ github.repository }}"
-          export repository_owner="${{ github.repository_owner }}"
-          export repository_name="${{ github.event.repository.name }}"
-          export image_name="$(printf '%s' "${repository}" | tr '[:upper:]' '[:lower:]')"
-
-          sed -i '/<!-- TEMPLATE-ONLY:START -->/,/<!-- TEMPLATE-ONLY:END -->/d' README.md
-          sed -i "s|https://github.com/FAIRmat-NFDI/nomad-distro-template/actions/workflows/docker-publish.yml/badge.svg|https://github.com/${repository}/actions/workflows/docker-publish.yml/badge.svg|g" README.md
-          sed -i "s|^# FAIRmat-NFDI's NOMAD Oasis Distribution$|# ${repository_owner}'s NOMAD Oasis Distribution|g" README.md
-          sed -i "s|^This is the NOMAD Oasis distribution of FAIRmat-NFDI\\.$|This is the NOMAD Oasis distribution of ${repository_owner}.|g" README.md
-          sed -i "s|^    git clone https://github.com/FAIRmat-NFDI/nomad-distro-template\\.git$|    git clone https://github.com/${repository}.git|g" README.md
-          sed -i "s|^    cd nomad-distro-template$|    cd ${repository_name}|g" README.md
-          sed -i "s|^    curl-L -o nomad-distro-template\\.zip \"https://github.com/FAIRmat-NFDI/nomad-distro-template/archive/main\\.zip\"$|    curl-L -o ${repository_name}.zip \"https://github.com/${repository}/archive/main.zip\"|g" README.md
-          sed -i "s|^    unzip nomad-distro-template\\.zip$|    unzip ${repository_name}.zip|g" README.md
-          sed -i "s|ghcr.io/fairmat-nfdi/nomad-distro-template:main|ghcr.io/${image_name}:main|g" README.md
-          sed -i "s|ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main|ghcr.io/${image_name}/jupyter:main|g" README.md
-          sed -i "s|https://ghcr.io/v2/FAIRmat-NFDI/nomad-distro-template/manifests/main|https://ghcr.io/v2/${repository}/manifests/main|g" README.md
+          export image_name="${{ github.repository }}"
+          uvx --from jinja2-cli jinja2 --strict README.md.j2 \
+            -D repository="${{ github.repository }}" \
+            -D repository_owner="${{ github.repository_owner }}" \
+            -D repository_name="${{ github.event.repository.name }}" \
+            -D image_name="${image_name,,}" \
+            -D include_template_section="false" \
+            > README.md
 
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
