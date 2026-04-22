@@ -12,8 +12,6 @@ env:
   REGISTRY: ghcr.io
   UV_VERSION: 0.9
   PYTHON_VERSION: 3.12
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
 
 permissions:
   contents: write
@@ -25,6 +23,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+
+      - name: Compute image name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> "${GITHUB_ENV}"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v8.1.0
@@ -38,13 +40,12 @@ jobs:
       # Renders the README for the newly created repository from the README template
       - name: Update README
         run: |
-          export image_name="${{ github.repository }}"
           tmp_readme="$(mktemp)"
           uvx --from jinja2-cli jinja2 --strict README.md \
             -D repository="${{ github.repository }}" \
             -D repository_owner="${{ github.repository_owner }}" \
             -D repository_name="${{ github.event.repository.name }}" \
-            -D image_name="${image_name,,}" \
+            -D image_name="${IMAGE_NAME}" \
             -D include_template_section="false" \
             > "${tmp_readme}"
           mv "${tmp_readme}" README.md
@@ -52,20 +53,17 @@ jobs:
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
         run: |
-          export image_name="${{ github.repository }}"
-          sed -i "s|fairmat-nfdi/nomad-distro-template|${image_name,,}|g" docker-compose.yaml
+          sed -i "s|fairmat-nfdi/nomad-distro-template|${IMAGE_NAME}|g" docker-compose.yaml
 
         # Replaces the template repository name in the nomad config with the new one
       - name: Update nomad.yaml
         run: |
-          export image_name="${{ github.repository }}"
-          sed -i "s|fairmat-nfdi/nomad-north-jupyter:latest|${image_name,,}/jupyter:main|g" configs/nomad.yaml
+          sed -i "s|fairmat-nfdi/nomad-north-jupyter:latest|${IMAGE_NAME}/jupyter:main|g" configs/nomad.yaml
 
         # Replaces the template repository name in the pyproject.toml with the new one
       - name: Update pyproject.toml
         run: |
-          export image_name="${{ github.repository }}"
-          sed -i "s|FAIRmat-NFDI/nomad-distro-template|${image_name,,}|g" pyproject.toml
+          sed -i "s|FAIRmat-NFDI/nomad-distro-template|${IMAGE_NAME}|g" pyproject.toml
 
       # Deletes this workflow file to prevent it from running on branch creation
       - name: Delete initialization workflow
