@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8.1.0
         with:
           version: ${{ env.UV_VERSION }}
 
@@ -35,17 +35,19 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      # Renders the README for the newly created repository from the Jinja template
+      # Renders the README for the newly created repository from the README template
       - name: Update README
         run: |
           export image_name="${{ github.repository }}"
-          uvx --from jinja2-cli jinja2 --strict README.md.j2 \
+          tmp_readme="$(mktemp)"
+          uvx --from jinja2-cli jinja2 --strict README.md \
             -D repository="${{ github.repository }}" \
             -D repository_owner="${{ github.repository_owner }}" \
             -D repository_name="${{ github.event.repository.name }}" \
             -D image_name="${image_name,,}" \
             -D include_template_section="false" \
-            > README.md
+            > "${tmp_readme}"
+          mv "${tmp_readme}" README.md
 
       # Replaces the template repository name in the docker config file with the new one
       - name: Update docker-compose.yaml
