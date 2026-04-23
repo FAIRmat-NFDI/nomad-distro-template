@@ -1,5 +1,6 @@
-![docker image](https://github.com/FAIRmat-NFDI/nomad-distro-template/actions/workflows/docker-publish.yml/badge.svg)
+![docker image](https://github.com/{{ repository }}/actions/workflows/docker-publish.yml/badge.svg)
 
+{% if include_template_section == "true" -%}
 # NOMAD Oasis Distribution *Template*
 This repository is a template for creating your own custom NOMAD Oasis distribution image.
 Click [here](https://github.com/new?template_name=nomad-distro-template&template_owner=FAIRmat-NFDI)
@@ -13,9 +14,10 @@ the main GitHub page for this template.
 > "Actions" tab at the top, clicking "Template Repository Initialization" on the left side,
 > and triggering it by clicking "Run workflow" under the "Run workflow" button on the right.
 
-# FAIRmat-NFDI's NOMAD Oasis Distribution
+{% endif -%}
+# {{ repository_owner }}'s NOMAD Oasis Distribution
 
-This is the NOMAD Oasis distribution of FAIRmat-NFDI.
+This is the NOMAD Oasis distribution of {{ repository_owner }}.
 Below are instructions for how to [deploy this distribution](#deploying-the-distribution)
 and how to customize it through [adding plugins](#adding-a-plugin).
 
@@ -62,16 +64,16 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 2. Clone the repository or download the repository as a zip file.
 
     ```sh
-    git clone https://github.com/FAIRmat-NFDI/nomad-distro-template.git
-    cd nomad-distro-template
+    git clone https://github.com/{{ repository }}.git
+    cd {{ repository_name }}
     ```
 
     or
 
     ```sh
-    curl-L -o nomad-distro-template.zip "https://github.com/FAIRmat-NFDI/nomad-distro-template/archive/main.zip"
-    unzip nomad-distro-template.zip
-    cd nomad-distro-template
+    curl -L -o {{ repository_name }}.zip "https://github.com/{{ repository }}/archive/main.zip"
+    unzip {{ repository_name }}.zip
+    cd {{ repository_name }}
     ```
 
 3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
@@ -110,7 +112,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 6. Configuring Secure HTTP and HTTPS Connections
 
-   By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server—including credentials and sensitive data—can be compromised.
+   By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server-including credentials and sensitive data-can be compromised.
 
    HTTPS requires a TLS certificate, which must be renewed periodically. Depending on your setup, you have several options:
 
@@ -197,7 +199,7 @@ You can find more details on setting up and maintaining an Oasis in the NOMAD do
 ### For an existing Oasis
 
 If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/fairmat-nfdi/nomad-distro-template:main` for the services
+your `docker-compose.yaml` with `ghcr.io/{{ image_name }}:main` for the services
 `worker`, `app`, `north`, and `logtransfer`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out
@@ -370,7 +372,7 @@ Note that the `base-notebook` image is more lightweight and uses less disk space
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
 ```sh
-docker pull ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+docker pull ghcr.io/{{ image_name }}/jupyter:main
 ```
 
 If you want additional python packages to be available to all users in the jupyter hub you can add those to the jupyter table in the [`pyproject.toml`](pyproject.toml):
@@ -404,7 +406,7 @@ If you need to disable tests for specific plugins, update the **PLUGIN_TESTS_PLU
 
 ## Set Up Regular Package Updates with Dependabot
 
-Dependabot is already configured in the repository’s CI setup, but you need to enable it manually in the repository settings.
+Dependabot is already configured in the repository's CI setup, but you need to enable it manually in the repository settings.
 
 To enable Dependabot, go to Settings > Code security and analysis in your GitHub repository. From there, turn on Dependabot alerts and version updates. Once enabled, Dependabot will automatically check for dependency updates and create pull requests when new versions are available.
 
@@ -419,7 +421,6 @@ By default, documentation is built using the [nomad-docs](https://github.com/FAI
 3. Update the `NOMAD_DOCS_REPO` variable in the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file to point to the URL of your forked repository.
 
 This setup ensures that your custom documentation is used when building your Oasis.
-
 
 ## Backing up the Oasis
 
@@ -499,7 +500,6 @@ The lock file merge conflicts can be resolved to use your versions instead of th
 git checkout --ours uv.lock
 ```
 
-
 For detailed instructions on how to resolve the merge conflicts between different version we refer you to the latest template release [notes](https://github.com/FAIRmat-NFDI/nomad-distro-template/releases/latest)
 
 Once the merge conflicts are resolved you should add the changes and commit them
@@ -513,7 +513,7 @@ Ideally all workflows should be triggered automatically but you might need to ru
 
 ## FAQ/Trouble shooting
 
-_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/FAIRmat-NFDI/nomad-distro-template/manifests/main": unauthorized`
+_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized`
 _when trying to pull my docker image._
 
 Most likely you have not made the package public or provided a personal access token (PAT).
