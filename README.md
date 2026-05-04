@@ -122,7 +122,7 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
    2. Free certificate from Let's Encrypt
 
-      [Let's Encrypt](https://letsencrypt.org/) provides free TLS certificates for those with a domain name. Follow their tutorials for instructions on generating a certificate.
+      [Let's Encrypt](https://letsencrypt.org/) provides free TLS certificates for those who control a domain name. Follow their tutorials for instructions on generating a certificate. For example [with ACME client `certbot`](https://phoenixnap.com/kb/letsencrypt-docker).
 
    3. Self-signed certificate
 
