@@ -277,25 +277,21 @@ services:
   # nomad remote tools hub (JupyterHUB, e.g. for AI Toolkit)
   north:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-north:main
     platform: linux/amd64
     container_name: nomad_oasis_north
     environment:
-      NOMAD_SERVICE: nomad_oasis_north
-      NOMAD_NORTH_DOCKER_NETWORK: nomad_oasis_network
-      NOMAD_NORTH_HUB_CONNECT_IP: north
-      NOMAD_NORTH_HUB_IP: "0.0.0.0"
-      NOMAD_NORTH_HUB_HOST: north
-      NOMAD_SERVICES_API_HOST: app
-      NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_ELASTIC_HOST: elastic
-      NOMAD_MONGO_HOST: mongo
+      NOMAD_API_URL: "http://app:8000/nomad-oasis/api/v1"
+      DOCKER_PREFIX: "nomad-oasis-north"
+      DOCKER_NETWORK: "nomad_oasis_network"
     env_file:
-      - ./.env
+      - ./.env.north
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
-      - ./.volumes/fs:/app/.volumes/fs
-      - /var/run/docker.sock:/var/run/docker.sock
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      - "nomad_north:/data"
     user: "1000:991"
     command: python -m nomad.cli admin run hub
     healthcheck:
@@ -309,6 +305,9 @@ services:
       timeout: 10s
       retries: 30
       start_period: 10s
+    depends_on:
+      app:
+        condition: service_healthy
 
   # nomad logtransfer
   # to enable the logtransfer service run "docker compose --profile with_logtransfer up"
@@ -379,6 +378,8 @@ volumes:
     name: "nomad_oasis_keycloak"
   postgresql:
     name: "nomad_oasis_postgresql"
+  nomad_north:
+
 networks:
   default:
     name: nomad_oasis_network
