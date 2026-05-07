@@ -1,3 +1,0 @@
-[submodule "packages/nomad-FAIR"]
-	path = packages/nomad-FAIR
-	url = git@gitlab.mpcdf.mpg.de:nomad-lab/nomad-FAIR.git
