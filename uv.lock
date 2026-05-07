@@ -37,6 +37,25 @@ wheels = [
 ]
 
 [[package]]
+name = "aiobotocore"
+version = "3.6.0"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "aioitertools" },
+    { name = "botocore" },
+    { name = "jmespath" },
+    { name = "multidict" },
+    { name = "python-dateutil" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/28/52/4689a0c2ddced3888c687a84b820da37da6abda5ec52d96a7f11f22ff6ec/aiobotocore-3.6.0.tar.gz", hash = "sha256:78e6b95b258bcdde8d681d6851f88f337ed30b2d6611fae45366e6bf7488feb3", size = 123104, upload-time = "2026-05-01T20:33:31.109Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/72/9a/17033aaafb880932eec0b0054a8e1cf201cb74501dfb0518c6b39fc5b258/aiobotocore-3.6.0-py3-none-any.whl", hash = "sha256:bf1c2e1d8492d98c9b63b330723a44b41a5d402afd19eaca704e107b91669c09", size = 88259, upload-time = "2026-05-01T20:33:29.213Z" },
+]
+
+[[package]]
 name = "aiofiles"
 version = "25.1.0"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
@@ -47,7 +66,7 @@ wheels = [
 
 [[package]]
 name = "aiohappyeyeballs"
-version = "2.6.2"
+version = "2.6.2"c
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/33/c6/61a2d7b7572279226bb2e7f61d7a19ca7c90da0329c93fa0d560cbf288d8/aiohappyeyeballs-2.6.2.tar.gz", hash = "sha256:e202810ee718bd01fc6ef49e8ea53d023d5cb6b581076d7925aa499fa55dbe64", size = 22591, upload-time = "2026-05-20T15:12:24.631Z" }
 wheels = [
