@@ -20,7 +20,7 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-dependencies = ["nomad-lab[infrastructure]>=1.4.2"]
+dependencies = ["nomad-lab[infrastructure]==v1.4.3.dev70+g93ba3a173"]
 
 [project.urls]
 repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
