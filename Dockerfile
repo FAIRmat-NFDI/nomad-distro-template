@@ -44,6 +44,8 @@ RUN apt-get update \
        libgomp1 \
        libmagic1 \
        curl \
+       jq \
+       ripgrep \
        zip \
        unzip \
        nodejs \
