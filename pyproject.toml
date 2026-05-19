@@ -22,7 +22,7 @@ requires-python = ">=3.10"
 license = { file = "LICENSE" }
 dependencies = [
   "nomad-lab[infrastructure]>=1.4.2",
-  "nomad-gui==2.0.0a2.dev566+g27dea98a6",
+  "nomad-gui==2.0.0a2.dev571+gff12e0b15",
 ]
 
 [project.urls]
