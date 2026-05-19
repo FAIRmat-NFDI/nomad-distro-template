@@ -189,7 +189,7 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
 
 #### NOMAD Remote Tools Hub (NORTH)
 
-0. (First time only) Make sure that you follow the instruction about [post installation steps](https://docs.docker.com/engine/install/linux-postinstall/) to create the docker group and add your user:
+1. (First time only) Make sure that you follow the instruction about [post installation steps](https://docs.docker.com/engine/install/linux-postinstall/) to create the docker group and add your user:
 
     1. Create the docker group.
         ```sh
@@ -210,16 +210,11 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
         newgrp docker
         ```
 
-1. To run `north` container as non-root user, it has to be run under the docker group. You might need to replace the `user` setting in the `docker-compose.yaml`'s `north` section with your systems docker group id (eg.: `user: 1000:911`).
-    - Run `id` if you are a docker user, or `getent group | grep docker` to find your systems docker gid. The user id 1000 is used as the nomad user inside all containers.
+2. To run `north` container as non-root user, it has to be run under the docker group. You might need to replace the `user` setting in the `docker-compose.yaml`'s `north` section with your systems docker group id (eg.: `user: '1000:911'`).
+    - The user id `1000` is used as the nomad user inside all containers.
+    - Run `id` if you are a docker user, or `getent group | grep docker` to find your systems docker gid.
 
-4. Create a file for environment variables
-    Before running the containers, you should create a `.env.north` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
-
-    ```sh
-    bash scripts/generate-env-north.sh
-    ```
-    Please customize the generated `.env.north` file with the correct values for your Keycloak instance and the desired service API token.
+3. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
 
 
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
