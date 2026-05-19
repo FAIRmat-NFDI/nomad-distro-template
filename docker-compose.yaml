@@ -272,7 +272,7 @@ services:
       retries: 30
       start_period: 10s
 
-  # nomad remote tools hub (JupyterHUB, e.g. for AI Toolkit)
+  # nomad remote tools hub (JupyterHUB)
   north:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-north:main
@@ -291,7 +291,6 @@ services:
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "nomad_north:/data"
     # user: "1000:991"
-    # command: python -m nomad.cli admin run hub
     healthcheck:
       test:
         - "CMD"
@@ -377,6 +376,8 @@ volumes:
   postgresql:
     name: "nomad_oasis_postgresql"
   nomad_north:
+    name: "nomad_oasis_north"
+
 
 networks:
   default:
