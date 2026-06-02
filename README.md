@@ -84,23 +84,33 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 4. Create a file for environment variables
 
-    Before running the containers, you should create a `.env` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
+    Before running the containers, you should create a `.env` and a `.env.north` files in the root of the repository. This file is used to store sensitive information and is ignored by git.
 
-    At a minimum, you should add a secure secret for the API:
-
-    ```
-    NOMAD_SERVICES_API_SECRET='***'
-    ```
-
-    Make sure the `NOMAD_SERVICES_API_SECRET` is at least 32 characters long.
-
-    If you have bash available you can run this script:
+    If you want to generate the them with random secrets you can also run the following script from the root of the repository:
 
     ```sh
     bash scripts/generate-env.sh
     ```
 
-    This will create a `.env` file with a randomly generated 64-character API secret. If the file already exists, you'll be prompted before overwriting it.
+    Alternatively you can create the `.env` and a `.env.north` files manually, At a minimum, you should add a secure secret for the API to `.env`:
+
+    ```
+    NOMAD_SERVICES_API_SECRET='***'
+    NOMAD_NORTH_HUB_SERVICE_API_TOKEN='***'
+    ```
+
+    If you want to use the NORTH (NOMAD Remote Tools Hub) you also need to add the following variables to the `.env.north` file:
+
+    ```
+    SERVICE_API_TOKEN='***'
+    JUPYTERHUB_CRYPT_KEY='***'
+    ```
+    The `SERVICE_API_TOKEN` and `NOMAD_NORTH_HUB_SERVICE_API_TOKEN` should be the same and will be used for authentication between the NORTH and the NOMAD API.
+
+    Note: The keys should be at least 64 characters long that can be generated with: `openssl rand -hex 32`
+
+
+
 
 5. Pull the images specified in the `docker-compose.yaml`
 
