@@ -47,6 +47,7 @@ services:
       start_period: 10s
 
   postgresql:
+    restart: unless-stopped
     container_name: nomad_oasis_postgresql
     environment:
       POSTGRES_PASSWORD: temporal
@@ -96,6 +97,7 @@ services:
     command: ["create_namespace"]
 
   temporal:
+    restart: unless-stopped
     image: temporalio/server:1.30
     container_name: nomad_oasis_temporal
     depends_on:
