@@ -170,27 +170,31 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
+          target: ${{ matrix.target }}
           build-args: |
             UV_VERSION=${{ env.UV_VERSION }}
             PYTHON_VERSION=${{ env.PYTHON_VERSION }}
             NOMAD_DOCS_REPO=${{ env.NOMAD_DOCS_REPO }}
             NOMAD_DOCS_REPO_REF=${{ env.NOMAD_DOCS_REPO_REF }}
             JUPYTER_VERSION=${{ env.JUPYTER_VERSION }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          target: ${{ matrix.target }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
+          outputs: type=image,name=${{ env.GHCR_IMAGE }},push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=true
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ github.repository }}${{ matrix.image_suffix }}-${{ github.ref_name }}-${{ matrix.platform }}
+          cache-to: type=gha,scope=${{ github.repository }}${{ matrix.image_suffix }}-${{ github.ref_name }}-${{ matrix.platform }}
 
-      - name: Set image output
-        run: |
-          FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
-          echo "${{ matrix.service }}_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
+      # - name: Set image output
+      #   run: |
+      #     FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+      #     echo "${{ matrix.service }}_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
-    outputs:
-      app_image: ${{ env.app_IMAGE }}
-      jupyter_image: ${{ env.jupyter_IMAGE }}
+    # outputs:
+    #   app_image: ${{ env.app_IMAGE }}
+    #   jupyter_image: ${{ env.jupyter_IMAGE }}
 
   # Job 4: Run example upload tests and entrypoint tests
   run_tests:
