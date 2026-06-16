@@ -103,13 +103,17 @@ jobs:
 
   # Job 3: Build and Push Docker Image
   build:
-    name: Build Docker Image
-    runs-on: ubuntu-latest
+    name: Build Docker image for ${{ matrix.platform }}
+    runs-on: ${{ matrix.platform == 'linux/amd64' && 'ubuntu-latest' || matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' }}
+
     needs: update-lockfile
 
     strategy:
       fail-fast: false
       matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
         service:
           - app
           - jupyter
@@ -130,6 +134,16 @@ jobs:
           #   image_suffix: /cpu-action
 
     steps:
+      - name: Prepare environment for current platform 
+        # This step sets up the environment for the current platform being built.
+        # It replaces the '/' character in the platform name with '-' and sets it as an environment variable.
+        # This is useful for naming artifacts and other resources that cannot contain '/'.
+        # The environment variable PLATFORMS_PAIR will be used later in the workflow.
+        id: prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref || github.ref_name }}
@@ -151,8 +165,11 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
+        env:
+          DOCKER_BUILDKIT: 1
         with:
           context: .
+          platforms: ${{ matrix.platform }}
           build-args: |
             UV_VERSION=${{ env.UV_VERSION }}
             PYTHON_VERSION=${{ env.PYTHON_VERSION }}
