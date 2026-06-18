@@ -47,6 +47,7 @@ services:
       start_period: 10s
 
   postgresql:
+    restart: unless-stopped
     container_name: nomad_oasis_postgresql
     environment:
       POSTGRES_PASSWORD: temporal
@@ -96,6 +97,7 @@ services:
     command: ["create_namespace"]
 
   temporal:
+    restart: unless-stopped
     image: temporalio/server:1.30
     container_name: nomad_oasis_temporal
     depends_on:
@@ -337,7 +339,7 @@ services:
   # nomad proxy (a reverse proxy for nomad)
   proxy:
     restart: unless-stopped
-    image: docker.io/nginx:1.27.4-alpine
+    image: docker.io/nginx:1.31.1-alpine
     container_name: nomad_oasis_proxy
     command: nginx -g 'daemon off;'
     volumes:
