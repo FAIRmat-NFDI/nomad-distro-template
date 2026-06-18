@@ -104,7 +104,7 @@ jobs:
   # Job 3: Build and Push Docker Image
   build:
     name: Build Docker image for ${{ matrix.platform }}
-    runs-on: ${{ matrix.platform == 'linux/amd64' && 'ubuntu-latest' || matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' }}
+    runs-on: ubuntu-latest
 
     needs: update-lockfile
 
@@ -132,30 +132,12 @@ jobs:
           # - service: cpu-action
           #   target: cpu_action_final
           #   image_suffix: /cpu-action
-
     steps:
-      - name: Prepare environment for current platform 
-        # This step sets up the environment for the current platform being built.
-        # It replaces the '/' character in the platform name with '-' and sets it as an environment variable.
-        # This is useful for naming artifacts and other resources that cannot contain '/'.
-        # The environment variable PLATFORMS_PAIR will be used later in the workflow.
-        id: prepare
-        run: |
-          platform=${{ matrix.platform }}
-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           submodules: true
-
-      - uses: docker/setup-buildx-action@v4
-
-      - uses: docker/login-action@v4
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract Docker metadata
         id: meta
@@ -163,38 +145,127 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository }}${{ matrix.image_suffix }}
 
+      - uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+        
       - name: Build and push Docker image
         uses: docker/build-push-action@v7
-        env:
-          DOCKER_BUILDKIT: 1
         with:
           context: .
+          push: true
           platforms: ${{ matrix.platform }}
-          target: ${{ matrix.target }}
           build-args: |
             UV_VERSION=${{ env.UV_VERSION }}
             PYTHON_VERSION=${{ env.PYTHON_VERSION }}
             NOMAD_DOCS_REPO=${{ env.NOMAD_DOCS_REPO }}
             NOMAD_DOCS_REPO_REF=${{ env.NOMAD_DOCS_REPO_REF }}
             JUPYTER_VERSION=${{ env.JUPYTER_VERSION }}
-          push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          annotations: ${{ steps.meta.outputs.annotations }}
-          outputs: type=image,name=${{ env.GHCR_IMAGE }},push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=true
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
-          cache-from: type=gha,scope=${{ github.repository }}${{ matrix.image_suffix }}-${{ github.ref_name }}-${{ matrix.platform }}
-          cache-to: type=gha,scope=${{ github.repository }}${{ matrix.image_suffix }}-${{ github.ref_name }}-${{ matrix.platform }}
 
-      # - name: Set image output
-      #   run: |
-      #     FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
-      #     echo "${{ matrix.service }}_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
 
-    # outputs:
-    #   app_image: ${{ env.app_IMAGE }}
-    #   jupyter_image: ${{ env.jupyter_IMAGE }}
+#   # Job 3: Build and Push Docker Image
+#   build:
+#     name: Build Docker image for ${{ matrix.platform }}
+#     runs-on: ${{ matrix.platform == 'linux/amd64' && 'ubuntu-latest' || matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' }}
+# 
+#     needs: update-lockfile
+# 
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         platform:
+#           - linux/amd64
+#           - linux/arm64
+#         service:
+#           - app
+#           - jupyter
+#           # - cpu-action
+#           # - gpu-action
+#         include:
+#           - service: app
+#             target: final
+#             image_suffix: ""
+#           - service: jupyter
+#             target: jupyter
+#             image_suffix: /jupyter
+#           # - service: gpu-action
+#           #   target: gpu_action_final
+#           #   image_suffix: /gpu-action
+#           # - service: cpu-action
+#           #   target: cpu_action_final
+#           #   image_suffix: /cpu-action
+# 
+#     steps:
+#       - name: Prepare environment for current platform 
+#         # This step sets up the environment for the current platform being built.
+#         # It replaces the '/' character in the platform name with '-' and sets it as an environment variable.
+#         # This is useful for naming artifacts and other resources that cannot contain '/'.
+#         # The environment variable PLATFORMS_PAIR will be used later in the workflow.
+#         id: prepare
+#         run: |
+#           platform=${{ matrix.platform }}
+#           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+# 
+#       - uses: actions/checkout@v6
+#         with:
+#           ref: ${{ github.head_ref || github.ref_name }}
+#           submodules: true
+# 
+#       - uses: docker/setup-buildx-action@v4
+# 
+#       - uses: docker/login-action@v4
+#         with:
+#           registry: ${{ env.REGISTRY }}
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
+# 
+#       - name: Extract Docker metadata
+#         id: meta
+#         uses: docker/metadata-action@v6
+#         with:
+#           images: ${{ env.REGISTRY }}/${{ github.repository }}${{ matrix.image_suffix }}
+# 
+#       - name: Build and push Docker image
+#         uses: docker/build-push-action@v7
+#         env:
+#           DOCKER_BUILDKIT: 1
+#         with:
+#           context: .
+#           platforms: ${{ matrix.platform }}
+#           target: ${{ matrix.target }}
+#           build-args: |
+#             UV_VERSION=${{ env.UV_VERSION }}
+#             PYTHON_VERSION=${{ env.PYTHON_VERSION }}
+#             NOMAD_DOCS_REPO=${{ env.NOMAD_DOCS_REPO }}
+#             NOMAD_DOCS_REPO_REF=${{ env.NOMAD_DOCS_REPO_REF }}
+#             JUPYTER_VERSION=${{ env.JUPYTER_VERSION }}
+#           push: true
+#           tags: ${{ steps.meta.outputs.tags }}
+#           labels: ${{ steps.meta.outputs.labels }}
+#           annotations: ${{ steps.meta.outputs.annotations }}
+#           outputs: type=image,name=${{ env.GHCR_IMAGE }},push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=true
+#           # cache-from: type=gha
+#           # cache-to: type=gha,mode=max
+#           cache-from: type=gha,scope=${{ github.repository }}${{ matrix.image_suffix }}-${{ github.ref_name }}-${{ matrix.platform }}
+#           cache-to: type=gha,scope=${{ github.repository }}${{ matrix.image_suffix }}-${{ github.ref_name }}-${{ matrix.platform }}
+# 
+#       # - name: Set image output
+#       #   run: |
+#       #     FIRST_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+#       #     echo "${{ matrix.service }}_IMAGE=$FIRST_TAG" >> $GITHUB_ENV
+# 
+#     # outputs:
+#     #   app_image: ${{ env.app_IMAGE }}
+#     #   jupyter_image: ${{ env.jupyter_IMAGE }}
 
   # Job 4: Run example upload tests and entrypoint tests
   run_tests:
