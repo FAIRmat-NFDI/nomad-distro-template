@@ -20,7 +20,13 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-dependencies = ["nomad-lab[infrastructure]>=1.4.2"]
+dependencies = [
+  "nomad-lab[infrastructure]==1.4.3.dev154+gd1503300c",
+  "nomad-schema-plugin-run",
+  "nomad-schema-plugin-simulation-workflow",
+  "nomad-parser-plugins-electronic>=1.0",
+  "nomad-parser-plugins-workflow",
+]
 
 [project.urls]
 repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
@@ -40,7 +46,7 @@ dev = ["nomad-lab[infrastructure, dev]>=1.4.2"]
 extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
-prerelease = "explicit"
+prerelease = "allow"
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
