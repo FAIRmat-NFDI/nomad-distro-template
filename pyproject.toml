@@ -26,6 +26,8 @@ dependencies = [
   "nomad-schema-plugin-simulation-workflow",
   "nomad-parser-plugins-electronic>=1.0",
   "nomad-parser-plugins-workflow",
+  "nomad-parser-plugins-atomistic",
+
 ]
 
 [project.urls]
@@ -33,9 +35,7 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 
 [project.optional-dependencies]
 # Add your plugins to the list below.
-plugins = [
- "nomad-north-jupyter>=0.2.5"
-]
+plugins = ["nomad-north-jupyter>=0.2.5"]
 jupyter = ["jupyter-events"]
 gpu-action = []
 cpu-action = []

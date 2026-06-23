@@ -3644,6 +3644,7 @@ name = "nomad-distribution"
 source = { editable = "." }
 dependencies = [
     { name = "nomad-lab", extra = ["infrastructure"] },
+    { name = "nomad-parser-plugins-atomistic" },
     { name = "nomad-parser-plugins-electronic" },
     { name = "nomad-parser-plugins-workflow" },
     { name = "nomad-schema-plugin-run" },
@@ -3667,6 +3668,7 @@ requires-dist = [
     { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = ">=1.4.2" },
     { name = "nomad-lab", extras = ["infrastructure"], specifier = "==1.4.3.dev154+gd1503300c" },
     { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.5" },
+    { name = "nomad-parser-plugins-atomistic" },
     { name = "nomad-parser-plugins-electronic", specifier = ">=1.0" },
     { name = "nomad-parser-plugins-workflow" },
     { name = "nomad-schema-plugin-run" },
@@ -3790,6 +3792,32 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/90/0b/e4360dc765663d2bbb9f72644aa53658753069b8d66dc0519bc1c6f7ad79/nomad_north_jupyter-0.2.5.tar.gz", hash = "sha256:a95dfdc36aee30ef3186a6db65ced8727f45e94fff81e341888392d37b7d7da9", size = 114680, upload-time = "2026-03-27T09:03:11.811Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/75/b8/149924231b5384b2d13038178422b3b1843c0d1eebab61c72867a2dba5ff/nomad_north_jupyter-0.2.5-py3-none-any.whl", hash = "sha256:afda15a820bbf90d02e2d97433538aa244c91bade60c4a99f9dd17264a31e89e", size = 14531, upload-time = "2026-03-27T09:03:10.363Z" },
+]
+
+[[package]]
+name = "nomad-parser-plugins-atomistic"
+version = "1.0.12"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "ase" },
+    { name = "h5py" },
+    { name = "lxml" },
+    { name = "mdanalysis", version = "2.9.0", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "mdanalysis", version = "2.10.0", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "nomad-lab" },
+    { name = "nomad-parser-plugins-simulation" },
+    { name = "nomad-schema-plugin-run" },
+    { name = "nomad-schema-plugin-simulation-workflow" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.3.5", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "panedr" },
+    { name = "pydantic" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/68/2b/0ecaec3d693ffb57140bdb565aa8480bf6dede70f0f281bef0cdbb010a04/nomad_parser_plugins_atomistic-1.0.12.tar.gz", hash = "sha256:3ead5953c766de262b9d1958765a112d2b23eb74e03e7cc5f791adb5f1ff5685", size = 94053644, upload-time = "2026-03-30T09:21:14.096Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d1/dd/74982da37bd512f32369ac49137c6ad15d0f4cbde92ac41f339e2962c1f4/nomad_parser_plugins_atomistic-1.0.12-py3-none-any.whl", hash = "sha256:1aa95394833de8240bdaeb615f394a2f6a5313f070865511ef330826858b1eb4", size = 189624, upload-time = "2026-03-30T09:21:10.953Z" },
 ]
 
 [[package]]
@@ -4551,6 +4579,20 @@ wheels = [
 ]
 
 [[package]]
+name = "panedr"
+version = "0.8.0"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "pandas", version = "2.3.3", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "pandas", version = "3.0.2", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "pyedr" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8e/f9/af3e6f5627a9c92f5577eda9e670992e35806b31155b4b371ee44b249436/panedr-0.8.0.tar.gz", hash = "sha256:50ecac36810d12db77903048b4972a234b6e3b2c122ffa2a158eba0ff69effc4", size = 17004, upload-time = "2023-12-23T15:14:13.572Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/63/8d/9ecc9ccd64365c75be17ca7fe15234359c19f97220a29df68acc07e6c9dc/panedr-0.8.0-py3-none-any.whl", hash = "sha256:e988c60ae02d9212692eaa03554d0c8c5042fcff7173082f0afa685117797634", size = 16079, upload-time = "2023-12-23T15:14:11.723Z" },
+]
+
+[[package]]
 name = "pathlib-abc"
 version = "0.5.2"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
@@ -5299,6 +5341,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/52/6d/fffca34caecc4a3f97bda81b2098da5e8ab7efc9a66e819074a11955d87e/pydantic_settings-2.13.1.tar.gz", hash = "sha256:b4c11847b15237fb0171e1462bf540e294affb9b86db4d9aa5c01730bdbe4025", size = 223826, upload-time = "2026-02-19T13:45:08.055Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/00/4b/ccc026168948fec4f7555b9164c724cf4125eac006e176541483d2c959be/pydantic_settings-2.13.1-py3-none-any.whl", hash = "sha256:d56fd801823dbeae7f0975e1f8c8e25c258eb75d278ea7abb5d9cebb01b56237", size = 58929, upload-time = "2026-02-19T13:45:06.034Z" },
+]
+
+[[package]]
+name = "pyedr"
+version = "0.8.0"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "mda-xdrlib" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.3.5", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/05/57/c6bc9d7c68f53dbed1562ea102f9c0ed531c72e988ed57eb2e50c0dea7a1/pyedr-0.8.0.tar.gz", hash = "sha256:2d119dc32cd0b0b2a14584626c2349b9dbad132a6bfed32723fe841ed5857fd0", size = 392817, upload-time = "2023-12-23T15:14:01.383Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/26/77/33237d2e9f19e32774704555f8efbd4c336d82b1bcf4dab712d5a8c2a9d5/pyedr-0.8.0-py3-none-any.whl", hash = "sha256:3e61705d4460bae9fd1f4245a11bdd433ac7fc6084ebd0ab8b8f5b6bcfeb5ad0", size = 396975, upload-time = "2023-12-23T15:13:59.472Z" },
 ]
 
 [[package]]
