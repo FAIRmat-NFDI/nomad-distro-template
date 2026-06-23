@@ -162,11 +162,6 @@ services:
         limits:
           cpus: "4.0" # Maximum 4 CPU cores
           memory: 8G # Maximum 8GB RAM
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 15
-        window: 1800s
 
   ## nomad gpu worker (actions)
   # gpu_worker:
