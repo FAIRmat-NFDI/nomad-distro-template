@@ -20,8 +20,10 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-# TODO: change after 1.4.3 release
-dependencies = ["nomad-lab[infrastructure]>=1.4.3.dev160"]
+dependencies = [
+  # TODO: change after 1.4.3 release
+  "nomad-lab[infrastructure]>=1.4.3.dev161",
+]
 
 [project.urls]
 repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
@@ -41,7 +43,7 @@ dev = ["nomad-lab[infrastructure, dev]>=1.4.2"]
 extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
-prerelease = "explicit"
+prerelease = "if-necessary-or-explicit"
 
 [tool.setuptools.packages.find]
 exclude = ["gui*", "docs*", "config*"]
