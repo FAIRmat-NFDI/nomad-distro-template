@@ -283,7 +283,7 @@ services:
     volumes:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
-    command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 --workers 1
+    command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 --workers 2
     healthcheck:
       test:
         - "CMD"
@@ -295,8 +295,6 @@ services:
       timeout: 10s
       retries: 30
       start_period: 10s
-    deploy:
-      replicas: 4
 
   # nomad remote tools hub (JupyterHUB, e.g. for AI Toolkit)
   north:
