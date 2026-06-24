@@ -149,9 +149,12 @@ services:
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run action-internal-worker
     healthcheck:
-      # See https://keithtenzer.com/temporal/Deploying_Temporal_Worker_on_Kubernetes/#liveliness-and-readiness-probes
-      # for rationale on using 'ls /' as a liveness/readiness probe for Temporal workers.
-      test: ls /
+      test:
+        - "CMD"
+        - "curl"
+        - "--fail"
+        - "--silent"
+        - "http://localhost:8080/health"
       interval: 10s
       timeout: 5s
       retries: 5
@@ -163,7 +166,7 @@ services:
           cpus: "4.0" # Maximum 4 CPU cores
           memory: 8G # Maximum 8GB RAM
 
-  ## nomad gpu worker (actions)
+  # nomad gpu worker (actions)
   # gpu_worker:
   #   restart: unless-stopped
   #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:main
@@ -196,6 +199,17 @@ services:
   #     # - ./configs/nomad.yaml:/app/nomad.yaml
   #     - ./.volumes/fs:/app/.volumes/fs
   #   command: python -m nomad.cli admin run action-gpu-worker
+  #   healthcheck:
+  #     test:
+  #       - "CMD"
+  #       - "curl"
+  #       - "--fail"
+  #       - "--silent"
+  #       - "http://localhost:8080/health"
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 15s
 
   # # nomad cpu worker (actions)
   # cpu_worker:
@@ -228,6 +242,17 @@ services:
   #     # - ./configs/nomad.yaml:/app/nomad.yaml
   #     - ./.volumes/fs:/app/.volumes/fs
   #   command: python -m nomad.cli admin run action-cpu-worker
+  #   healthcheck:
+  #     test:
+  #       - "CMD"
+  #       - "curl"
+  #       - "--fail"
+  #       - "--silent"
+  #       - "http://localhost:8080/health"
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 15s
 
   # nomad app (api + proxy)
   app:
@@ -258,7 +283,7 @@ services:
     volumes:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
-    command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0
+    command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 --workers 1
     healthcheck:
       test:
         - "CMD"
