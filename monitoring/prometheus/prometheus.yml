@@ -1,13 +1,35 @@
 global:
   scrape_interval: 15s
 
+rule_files:
+  - "/etc/prometheus/rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"
+
 scrape_configs:
   - job_name: "cadvisor"
     scrape_interval: 5s
     static_configs:
       - targets: ["cadvisor:8080"]
   - job_name: "nomad-worker"
-    file_sd_configs:
-      - files:
-          - "/etc/prometheus/targets.json"
-        refresh_interval: 30s
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    relabel_configs:
+      - source_labels: [__meta_docker_container_label_com_docker_compose_service]
+        regex: worker
+        action: keep
+      - source_labels: [__address__]
+        regex: '([^:]+)(?::\d+)?'
+        replacement: '$1:9400'
+        target_label: __address__
+      - source_labels: [__meta_docker_container_name]
+        regex: '/(.*)'
+        target_label: instance
+
+  - job_name: "temporal-server"
+    static_configs:
+      - targets: ["temporal:8000"]
