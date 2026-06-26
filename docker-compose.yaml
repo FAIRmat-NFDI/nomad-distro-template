@@ -63,7 +63,7 @@ services:
       start_period: 30s
 
   temporal-setup-db:
-    image: temporalio/admin-tools:1.30
+    image: temporalio/admin-tools:1.31
     container_name: temporal-setup-db
     restart: on-failure:6
     depends_on:
@@ -82,7 +82,7 @@ services:
     command: ["setup_db"]
 
   temporal-create-namespace:
-    image: temporalio/admin-tools:1.30
+    image: temporalio/admin-tools:1.31
     container_name: temporal-create-namespace
     restart: on-failure:5
     depends_on:
@@ -98,7 +98,7 @@ services:
 
   temporal:
     restart: unless-stopped
-    image: temporalio/server:1.30
+    image: temporalio/server:1.31
     container_name: nomad_oasis_temporal
     depends_on:
       postgresql:
