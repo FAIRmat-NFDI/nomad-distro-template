@@ -446,7 +446,7 @@ services:
     depends_on:
       - temporal
     environment:
-      - TEMPORAL_CORS_ORIGINS=${MONITORING_EXTERNAL_HOST:-localhost}/temporal
+      - TEMPORAL_CORS_ORIGINS=${MONITORING_EXTERNAL_URL:-http://localhost}/temporal
       - TEMPORAL_AUTH_CALLBACK_URL=${MONITORING_EXTERNAL_URL:-http://localhost}/temporal/auth/sso/callback
       - TEMPORAL_UI_PUBLIC_PATH=/temporal
       - TEMPORAL_ADDRESS=temporal:7233
