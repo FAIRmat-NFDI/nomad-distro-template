@@ -32,12 +32,6 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 # Add your plugins to the list below.
 plugins = [
   "nomad-north-jupyter>=0.2.5",
-  "nomad-north-apmtools>=0.1.1",
-  "nomad-north-fiji>=0.1.1",
-  "nomad-north-nionswift>=0.1.1",
-  "nomad-north-pyiron @ git+https://github.com/FAIRmat-NFDI/nomad-north-pyiron.git@0b00b44b0ed0a927b5eca4eedd1a3571abdbf5ea",
-  "nomad-north-vesta>=0.1.1",
-  "nomad-north-voila>=0.1.14",
 ]
 jupyter = ["jupyter-events"]
 gpu-action = []
