@@ -84,23 +84,33 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 4. Create a file for environment variables
 
-    Before running the containers, you should create a `.env` file in the root of the repository. This file is used to store sensitive information and is ignored by git.
+    Before running the containers, you should create a `.env` and a `.env.north` files in the root of the repository. This file is used to store sensitive information and is ignored by git.
 
-    At a minimum, you should add a secure secret for the API:
-
-    ```
-    NOMAD_SERVICES_API_SECRET='***'
-    ```
-
-    Make sure the `NOMAD_SERVICES_API_SECRET` is at least 32 characters long.
-
-    If you have bash available you can run this script:
+    If you want to generate the them with random secrets you can also run the following script from the root of the repository:
 
     ```sh
     bash scripts/generate-env.sh
     ```
 
-    This will create a `.env` file with a randomly generated 64-character API secret. If the file already exists, you'll be prompted before overwriting it.
+    Alternatively you can create the `.env` and a `.env.north` files manually, At a minimum, you should add a secure secret for the API to `.env`:
+
+    ```
+    NOMAD_SERVICES_API_SECRET='***'
+    NOMAD_NORTH_HUB_SERVICE_API_TOKEN='***'
+    ```
+
+    If you want to use the NORTH (NOMAD Remote Tools Hub) you also need to add the following variables to the `.env.north` file:
+
+    ```
+    SERVICE_API_TOKEN='***'
+    JUPYTERHUB_CRYPT_KEY='***'
+    ```
+    The `SERVICE_API_TOKEN` and `NOMAD_NORTH_HUB_SERVICE_API_TOKEN` should be the same and will be used for authentication between the NORTH and the NOMAD API.
+
+    Note: The keys should be at least 64 characters long that can be generated with: `openssl rand -hex 32`
+
+
+
 
 5. Pull the images specified in the `docker-compose.yaml`
 
@@ -166,6 +176,10 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
 
 9. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
+You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
+[https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
+
+
 #### Updating the image
 Any pushes to the main branch of this repository, such as when [adding a plugin](#adding-a-plugin), will trigger a pipeline that generates a new app and jupyter image.
 
@@ -185,16 +199,36 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
 
 #### NOMAD Remote Tools Hub (NORTH)
 
-To run NORTH (the NOMAD Remote Tools Hub), the `hub` container needs to run docker and
-the container has to be run under the docker group. You need to replace the default group
-id `991` in the `docker-compose.yaml`'s `hub` section with your systems docker group id.
-Run `id` if you are a docker user, or `getent group | grep docker` to find your
-systems docker gid. The user id 1000 is used as the nomad user inside all containers.
+1. (First time only) Make sure that you follow the instruction about [post installation steps](https://docs.docker.com/engine/install/linux-postinstall/) to create the docker group and add your user:
+
+    1. Create the docker group.
+        ```sh
+        sudo groupadd docker
+        ```
+    2. Add your user to the docker group.
+
+        ```sh
+        sudo usermod -aG docker $USER
+        ```
+    3. Log out and log back in so that your group membership is re-evaluated.
+
+        If you're running Linux in a virtual machine, it may be necessary to restart the virtual machine for changes to take effect.
+
+        You can also run the following command to activate the changes to groups:
+
+        ```sh
+        newgrp docker
+        ```
+
+2. To run `north` container as non-root user, it has to be run under the docker group. You might need to replace the `user` setting in the `docker-compose.yaml`'s `north` section with your systems docker group id (eg.: `user: '1000:911'`).
+    - The user id `1000` is used as the nomad user inside all containers.
+    - Run `id` if you are a docker user, or `getent group | grep docker` to find your systems docker gid.
+
+3. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
+
 
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
 
-You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
-[https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
 
 ### For an existing Oasis
 
@@ -212,6 +246,7 @@ volumes:
 ```
 
 To run the new image you can follow steps 5. and 7. [above](#for-a-new-oasis).
+
 
 ## Deploying on Kubernetes (Quick Start)
 
