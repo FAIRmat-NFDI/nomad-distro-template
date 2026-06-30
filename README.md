@@ -36,8 +36,8 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 > ⚙️ next to "About" on the main GitHub page for this repository.
 
 In this README you will find instructions for:
-1. [Deploying the distribution](#deploying-the-distribution)
-2. [Deploying on Kubernetes (Quick Start)](#deploying-on-kubernetes-quick-start)
+1. [Deploying with Docker](#deploying-with-docker)
+2. [Deploying with Kubernetes](#deploying-with-kubernetes)
 3. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
 4. [Adding a plugin](#adding-a-plugin)
 5. [The jupyter image](#the-jupyter-image)
@@ -50,9 +50,9 @@ In this README you will find instructions for:
 12. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
 13. [Solving common issues](#faqtrouble-shooting)
 
-## Deploying the distribution
+## Deploying with Docker
 
-Below are instructions for how to deploy this NOMAD Oasis distribution in different scenarios.
+Below are instructions on how to deploy this NOMAD Oasis distribution using Docker. This is the default recommended way to get started.
 
 ### Quick-start for a local Oasis
 
@@ -129,7 +129,6 @@ This section covers the minimal steps for getting an Oasis running locally. Note
 7. (Optional) You can now test that NOMAD is running with
 
     ```sh
-    # HTTP
     curl localhost/nomad-oasis/alive
     ```
 
@@ -146,9 +145,9 @@ Before you can host your Oasis securely under a domain, you will have to go thro
 
    In production, your Oasis will be available under a domain name of your choice. This means that in some DNS server there is a record that points a domain name to point to your Oasis IP address.
 
-   Once this domain name is available, you also need to configure it in the NOMAD Oasis configuration. This can be done by adding the following field into your `nomad.yaml`:
+   Once this domain name is available, you also need to configure it in the NOMAD Oasis configuration. This can be done by adding the following field into your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`):
 
-   ```
+   ```yaml
    services:
      api_host: <your-domain-name>
    ```
@@ -157,9 +156,9 @@ Before you can host your Oasis securely under a domain, you will have to go thro
 
    By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server-including credentials and sensitive data-can be compromised.
 
-   The first step is to add a configuration to your `nomad.yaml` that makes sure that HTTPS protocol is by the links that the platform creates:
+   The first step is to add a configuration to your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`) that makes sure that HTTPS protocol is by the links that the platform creates:
 
-   ```
+   ```yaml
    services:
      https: true
    ```
@@ -268,7 +267,7 @@ volumes:
 To run the new image you can follow steps 5. and 7. [above](#for-a-new-oasis).
 
 
-## Deploying on Kubernetes (Quick Start)
+## Deploying with Kubernetes
 
 As an alternative to Docker Compose, you can deploy NOMAD Oasis on Kubernetes using Helm.
 A minimal `values.yaml` for single-node clusters (Minikube, Kind, k3s, etc.) is provided in the [`kubernetes/`](kubernetes/) directory.
