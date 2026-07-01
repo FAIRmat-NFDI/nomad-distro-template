@@ -143,13 +143,20 @@ Before you can host your Oasis securely under a domain, you will have to go thro
 
 1. Setting up host name
 
-   In production, your Oasis will be available under a domain name of your choice. This means that in some DNS server there is a record that points a domain name to point to your Oasis IP address.
+   In production, your Oasis will be available under a domain name of your choice. This means that in some DNS server there is a record that points a domain name to your Oasis IP address.
 
-   Once this domain name is available, you also need to configure it in the NOMAD Oasis configuration. This can be done by adding the following field into your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`):
+   Once this domain name is available, you also need to configure it in the NOMAD Oasis configuration. This can be done by adding the `services.api_host` field into your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`). If your Oasis is available under the address `https://mydomainname/nomad-oasis`, you need to set it up like this:
 
    ```yaml
    services:
-     api_host: <your-domain-name>
+     api_host: mydomainname
+   ```
+
+   Note that if your Oasis uses a subdomain like `https://mydomainname/mysubdomain/nomad-oasis`, you need to include that subdomain as well:
+
+   ```yaml
+   services:
+     api_host: mydomainname/mysubdomain
    ```
 
 2. Configuring Secure HTTP and HTTPS Connections
