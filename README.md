@@ -572,6 +572,17 @@ git commit -m "Updated to new distribution version"
 
 Ideally all workflows should be triggered automatically but you might need to run the initialization one manually by navigating to the "Actions" tab at the top, clicking "Template Repository Initialization" on the left side, and triggering it by clicking "Run workflow" under the "Run workflow" button on the right.
 
+## Migration steps
+
+Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version. This list keeps track of the biggest changes that require additional steps beyond just updating the template code/files.
+
+ - **v1.4.2**: MongoDB image was migrated from v5.0.6 to v8.x. This requires an additional step of migrating the existing MongoDB data into this new version. We provide [a helper script}(https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py) that will aid you in doing this migration. Before doing the migration, it is key that you **backup your existing MongoDB data**. Our script does the backup automatically, but you should ensure that the backup files are created successfully. Read through the script to understand the different steps, and then run it on your Docker host machine (Python>=3.8 is required) like this, adjusting parameters as needed:
+
+    ```
+    curl -O https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py && \
+    python3 upgrade_mongo.py -c nomad_oasis_mongo -f docker-compose.yaml --from-version 5.0.6
+    ```
+
 ## FAQ/Trouble shooting
 
 _I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized`
