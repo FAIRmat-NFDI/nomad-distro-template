@@ -2667,7 +2667,7 @@ requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
     { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = "==1.4.2" },
     { name = "nomad-lab", extras = ["infrastructure"], specifier = "==1.4.2" },
-    { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.5" },
+    { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.6" },
 ]
 provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
 
@@ -2771,14 +2771,14 @@ infrastructure = [
 
 [[package]]
 name = "nomad-north-jupyter"
-version = "0.2.5"
+version = "0.2.6"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "nomad-lab" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/90/0b/e4360dc765663d2bbb9f72644aa53658753069b8d66dc0519bc1c6f7ad79/nomad_north_jupyter-0.2.5.tar.gz", hash = "sha256:a95dfdc36aee30ef3186a6db65ced8727f45e94fff81e341888392d37b7d7da9", size = 114680, upload-time = "2026-03-27T09:03:11.811Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/97/4dc44543907bd9a1259b5daf33c02409180c81090bf84b7bde227c84a213/nomad_north_jupyter-0.2.6.tar.gz", hash = "sha256:9f3fb5668c19ba9225cd6dd5c3f353083c2fdf44c08f8f54b654b77c35e8dc61", size = 114640, upload-time = "2026-06-29T15:24:46.314Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/75/b8/149924231b5384b2d13038178422b3b1843c0d1eebab61c72867a2dba5ff/nomad_north_jupyter-0.2.5-py3-none-any.whl", hash = "sha256:afda15a820bbf90d02e2d97433538aa244c91bade60c4a99f9dd17264a31e89e", size = 14531, upload-time = "2026-03-27T09:03:10.363Z" },
+    { url = "https://files.pythonhosted.org/packages/01/96/43675168cf18b66884b71c49111d81f8677f4f8e459ce99d12dcc5451a1b/nomad_north_jupyter-0.2.6-py3-none-any.whl", hash = "sha256:c4b708e2c7032792b7e363aaab308c89512f561accd3c90745b93096a4b14b77", size = 14526, upload-time = "2026-06-29T15:24:44.966Z" },
 ]
 
 [[package]]
