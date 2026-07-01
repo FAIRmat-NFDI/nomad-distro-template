@@ -36,8 +36,8 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 > ⚙️ next to "About" on the main GitHub page for this repository.
 
 In this README you will find instructions for:
-1. [Deploying the distribution](#deploying-the-distribution)
-2. [Deploying on Kubernetes (Quick Start)](#deploying-on-kubernetes-quick-start)
+1. [Deploying with Docker](#deploying-with-docker)
+2. [Deploying with Kubernetes](#deploying-with-kubernetes)
 3. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
 4. [Adding a plugin](#adding-a-plugin)
 5. [The jupyter image](#the-jupyter-image)
@@ -50,12 +50,13 @@ In this README you will find instructions for:
 12. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
 13. [Solving common issues](#faqtrouble-shooting)
 
-## Deploying the distribution
+## Deploying with Docker
 
-Below are instructions for how to deploy this NOMAD Oasis distribution
-[for a new Oasis](#for-a-new-oasis) and [for an existing Oasis](#for-an-existing-oasis)
+Below are instructions on how to deploy this NOMAD Oasis distribution using Docker. This is the default recommended way to get started.
 
-### For a new Oasis
+### Quick-start for a local Oasis
+
+This section covers the minimal steps for getting an Oasis running locally. Note that before publishing your Oasis in any network, you need to take also the steps shown in [the before entering production section](#steps-before-entering-production).
 
 1. Make sure you have [docker](https://docs.docker.com/engine/install/) installed.
    Docker nowadays comes with `docker compose` built in. Prior, you needed to
@@ -110,8 +111,6 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     Note: The keys should be at least 64 characters long that can be generated with: `openssl rand -hex 32`
 
 
-
-
 5. Pull the images specified in the `docker-compose.yaml`
 
     Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
@@ -120,11 +119,59 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
     docker compose pull
     ```
 
-6. Configuring Secure HTTP and HTTPS Connections
+
+6. And run it with docker compose in detached (--detach or -d) mode
+
+    ```sh
+    docker compose up -d
+    ```
+
+7. (Optional) You can now test that NOMAD is running with
+
+    ```sh
+    curl localhost/nomad-oasis/alive
+    ```
+
+8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
+
+You can find more details on setting up and maintaining an Oasis in the NOMAD docs here: [https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
+
+
+### Steps before entering production
+
+Before you can host your Oasis securely under a domain, you will have to go through a few additional steps
+
+1. Setting up host name
+
+   In production, your Oasis will be available under a domain name of your choice. This means that in some DNS server there is a record that points a domain name to your Oasis IP address.
+
+   Once this domain name is available, you also need to configure it in the NOMAD Oasis configuration. This can be done by adding the `services.api_host` field into your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`). If your Oasis is available under the address `https://mydomainname/nomad-oasis`, you need to set it up like this:
+
+   ```yaml
+   services:
+     api_host: mydomainname
+   ```
+
+   Note that if your Oasis uses a subdomain like `https://mydomainname/mysubdomain/nomad-oasis`, you need to include that subdomain as well:
+
+   ```yaml
+   services:
+     api_host: mydomainname/mysubdomain
+   ```
+
+2. Configuring Secure HTTP and HTTPS Connections
 
    By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server-including credentials and sensitive data-can be compromised.
 
-   HTTPS requires a TLS certificate, which must be renewed periodically. Depending on your setup, you have several options:
+   The first step is to add a configuration to your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`) that makes sure that HTTPS protocol is by the links that the platform creates:
+
+   ```yaml
+   services:
+     https: true
+   ```
+
+   The second step is to setup a TLS certificate. This certificate also needs to be
+   renewed periodically. Depending on your setup, you have several options:
 
    1. You already have a certificate.
 
@@ -157,27 +204,6 @@ Below are instructions for how to deploy this NOMAD Oasis distribution
    + - ./tls/selfsigned.crt:/etc/nginx/tls/mounted-nomad-oasis.crt:ro  # Path to your TLS certificate
    + - ./tls/selfsigned.key:/etc/nginx/tls/mounted-nomad-oasis.key:ro  # Path to your TLS private key
    ```
-
-7. And run it with docker compose in detached (--detach or -d) mode
-
-    ```sh
-    docker compose up -d
-    ```
-
-8. (Optional) You can now test that NOMAD is running with
-
-    ```sh
-    # HTTP
-    curl localhost/nomad-oasis/alive
-
-    # HTTPS (--insecure flag is only needed for a self-signed certificate)
-    curl --insecure https://localhost/nomad-oasis/alive
-    ```
-
-9. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
-
-You can find more details on setting up and maintaining an Oasis in the NOMAD docs here:
-[https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
 
 
 #### Updating the image
@@ -248,7 +274,7 @@ volumes:
 To run the new image you can follow steps 5. and 7. [above](#for-a-new-oasis).
 
 
-## Deploying on Kubernetes (Quick Start)
+## Deploying with Kubernetes
 
 As an alternative to Docker Compose, you can deploy NOMAD Oasis on Kubernetes using Helm.
 A minimal `values.yaml` for single-node clusters (Minikube, Kind, k3s, etc.) is provided in the [`kubernetes/`](kubernetes/) directory.
