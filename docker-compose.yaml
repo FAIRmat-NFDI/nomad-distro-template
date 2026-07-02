@@ -127,14 +127,7 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: final
-      args:
-        PYTHON_VERSION: "3.12"
-        UV_VERSION: "0.9"
-    image: nomad-oasis:local
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -264,14 +257,7 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: final
-      args:
-        PYTHON_VERSION: "3.12"
-        UV_VERSION: "0.9"
-    image: nomad-oasis:local
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
@@ -354,14 +340,7 @@ services:
   # to enable the logtransfer service run "docker compose --profile with_logtransfer up"
   logtransfer:
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: final
-      args:
-        PYTHON_VERSION: "3.12"
-        UV_VERSION: "0.9"
-    image: nomad-oasis:local
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
     platform: linux/amd64
     container_name: nomad_oasis_logtransfer
     environment:
