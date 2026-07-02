@@ -127,7 +127,14 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        PYTHON_VERSION: "3.12"
+        UV_VERSION: "0.9"
+    image: nomad-oasis:local
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -257,7 +264,14 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        PYTHON_VERSION: "3.12"
+        UV_VERSION: "0.9"
+    image: nomad-oasis:local
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
@@ -310,9 +324,17 @@ services:
       # Bind Docker socket on the host so we can connect to the daemon from
       # within the container
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
-      # Bind Docker volume on host for JupyterHub database and cookie secrets
-      - "nomad_north:/data"
+      # JupyterHub database and cookie secrets. Bind-mounted under .volumes so the
+      # `sudo chown -R 1000 .volumes` setup step also owns it (needed when running
+      # NORTH as the non-root user; see the NORTH section in the README).
+      - "./.volumes/north_hub:/data"
+    # By default NORTH runs as root, which works out of the box. To run it as the
+    # non-root nomad user (1000) instead, uncomment the line below and set the group
+    # to your host's `docker` group ID (see the NORTH section in the README).
     # user: "1000:991"
+    # JupyterHub writes its proxy pid file to the working directory (not writable by a
+    # non-root user) by default; redirect it into /data so the non-root option works too.
+    command: jupyterhub --ConfigurableHTTPProxy.pid_file=/data/jupyterhub-proxy.pid
     healthcheck:
       test:
         - "CMD"
@@ -332,7 +354,14 @@ services:
   # to enable the logtransfer service run "docker compose --profile with_logtransfer up"
   logtransfer:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: final
+      args:
+        PYTHON_VERSION: "3.12"
+        UV_VERSION: "0.9"
+    image: nomad-oasis:local
     platform: linux/amd64
     container_name: nomad_oasis_logtransfer
     environment:
@@ -397,8 +426,6 @@ volumes:
     name: "nomad_oasis_keycloak"
   postgresql:
     name: "nomad_oasis_postgresql"
-  nomad_north:
-    name: "nomad_oasis_north"
 
 
 networks:

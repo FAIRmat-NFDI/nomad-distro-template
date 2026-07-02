@@ -246,12 +246,16 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
         newgrp docker
         ```
 
-2. To run `north` container as non-root user, it has to be run under the docker group. You might need to replace the `user` setting in the `docker-compose.yaml`'s `north` section with your systems docker group id (eg.: `user: '1000:911'`).
-    - The user id `1000` is used as the nomad user inside all containers.
-    - Run `id` if you are a docker user, or `getent group | grep docker` to find your systems docker gid.
+2. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
 
-3. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
+3. Uncomment the `user` line in the `docker-compose.yaml`'s `north` section and set the group to your host's `docker` group id so the container can still reach the mounted docker socket:
 
+    ```yaml
+    user: "1000:991" # replace 991 with your host's docker group id
+    ```
+
+    - Run `getent group docker` (or `id` if you are a docker user) to find your system's docker gid.
+    - No extra volume permission step is needed: NORTH stores its JupyterHub data in `./.volumes/north_hub`, which the `sudo chown -R 1000 .volumes` step from the Quick-start already gives to the nomad user.
 
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
 
@@ -585,10 +589,9 @@ Sometimes there are significant changes in these distribution templates, and you
 
 ## FAQ/Trouble shooting
 
-_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized`
-_when trying to pull my docker image._
+- _I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized` _when trying to pull my docker image._
 
-Most likely you have not made the package public or provided a personal access token (PAT).
+   Most likely you have not made the package public or provided a personal access token (PAT).
 You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
 or how to configure a PAT (if you want to keep the distribution private) in the GitHub
 docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
