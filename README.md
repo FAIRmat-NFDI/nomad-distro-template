@@ -248,14 +248,13 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
 
 2. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
 
-3. To make the NORTH tools run as non-root, uncomment the `user` line in the `docker-compose.yaml`'s `north` section and set the group to your host's `docker` group id. This way the container can still reach the mounted docker socket.
+3. To run `north` container as non-root user, it has to be run under the docker group. You might need to replace the `user` setting in the `docker-compose.yaml`'s `north` section with your systems docker group id:
 
     ```yaml
     user: "1000:991" # replace 991 with your host's docker group id
     ```
 
-    - Run `getent group docker` (or `id` if you are a docker user) to find your system's docker gid.
-    - No extra volume permission step is needed: NORTH stores its JupyterHub data in `./.volumes/north_hub`, which the `sudo chown -R 1000 .volumes` step from the Quick-start already gives to the user.
+    You can run run `getent group | grep docker` (or `id` if you are a docker user) to find your system's docker gid. The user id `1000` is used as the nomad user inside all containers. No extra volume permission step is needed: NORTH stores its JupyterHub data in `./.volumes/north_hub`, which the `sudo chown -R 1000 .volumes` step from the Quick-start already gives to the user.
 
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
 
