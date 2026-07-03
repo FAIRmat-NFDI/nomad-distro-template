@@ -246,12 +246,14 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
         newgrp docker
         ```
 
-2. To run `north` container as non-root user, it has to be run under the docker group. You might need to replace the `user` setting in the `docker-compose.yaml`'s `north` section with your systems docker group id (eg.: `user: '1000:911'`).
-    - The user id `1000` is used as the nomad user inside all containers.
-    - Run `id` if you are a docker user, or `getent group | grep docker` to find your systems docker gid.
+    > [!NOTE]
+    >
+    > On MacOS, you may need to explicitly say that the NORTH service should run under root. You can do this but adding this to the `north` service:
+    > ```
+    > user: root
+    > ```
 
-3. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
-
+2. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
 
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
 
@@ -585,10 +587,9 @@ Sometimes there are significant changes in these distribution templates, and you
 
 ## FAQ/Trouble shooting
 
-_I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized`
-_when trying to pull my docker image._
+- _I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized` _when trying to pull my docker image._
 
-Most likely you have not made the package public or provided a personal access token (PAT).
+   Most likely you have not made the package public or provided a personal access token (PAT).
 You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
 or how to configure a PAT (if you want to keep the distribution private) in the GitHub
 docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
