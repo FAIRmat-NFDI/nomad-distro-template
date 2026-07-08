@@ -3226,15 +3226,15 @@ plugins = [
 [package.metadata]
 requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
-    { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = ">=1.4.2" },
-    { name = "nomad-lab", extras = ["infrastructure"], specifier = ">=1.4.3.dev161" },
-    { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.5" },
+    { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = "==1.4.3rc1" },
+    { name = "nomad-lab", extras = ["infrastructure"], specifier = "==1.4.3rc1" },
+    { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.6" },
 ]
 provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
 
 [[package]]
 name = "nomad-lab"
-version = "1.4.3.dev190+g687304001"
+version = "1.4.3rc1"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "ase" },
@@ -3276,9 +3276,9 @@ dependencies = [
     { name = "unidecode" },
     { name = "xarray" },
 ]
-sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/8858e4ecf04179d627f2a7a68fff8965a72f39f6b3902d8df4802c5f7fb3479d/nomad_lab-1.4.3.dev190+g687304001.tar.gz", hash = "sha256:8858e4ecf04179d627f2a7a68fff8965a72f39f6b3902d8df4802c5f7fb3479d" }
+sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/51c76f1c1e42b03af19cf4b63199e6616c93e154f659ef7c7b7471caf87725be/nomad_lab-1.4.3rc1.tar.gz", hash = "sha256:51c76f1c1e42b03af19cf4b63199e6616c93e154f659ef7c7b7471caf87725be" }
 wheels = [
-    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/76821a285849e6d3e285652691c9d0cd8e8818ae399f79de612c42d9c66a0c8a/nomad_lab-1.4.3.dev190+g687304001-py3-none-any.whl", hash = "sha256:76821a285849e6d3e285652691c9d0cd8e8818ae399f79de612c42d9c66a0c8a" },
+    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/ba0cdfcb479f94a7a7e5807f7a253965592aa24ad491a9d9f361f6d8be897eea/nomad_lab-1.4.3rc1-py3-none-any.whl", hash = "sha256:ba0cdfcb479f94a7a7e5807f7a253965592aa24ad491a9d9f361f6d8be897eea" },
 ]
 
 [package.optional-dependencies]
