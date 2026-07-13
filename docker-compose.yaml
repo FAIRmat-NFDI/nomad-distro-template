@@ -47,6 +47,7 @@ services:
       start_period: 10s
 
   postgresql:
+    restart: unless-stopped
     container_name: nomad_oasis_postgresql
     environment:
       POSTGRES_PASSWORD: temporal
@@ -62,7 +63,7 @@ services:
       start_period: 30s
 
   temporal-setup-db:
-    image: temporalio/admin-tools:1.30
+    image: temporalio/admin-tools:1.31
     container_name: temporal-setup-db
     restart: on-failure:6
     depends_on:
@@ -81,7 +82,7 @@ services:
     command: ["setup_db"]
 
   temporal-create-namespace:
-    image: temporalio/admin-tools:1.30
+    image: temporalio/admin-tools:1.31
     container_name: temporal-create-namespace
     restart: on-failure:5
     depends_on:
@@ -96,7 +97,8 @@ services:
     command: ["create_namespace"]
 
   temporal:
-    image: temporalio/server:1.30
+    restart: unless-stopped
+    image: temporalio/server:1.31
     container_name: nomad_oasis_temporal
     depends_on:
       postgresql:
@@ -147,9 +149,12 @@ services:
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run action-internal-worker
     healthcheck:
-      # See https://keithtenzer.com/temporal/Deploying_Temporal_Worker_on_Kubernetes/#liveliness-and-readiness-probes
-      # for rationale on using 'ls /' as a liveness/readiness probe for Temporal workers.
-      test: ls /
+      test:
+        - "CMD"
+        - "curl"
+        - "--fail"
+        - "--silent"
+        - "http://localhost:8080/health"
       interval: 10s
       timeout: 5s
       retries: 5
@@ -160,13 +165,8 @@ services:
         limits:
           cpus: "4.0" # Maximum 4 CPU cores
           memory: 8G # Maximum 8GB RAM
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 15
-        window: 1800s
 
-  ## nomad gpu worker (actions)
+  # nomad gpu worker (actions)
   # gpu_worker:
   #   restart: unless-stopped
   #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:main
@@ -199,6 +199,17 @@ services:
   #     # - ./configs/nomad.yaml:/app/nomad.yaml
   #     - ./.volumes/fs:/app/.volumes/fs
   #   command: python -m nomad.cli admin run action-gpu-worker
+  #   healthcheck:
+  #     test:
+  #       - "CMD"
+  #       - "curl"
+  #       - "--fail"
+  #       - "--silent"
+  #       - "http://localhost:8080/health"
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 15s
 
   # # nomad cpu worker (actions)
   # cpu_worker:
@@ -231,6 +242,17 @@ services:
   #     # - ./configs/nomad.yaml:/app/nomad.yaml
   #     - ./.volumes/fs:/app/.volumes/fs
   #   command: python -m nomad.cli admin run action-cpu-worker
+  #   healthcheck:
+  #     test:
+  #       - "CMD"
+  #       - "curl"
+  #       - "--fail"
+  #       - "--silent"
+  #       - "http://localhost:8080/health"
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 15s
 
   # nomad app (api + proxy)
   app:
@@ -256,12 +278,10 @@ services:
         condition: service_healthy
       mongo:
         condition: service_healthy
-      north:
-        condition: service_started
     volumes:
       # - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
-    command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0
+    command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 --workers 2
     healthcheck:
       test:
         - "CMD"
@@ -274,30 +294,24 @@ services:
       retries: 30
       start_period: 10s
 
-  # nomad remote tools hub (JupyterHUB, e.g. for AI Toolkit)
+  # nomad remote tools hub (JupyterHUB)
   north:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-north:main
     platform: linux/amd64
     container_name: nomad_oasis_north
     environment:
-      NOMAD_SERVICE: nomad_oasis_north
-      NOMAD_NORTH_DOCKER_NETWORK: nomad_oasis_network
-      NOMAD_NORTH_HUB_CONNECT_IP: north
-      NOMAD_NORTH_HUB_IP: "0.0.0.0"
-      NOMAD_NORTH_HUB_HOST: north
-      NOMAD_SERVICES_API_HOST: app
-      NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_ELASTIC_HOST: elastic
-      NOMAD_MONGO_HOST: mongo
+      NOMAD_API_URL: "http://app:8000/nomad-oasis/api/v1"
+      DOCKER_PREFIX: "nomad-oasis-north"
+      DOCKER_NETWORK: "nomad_oasis_network"
     env_file:
-      - ./.env
+      - ./.env.north
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
-      - ./.volumes/fs:/app/.volumes/fs
-      - /var/run/docker.sock:/var/run/docker.sock
-    user: "1000:991"
-    command: python -m nomad.cli admin run hub
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      - "nomad_north:/data"
     healthcheck:
       test:
         - "CMD"
@@ -309,6 +323,9 @@ services:
       timeout: 10s
       retries: 30
       start_period: 10s
+    depends_on:
+      app:
+        condition: service_healthy
 
   # nomad logtransfer
   # to enable the logtransfer service run "docker compose --profile with_logtransfer up"
@@ -337,7 +354,7 @@ services:
   # nomad proxy (a reverse proxy for nomad)
   proxy:
     restart: unless-stopped
-    image: docker.io/nginx:1.27.4-alpine
+    image: docker.io/nginx:1.31.1-alpine
     container_name: nomad_oasis_proxy
     command: nginx -g 'daemon off;'
     volumes:
@@ -379,6 +396,10 @@ volumes:
     name: "nomad_oasis_keycloak"
   postgresql:
     name: "nomad_oasis_postgresql"
+  nomad_north:
+    name: "nomad_oasis_north"
+
+
 networks:
   default:
     name: nomad_oasis_network

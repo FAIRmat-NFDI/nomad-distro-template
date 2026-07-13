@@ -46,9 +46,6 @@ RUN apt-get update \
        curl \
        zip \
        unzip \
-       nodejs \
-       npm \
-       && npm install -g configurable-http-proxy@^4.2.0 \
        # clean cache and logs
        && rm -rf /var/lib/apt/lists/* /var/log/* /var/tmp/* ~/.npm
 
@@ -97,7 +94,6 @@ FROM builder AS docs
 WORKDIR /app
 
 ARG NOMAD_DOCS_REPO="https://github.com/FAIRmat-NFDI/nomad-docs.git"
-ARG NOMAD_DOCS_REPO_REF=""
 
 # Clones the documentation repository, checks out the version matching nomad-lab
 # (unless a specific NOMAD_DOCS_REPO_REF is provided), installs it, and builds the documentation.
