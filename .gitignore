@@ -1,4 +1,5 @@
 .env.north
+.devcontainer/.devpod-internal
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
