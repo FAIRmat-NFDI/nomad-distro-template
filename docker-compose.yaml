@@ -63,7 +63,7 @@ services:
       start_period: 30s
 
   temporal-setup-db:
-    image: temporalio/admin-tools:1.31
+    image: docker.io/temporalio/admin-tools:1.31
     container_name: temporal-setup-db
     restart: on-failure:6
     depends_on:
@@ -82,7 +82,7 @@ services:
     command: ["setup_db"]
 
   temporal-create-namespace:
-    image: temporalio/admin-tools:1.31
+    image: docker.io/temporalio/admin-tools:1.31
     container_name: temporal-create-namespace
     restart: on-failure:5
     depends_on:
@@ -98,7 +98,7 @@ services:
 
   temporal:
     restart: unless-stopped
-    image: temporalio/server:1.31
+    image: docker.io/temporalio/server:1.31
     container_name: nomad_oasis_temporal
     depends_on:
       postgresql:
@@ -129,6 +129,7 @@ services:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
     platform: linux/amd64
+    userns_mode: "keep-id:uid=1000,gid=1000"
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
       NOMAD_ELASTIC_HOST: elastic
@@ -259,6 +260,7 @@ services:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
     platform: linux/amd64
+    userns_mode: "keep-id:uid=1000,gid=1000"
     container_name: nomad_oasis_app
     environment:
       NOMAD_SERVICE: nomad_oasis_app
@@ -307,9 +309,10 @@ services:
     env_file:
       - ./.env.north
     volumes:
-      # Bind Docker socket on the host so we can connect to the daemon from
-      # within the container
-      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # Bind the container runtime socket on the host so we can connect to it
+      # from within the container. Defaults to a rootless Podman socket;
+      # override with DOCKER_SOCKET for Docker or rootful Podman.
+      - "${DOCKER_SOCKET:-/tmp/podman.sock}:/var/run/docker.sock:rw"
       # Bind Docker volume on host for JupyterHub database and cookie secrets
       - "nomad_north:/data"
     healthcheck:
@@ -333,6 +336,7 @@ services:
     restart: unless-stopped
     image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
     platform: linux/amd64
+    userns_mode: "keep-id:uid=1000,gid=1000"
     container_name: nomad_oasis_logtransfer
     environment:
       NOMAD_SERVICE: nomad_oasis_logtransfer
@@ -374,8 +378,10 @@ services:
       north:
         condition: service_healthy
     ports:
-      - 80:80
-      - 443:443
+      # Rootless podman cannot bind privileged ports (<1024) unless
+      # net.ipv4.ip_unprivileged_port_start is lowered (needs root).
+      - 8080:80
+      - 8443:443
 
   # jupyterlab image: (this is only used to pull the image, no service is run for this)
   jupyterlab_image:
@@ -386,6 +392,9 @@ services:
     entrypoint: ["true"]
     deploy:
       replicas: 0 # Ensures the service isn't started
+
+x-podman:
+  in_pod: false
 
 volumes:
   mongo:
