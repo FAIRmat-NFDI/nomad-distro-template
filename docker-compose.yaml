@@ -24,7 +24,7 @@ services:
   # the user data db
   mongo:
     restart: unless-stopped
-    image: docker.io/mongo:8.0
+    image: docker.io/mongo:8.0.4
     container_name: nomad_oasis_mongo
     environment:
       - MONGO_DATA_DIR=/data/db
