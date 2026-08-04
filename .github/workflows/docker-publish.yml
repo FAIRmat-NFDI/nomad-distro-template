@@ -20,7 +20,7 @@ env:
   NOMAD_DOCS_REPO: https://github.com/FAIRmat-NFDI/nomad-docs.git
   NOMAD_DOCS_REPO_REF: ""
   # If you want to skip the tests for some plugins, add them here as a single string where
-  # each plugin is separated by whitespace
+  # each plugin is separated by a comma or a line break
   PLUGIN_TESTS_PLUGINS_TO_SKIP: ""
 
 permissions:
@@ -94,7 +94,7 @@ jobs:
         env:
           PLUGIN_TESTS_CI_NODE_INDEX: ${{ matrix.group }}
         run: |
-          # replace the yaml list with a string, use a `,` to separate the plugins
+          # Convert line-separated plugin names to the CLI's comma-separated format.
           PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
           uv run \
             --extra plugins \
