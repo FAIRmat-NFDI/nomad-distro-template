@@ -1,9 +1,7 @@
 ![docker image](https://github.com/{{ repository }}/actions/workflows/docker-publish.yml/badge.svg)
 
 {% if include_template_section == "true" -%}
-
-# NOMAD Oasis Distribution _Template_
-
+# NOMAD Oasis Distribution *Template*
 This repository is a template for creating your own custom NOMAD Oasis distribution image.
 Click [here](https://github.com/new?template_name=nomad-distro-template&template_owner=FAIRmat-NFDI)
 to use this template, or click the `Use this template` button in the upper right corner of
@@ -17,7 +15,6 @@ the main GitHub page for this template.
 > and triggering it by clicking "Run workflow" under the "Run workflow" button on the right.
 
 {% endif -%}
-
 # {{ repository_owner }}'s NOMAD Oasis Distribution
 
 This is the NOMAD Oasis distribution of {{ repository_owner }}.
@@ -39,7 +36,6 @@ and how to customize it through [adding plugins](#adding-a-plugin).
 > ⚙️ next to "About" on the main GitHub page for this repository.
 
 In this README you will find instructions for:
-
 1. [Deploying with Docker](#deploying-with-docker)
 2. [Deploying with Kubernetes](#deploying-with-kubernetes)
 3. [Configuring Worker Replicas and Resource Limits](#configuring-worker-replicas-and-resource-limits)
@@ -69,76 +65,78 @@ This section covers the minimal steps for getting an Oasis running locally. Note
 
 2. Clone the repository or download the repository as a zip file.
 
-   ```sh
-   git clone https://github.com/{{ repository }}.git
-   cd {{ repository_name }}
-   ```
+    ```sh
+    git clone https://github.com/{{ repository }}.git
+    cd {{ repository_name }}
+    ```
 
-   or
+    or
 
-   ```sh
-   curl -L -o {{ repository_name }}.zip "https://github.com/{{ repository }}/archive/main.zip"
-   unzip {{ repository_name }}.zip
-   cd {{ repository_name }}
-   ```
+    ```sh
+    curl -L -o {{ repository_name }}.zip "https://github.com/{{ repository }}/archive/main.zip"
+    unzip {{ repository_name }}.zip
+    cd {{ repository_name }}
+    ```
 
 3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
 
-   ```sh
-   sudo chown -R 1000 .volumes
-   ```
+    ```sh
+    sudo chown -R 1000 .volumes
+    ```
 
 4. Create a file for environment variables
 
-   Before running the containers, you should create a `.env` and a `.env.north` files in the root of the repository. This file is used to store sensitive information and is ignored by git.
+    Before running the containers, you should create a `.env` and a `.env.north` files in the root of the repository. This file is used to store sensitive information and is ignored by git.
 
-   If you want to generate the them with random secrets you can also run the following script from the root of the repository:
+    If you want to generate the them with random secrets you can also run the following script from the root of the repository:
 
-   ```sh
-   bash scripts/generate-env.sh
-   ```
+    ```sh
+    bash scripts/generate-env.sh
+    ```
 
-   Alternatively you can create the `.env` and a `.env.north` files manually, At a minimum, you should add a secure secret for the API to `.env`:
+    Alternatively you can create the `.env` and a `.env.north` files manually, At a minimum, you should add a secure secret for the API to `.env`:
 
-   ```
-   NOMAD_SERVICES_API_SECRET='***'
-   NOMAD_NORTH_HUB_SERVICE_API_TOKEN='***'
-   ```
+    ```
+    NOMAD_SERVICES_API_SECRET='***'
+    NOMAD_NORTH_HUB_SERVICE_API_TOKEN='***'
+    ```
 
-   If you want to use the NORTH (NOMAD Remote Tools Hub) you also need to add the following variables to the `.env.north` file:
+    If you want to use the NORTH (NOMAD Remote Tools Hub) you also need to add the following variables to the `.env.north` file:
 
-   ```
-   SERVICE_API_TOKEN='***'
-   JUPYTERHUB_CRYPT_KEY='***'
-   ```
+    ```
+    SERVICE_API_TOKEN='***'
+    JUPYTERHUB_CRYPT_KEY='***'
+    ```
+    The `SERVICE_API_TOKEN` and `NOMAD_NORTH_HUB_SERVICE_API_TOKEN` should be the same and will be used for authentication between the NORTH and the NOMAD API.
 
-   The `SERVICE_API_TOKEN` and `NOMAD_NORTH_HUB_SERVICE_API_TOKEN` should be the same and will be used for authentication between the NORTH and the NOMAD API.
+    Note: The keys should be at least 64 characters long that can be generated with: `openssl rand -hex 32`
 
-   Note: The keys should be at least 64 characters long that can be generated with: `openssl rand -hex 32`
 
 5. Pull the images specified in the `docker-compose.yaml`
 
-   Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
+    Note that the image needs to be public or you need to provide a PAT (see "Important" note above).
 
-   ```sh
-   docker compose pull
-   ```
+    ```sh
+    docker compose pull
+    ```
+
 
 6. And run it with docker compose in detached (--detach or -d) mode
 
-   ```sh
-   docker compose up -d
-   ```
+    ```sh
+    docker compose up -d
+    ```
 
 7. (Optional) You can now test that NOMAD is running with
 
-   ```sh
-   curl localhost/nomad-oasis/alive
-   ```
+    ```sh
+    curl localhost/nomad-oasis/alive
+    ```
 
 8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
 
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here: [https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
+
 
 ### Steps before entering production
 
@@ -198,7 +196,6 @@ Before you can host your Oasis securely under a domain, you will have to go thro
       ```
 
    To start using a TLS certificate, update the `proxy` configuration in `docker-compose.yml`:
-
    ```diff
    - # HTTP
    - - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
@@ -209,59 +206,58 @@ Before you can host your Oasis securely under a domain, you will have to go thro
    + - ./tls/selfsigned.key:/etc/nginx/tls/mounted-nomad-oasis.key:ro  # Path to your TLS private key
    ```
 
-#### Updating the image
 
+#### Updating the image
 Any pushes to the main branch of this repository, such as when [adding a plugin](#adding-a-plugin), will trigger a pipeline that generates a new app and jupyter image.
 
 1. To update your local image you need to shut down NOMAD using
 
-   ```sh
-   docker compose down
-   ```
+    ```sh
+    docker compose down
+    ```
 
-   and then repeat steps 5. and 7. above.
+    and then repeat steps 5. and 7. above.
 
 2. You can remove unused images to free up space by running
 
-   ```sh
-   docker image prune -a
-   ```
+    ```sh
+    docker image prune -a
+    ```
 
 #### NOMAD Remote Tools Hub (NORTH)
 
 1. (First time only) Make sure that you follow the instruction about [post installation steps](https://docs.docker.com/engine/install/linux-postinstall/) to create the docker group and add your user:
 
-   1. Create the docker group.
-      ```sh
-      sudo groupadd docker
-      ```
-   2. Add your user to the docker group.
+    1. Create the docker group.
+        ```sh
+        sudo groupadd docker
+        ```
+    2. Add your user to the docker group.
 
-      ```sh
-      sudo usermod -aG docker $USER
-      ```
+        ```sh
+        sudo usermod -aG docker $USER
+        ```
+    3. Log out and log back in so that your group membership is re-evaluated.
 
-   3. Log out and log back in so that your group membership is re-evaluated.
+        If you're running Linux in a virtual machine, it may be necessary to restart the virtual machine for changes to take effect.
 
-      If you're running Linux in a virtual machine, it may be necessary to restart the virtual machine for changes to take effect.
+        You can also run the following command to activate the changes to groups:
 
-      You can also run the following command to activate the changes to groups:
+        ```sh
+        newgrp docker
+        ```
 
-      ```sh
-      newgrp docker
-      ```
-
-   > [!NOTE]
-   >
-   > On MacOS, you may need to explicitly say that the NORTH service should run under root. You can do this but adding this to the `north` service:
-   >
-   > ```
-   > user: root
-   > ```
+    > [!NOTE]
+    >
+    > On MacOS, you may need to explicitly say that the NORTH service should run under root. You can do this but adding this to the `north` service:
+    > ```
+    > user: root
+    > ```
 
 2. Customize the previously generated `.env.north` file with the correct values for your Keycloak instance.
 
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
+
 
 ### For an existing Oasis
 
@@ -280,6 +276,7 @@ volumes:
 
 To run the new image you can follow steps 5. and 7. [above](#for-a-new-oasis).
 
+
 ## Deploying with Kubernetes
 
 As an alternative to Docker Compose, you can deploy NOMAD Oasis on Kubernetes using Helm.
@@ -289,32 +286,33 @@ A minimal `values.yaml` for single-node clusters (Minikube, Kind, k3s, etc.) is 
 
 2. Add the NOMAD Helm repository:
 
-   ```sh
-   helm repo add nomad https://fairmat-nfdi.github.io/nomad-helm-charts
-   helm repo update
-   ```
+    ```sh
+    helm repo add nomad https://fairmat-nfdi.github.io/nomad-helm-charts
+    helm repo update
+    ```
 
 3. Install the chart using the provided values file:
 
-   ```sh
-   helm install nomad-oasis nomad/default -f kubernetes/values.yaml --timeout 15m
-   ```
+    ```sh
+    helm install nomad-oasis nomad/default -f kubernetes/values.yaml --timeout 15m
+    ```
 
 4. Watch the pods come up:
 
-   ```sh
-   kubectl get pods -w
-   ```
+    ```sh
+    kubectl get pods -w
+    ```
 
 5. Once all pods are running, access the Oasis via port-forward:
 
-   ```sh
-   kubectl port-forward svc/nomad-oasis-proxy 80:80
-   ```
+    ```sh
+    kubectl port-forward svc/nomad-oasis-proxy 80:80
+    ```
 
-   Then open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser.
+    Then open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser.
 
-> [!NOTE] > **Secrets:** The API secret is auto-generated by default. For production, you can
+> [!NOTE]
+> **Secrets:** The API secret is auto-generated by default. For production, you can
 > provide your own by creating a Kubernetes secret and referencing it in your values:
 >
 > ```sh
@@ -371,9 +369,9 @@ services:
           memory: 8G # Maximum 8GB RAM
 ```
 
-- `replicas`: The number of container instances to run for the worker service.
-- `cpus`: The maximum number of CPU cores the container can use.
-- `memory`: The maximum amount of memory the container can use.
+-   `replicas`: The number of container instances to run for the worker service.
+-   `cpus`: The maximum number of CPU cores the container can use.
+-   `memory`: The maximum amount of memory the container can use.
 
 Adjust these values based on your server's available resources to optimize performance.
 
@@ -494,35 +492,34 @@ For detailed instructions on backing up the data on your Oasis we recommend read
 [NOMAD documentation on administration](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/administer.html#backups).
 
 As part of this repository there is a bash script for running the mongodump in `scripts/backup-mongo.sh`.
+1. Make sure you are in the top directory of this repository and that the `mongo` service (container `nomad_oasis_mongo`) is running.
 
-1.  Make sure you are in the top directory of this repository and that the `mongo` service (container `nomad_oasis_mongo`) is running.
-
-2.  Run the script:
+2. Run the script:
 
     ```sh
     bash scripts/backup-mongo.sh
     ```
 
-3.  Check that a `nomad_oasis_v1` mongodump was created in `.volumes/mongo` and that the
-    dump was added to the logfile.
+3. Check that a `nomad_oasis_v1` mongodump was created in `.volumes/mongo` and that the
+dump was added to the logfile.
 
-        ```sh
-        ls .volumes/mongo
-        cat .volumes/mongo/backup.log
-        ```
+    ```sh
+    ls .volumes/mongo
+    cat .volumes/mongo/backup.log
+    ```
 
-4.  (Optional) Add the script to the crontab to run for example every night at 2 am.
-    From the top directory of this repository, run:
+4. (Optional) Add the script to the crontab to run for example every night at 2 am.
+From the top directory of this repository, run:
 
-        ```sh
-        (crontab -l 2>/dev/null; echo "0 2 * * * bash $(realpath scripts/backup-mongo.sh)") | crontab -
-        ```
+    ```sh
+    (crontab -l 2>/dev/null; echo "0 2 * * * bash $(realpath scripts/backup-mongo.sh)") | crontab -
+    ```
 
-        Finally, check that the cronjob was added:
+    Finally, check that the cronjob was added:
 
-        ```sh
-        crontab -l
-        ```
+    ```sh
+    crontab -l
+    ```
 
 > [!CAUTION]
 > This will only dump the NOMAD mongo data onto the server. It is still up to you
@@ -563,7 +560,6 @@ git checkout --theirs .github/workflows/docker-publish.yml
 ```
 
 The lock file merge conflicts can be resolved to use your versions instead of the template repository resolution.
-
 ```sh
 git checkout --ours uv.lock
 ```
@@ -583,12 +579,12 @@ Ideally all workflows should be triggered automatically but you might need to ru
 
 Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version. This list keeps track of the biggest changes that require additional steps beyond just updating the template code/files.
 
-- **v1.4.2**: MongoDB image was migrated from v5.0.6 to v8.x. This requires an additional step of migrating the existing MongoDB data into this new version. We provide [a helper script](https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py) that will aid you in doing this migration. Before doing the migration, it is key that you **backup your existing MongoDB data**. Our script does the backup automatically, but you should ensure that the backup files are created successfully. Read through the script to understand the different steps, and then run it on your Docker host machine (Python>=3.8 is required) like this, adjusting parameters as needed:
+ - **v1.4.2**: MongoDB image was migrated from v5.0.6 to v8.x. This requires an additional step of migrating the existing MongoDB data into this new version. We provide [a helper script](https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py) that will aid you in doing this migration. Before doing the migration, it is key that you **backup your existing MongoDB data**. Our script does the backup automatically, but you should ensure that the backup files are created successfully. Read through the script to understand the different steps, and then run it on your Docker host machine (Python>=3.8 is required) like this, adjusting parameters as needed:
 
-  ```
-  curl -O https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py && \
-  python3 upgrade_mongo.py -c nomad_oasis_mongo -f docker-compose.yaml --from-version 5.0.6
-  ```
+    ```
+    curl -O https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py && \
+    python3 upgrade_mongo.py -c nomad_oasis_mongo -f docker-compose.yaml --from-version 5.0.6
+    ```
 
 ## Enabling Monitoring
 
@@ -619,13 +615,13 @@ The Keycloak SSO integration and external host callback parameters can be config
 
 > [!IMPORTANT] > **External URL Configuration**: It is critical to change `MONITORING_EXTERNAL_URL` in production (e.g. to `https://my-oasis.org`). Leaving it as `http://localhost` will cause SSO login callbacks and CORS headers to fail for remote users.
 
-> [!WARNING] > **Access Control & Security**: By default, the monitoring stack connects to the public Keycloak realm (`fairdi_nomad_prod`). This means **any user with a NOMAD account** will be able to authenticate and access your Grafana and Temporal UI pages. For private production deployments, you **must** set up a dedicated Keycloak realm and configure client overrides in your `.env` file.
+> [!NOTE] > **Access Control & Security**: By default, the monitoring stack connects to the public Keycloak realm (`fairdi_nomad_prod`). Any user with a NOMAD account can authenticate if they can reach your monitoring endpoints. If your Oasis is only reachable behind a VPN, it is fine to use the `fairdi_nomad_prod` realm because public users will not be able to reach your Oasis. If your Oasis is publicly reachable, we recommend setting up a dedicated Keycloak configuration for your Oasis administrators and restricting monitoring access to those administrators.
 
 ## FAQ/Trouble shooting
 
 - _I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized` _when trying to pull my docker image._
 
-  Most likely you have not made the package public or provided a personal access token (PAT).
-  You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
-  or how to configure a PAT (if you want to keep the distribution private) in the GitHub
-  docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
+   Most likely you have not made the package public or provided a personal access token (PAT).
+You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
+or how to configure a PAT (if you want to keep the distribution private) in the GitHub
+docs [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-with-a-personal-access-token-classic).
