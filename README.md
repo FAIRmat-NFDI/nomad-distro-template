@@ -603,6 +603,7 @@ All monitoring interfaces are secured and routed exclusively through the Nginx r
 - **Grafana**: `/grafana/` (e.g., `http://localhost/grafana/`)
 - **Temporal UI**: `/temporal/` (e.g., `http://localhost/temporal/`)
 - **Alertmanager**: Accessible internally by Grafana. Alerts and silences can be managed under Grafana's **Alerting** tab.
+- **Dashboards**: Grafana automatically provisions the NOMAD FastAPI Performance Monitoring and Temporal Server dashboards.
 
 ### Configuring Keycloak/OIDC & Host Overrides
 

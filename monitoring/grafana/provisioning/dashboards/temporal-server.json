@@ -2362,7 +2362,7 @@
           "type": "text",
           "options": {
             "mode": "markdown",
-            "content": "**Shard Queue Health** tracks task queue lag per history pod and task category to detect stuck shards. A stuck shard shows as one `instance + task_category` line rising monotonically across multiple 5-minute ticks without recovering \u2014 while all other pods' lines oscillate and recover.\n\nAlso tracks SQL connection pool refresh failures (earliest signal for DB-caused stuck shards) and the deadlock detector (Go-level lock/semaphore deadlocks). Note that `dd_current_suspected_deadlocks` does **not** fire for DB-caused stuck shards \u2014 the pool refresh failure rate does."
+            "content": "**Shard Queue Health** tracks task queue lag per history service instance and task category to detect stuck shards. A stuck shard shows as one `instance + task_category` line rising monotonically across multiple 5-minute ticks without recovering \u2014 while all other service instances' lines oscillate and recover.\n\nAlso tracks SQL connection pool refresh failures (earliest signal for DB-caused stuck shards) and the deadlock detector (Go-level lock/semaphore deadlocks). Note that `dd_current_suspected_deadlocks` does **not** fire for DB-caused stuck shards \u2014 the pool refresh failure rate does."
           }
         },
         {
@@ -2403,8 +2403,8 @@
             "y": 12
           },
           "id": 2109,
-          "title": "Immediate Queue Lag per Pod",
-          "description": "Task ID delta between the high watermark and the minimum pending immediate task, per history pod and task category. Emitted every 5 minutes per shard. A line rising monotonically across multiple ticks without recovering indicates a stuck shard on that pod. Orange > 500K tasks, red > 3M tasks (matches the server internal log threshold). No shard_id tag exists \u2014 use the instance label to identify the pod, then tdbg history-host describe to enumerate its shards.",
+          "title": "Immediate Queue Lag per Service Instance",
+          "description": "Task ID delta between the high watermark and the minimum pending immediate task, per history service instance and task category. Emitted every 5 minutes per shard. A line rising monotonically across multiple ticks without recovering indicates a stuck shard on that service instance. Orange > 500K tasks, red > 3M tasks (matches the server internal log threshold). No shard_id tag exists \u2014 use the instance label to identify the service instance, then tdbg history-host describe to enumerate its shards.",
           "type": "timeseries",
           "options": {
             "legend": {
@@ -2464,8 +2464,8 @@
             "y": 12
           },
           "id": 2110,
-          "title": "Scheduled Queue Lag per Pod",
-          "description": "Time delta between the high watermark fire time and the oldest pending scheduled task fire time, per history pod and task category. Emitted every 5 minutes per shard. Orange > 10 min (600,000 ms), red > 30 min (1,800,000 ms \u2014 matches the server internal log threshold).",
+          "title": "Scheduled Queue Lag per Service Instance",
+          "description": "Time delta between the high watermark fire time and the oldest pending scheduled task fire time, per history service instance and task category. Emitted every 5 minutes per shard. Orange > 10 min (600,000 ms), red > 30 min (1,800,000 ms \u2014 matches the server internal log threshold).",
           "type": "timeseries",
           "options": {
             "legend": {
@@ -2521,8 +2521,8 @@
             "y": 20
           },
           "id": 2111,
-          "title": "DB Pool Refresh Failure Rate per Pod",
-          "description": "Rate of failed SQL connection pool refresh attempts per history pod (persistence_session_refresh_failures). Fires immediately when the pool cannot reconnect to the DB primary \u2014 the earliest metric signal for a DB-caused stuck shard, before queue lag has time to build. Any non-zero value on any pod warrants investigation. SQL backends only (PostgreSQL, MySQL) \u2014 not emitted for Cassandra.",
+          "title": "DB Pool Refresh Failure Rate per Service Instance",
+          "description": "Rate of failed SQL connection pool refresh attempts per history service instance (persistence_session_refresh_failures). Fires immediately when the pool cannot reconnect to the DB primary \u2014 the earliest metric signal for a DB-caused stuck shard, before queue lag has time to build. Any non-zero value on any service instance warrants investigation. SQL backends only (PostgreSQL, MySQL) \u2014 not emitted for Cassandra.",
           "type": "timeseries",
           "options": {
             "legend": {
@@ -2584,8 +2584,8 @@
             "y": 20
           },
           "id": 2112,
-          "title": "DB Pool Refresh Failure Ratio per Pod",
-          "description": "Ratio of failed to total SQL connection pool refresh attempts per pod. Orange > 10%, red > 50%. More stable than raw rate for alerting across clusters of different sizes. SQL backends only.",
+          "title": "DB Pool Refresh Failure Ratio per Service Instance",
+          "description": "Ratio of failed to total SQL connection pool refresh attempts per service instance. Orange > 10%, red > 50%. More stable than raw rate for alerting across clusters of different sizes. SQL backends only.",
           "type": "timeseries",
           "options": {
             "legend": {
@@ -2641,8 +2641,8 @@
             "y": 28
           },
           "id": 2113,
-          "title": "Suspected Deadlocks (current) per Pod",
-          "description": "Current number of unresolved suspected deadlocks per history pod. Increments when the deadlock detector's shard lock or io-semaphore ping times out; decrements when the lock is eventually released. Any value above zero means a shard lock is currently held \u2014 pod restart required. This metric is event-driven: it only appears when a deadlock is detected. Absence of data is healthy and expected.",
+          "title": "Suspected Deadlocks (current) per Service Instance",
+          "description": "Current number of unresolved suspected deadlocks per history service instance. Increments when the deadlock detector's shard lock or io-semaphore ping times out; decrements when the lock is eventually released. Any value above zero means a shard lock is currently held \u2014 service instance restart required. This metric is event-driven: it only appears when a deadlock is detected. Absence of data is healthy and expected.",
           "type": "timeseries",
           "options": {
             "legend": {
@@ -2698,8 +2698,8 @@
             "y": 28
           },
           "id": 2114,
-          "title": "Deadlock Event Rate per Pod",
-          "description": "Rate of suspected deadlock detection events per history pod (dd_suspected_deadlocks). Complements the current gauge \u2014 shows the cumulative rate of detection events even after dd_current_suspected_deadlocks has decremented back to zero. Any non-zero rate warrants checking pod logs for the goroutine dump (emitted automatically when system.deadlock.DumpGoroutines=true, which is the default).",
+          "title": "Deadlock Event Rate per Service Instance",
+          "description": "Rate of suspected deadlock detection events per history service instance (dd_suspected_deadlocks). Complements the current gauge \u2014 shows the cumulative rate of detection events even after dd_current_suspected_deadlocks has decremented back to zero. Any non-zero rate warrants checking service instance logs for the goroutine dump (emitted automatically when system.deadlock.DumpGoroutines=true, which is the default).",
           "type": "timeseries",
           "options": {
             "legend": {
@@ -4722,7 +4722,7 @@
           "type": "text",
           "options": {
             "mode": "markdown",
-            "content": "**Total concurrent pollers** tracks long-poll requests per namespace and per frontend pod"
+            "content": "**Total concurrent pollers** tracks long-poll requests per namespace and per frontend service instance"
           }
         },
         {
@@ -4789,7 +4789,7 @@
             "y": 16
           },
           "id": 163,
-          "title": "Max Concurrent Pollers per Frontend Pod",
+          "title": "Max Concurrent Pollers per Frontend Service Instance",
           "type": "timeseries",
           "options": {
             "legend": {
@@ -6580,14 +6580,15 @@
         },
         "definition": "label_values(service_requests{namespace!=\"_unknown_\"}, namespace)",
         "hide": 0,
-        "includeAll": false,
-        "label": "Namespace",
+        "includeAll": true,
+        "label": "Temporal Namespace",
         "multi": false,
         "name": "namespace",
         "query": "label_values(service_requests{namespace!=\"_unknown_\"}, namespace)",
         "refresh": 2,
         "sort": 1,
-        "type": "query"
+        "type": "query",
+        "allValue": ".*"
       },
       {
         "current": {

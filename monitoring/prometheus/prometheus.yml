@@ -30,6 +30,13 @@ scrape_configs:
         regex: '/(.*)'
         target_label: instance
 
+  - job_name: "nomad-app"
+    static_configs:
+      - targets: ["app:8000"]
+        labels:
+          namespace: "nomad-oasis"
+          pod: "app"
+
   - job_name: "temporal-server"
     static_configs:
       - targets: ["temporal:8000"]
