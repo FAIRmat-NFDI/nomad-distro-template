@@ -48,7 +48,8 @@ In this README you will find instructions for:
 10. [Backing up the Oasis](#backing-up-the-oasis)
 11. [Enabling NOMAD Actions](#enabling-nomad-actions)
 12. [Updating the distribution from the template](#updating-the-distribution-from-the-template)
-13. [Solving common issues](#faqtrouble-shooting)
+13. [Enabling Monitoring](#enabling-monitoring)
+14. [Solving common issues](#faqtrouble-shooting)
 
 ## Deploying with Docker
 
@@ -584,6 +585,38 @@ Sometimes there are significant changes in these distribution templates, and you
     curl -O https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py && \
     python3 upgrade_mongo.py -c nomad_oasis_mongo -f docker-compose.yaml --from-version 5.0.6
     ```
+
+## Enabling Monitoring
+
+The distribution includes an optional monitoring stack (Prometheus, Grafana, Alertmanager, cAdvisor, and Temporal UI).
+
+To start the stack with monitoring enabled, run:
+
+```sh
+docker compose --profile monitoring up -d
+```
+
+### Accessing UI Services
+
+All monitoring interfaces are secured and routed exclusively through the Nginx reverse proxy (public container ports are disabled for security):
+
+- **Grafana**: `/grafana/` (e.g., `http://localhost/grafana/`)
+- **Temporal UI**: `/temporal/` (e.g., `http://localhost/temporal/`)
+- **Alertmanager**: Accessible internally by Grafana. Alerts and silences can be managed under Grafana's **Alerting** tab.
+- **Dashboards**: Grafana automatically provisions the NOMAD FastAPI Performance Monitoring and Temporal Server dashboards.
+
+### Configuring Keycloak/OIDC & Host Overrides
+
+The Keycloak SSO integration and external host callback parameters can be configured dynamically by defining host environment variables or setting them in your `.env` file:
+
+- `MONITORING_KEYCLOAK_REALM` (default: `fairdi_nomad_prod`): Keycloak authentication realm.
+- `MONITORING_KEYCLOAK_CLIENT_ID` (default: `nomad_public`): Keycloak client ID.
+- `MONITORING_KEYCLOAK_CLIENT_SECRET` (default: `test`): Keycloak client secret.
+- `MONITORING_EXTERNAL_URL` (default: `http://localhost`): External base URL for CORS and auth redirects/callbacks (e.g., `https://my-oasis.org`).
+
+> [!IMPORTANT] > **External URL Configuration**: It is critical to change `MONITORING_EXTERNAL_URL` in production (e.g. to `https://my-oasis.org`). Leaving it as `http://localhost` will cause SSO login callbacks and CORS headers to fail for remote users.
+
+> [!NOTE] > **Access Control & Security**: By default, the monitoring stack connects to the public Keycloak realm (`fairdi_nomad_prod`). Any user with a NOMAD account can authenticate if they can reach your monitoring endpoints. If your Oasis is only reachable behind a VPN, it is fine to use the `fairdi_nomad_prod` realm because public users will not be able to reach your Oasis. If your Oasis is publicly reachable, we recommend setting up a dedicated Keycloak configuration for your Oasis administrators and restricting monitoring access to those administrators.
 
 ## FAQ/Trouble shooting
 

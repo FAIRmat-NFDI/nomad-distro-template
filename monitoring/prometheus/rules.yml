@@ -1,0 +1,191 @@
+groups:
+  - name: nomad-alerts
+    rules:
+      - alert: NomadWorkerOffline
+        expr: up{job="nomad-worker"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nomad Worker Offline"
+          description: "Nomad worker instance {{ $labels.instance }} has been offline for more than 1 minute."
+
+  - name: temporal-server
+    rules:
+      - alert: TemporalServerFrontendErrorRateHigh
+        expr: |
+          (
+            sum by (namespace) (
+              rate(service_errors{
+                service_name="frontend",
+                namespace!=""
+              }[5m])
+            )
+            /
+            clamp_min(
+              sum by (namespace) (
+                rate(service_requests{
+                  service_name="frontend",
+                  namespace!=""
+                }[5m])
+              ),
+              0.001
+            )
+          ) > 0.3
+        for: 2m
+        labels:
+          severity: critical
+          service: temporal
+          component: frontend
+        annotations:
+          summary: "Temporal frontend error rate is high in {{ $labels.namespace }}"
+          description: "More than 30% of Temporal frontend requests are failing in namespace {{ $labels.namespace }}."
+      - alert: TemporalServerAllPollersDisconnected
+        expr: |
+          sum by (namespace) (
+            service_pending_requests{
+              service_name="frontend",
+              namespace!="",
+              operation=~"PollWorkflowTaskQueue|PollActivityTaskQueue"
+            }
+          ) < 1
+        for: 1m
+        labels:
+          severity: critical
+          service: temporal
+          component: frontend
+        annotations:
+          summary: "Temporal pollers are disconnected in {{ $labels.namespace }}"
+          description: "Temporal server sees no active workflow or activity pollers for namespace {{ $labels.namespace }}."
+      - alert: TemporalServerMatchingSyncThrottleActive
+        expr: |
+          sum by (namespace, task_type) (
+            rate(sync_throttle_count{
+              service_name="matching",
+              namespace!=""
+            }[5m])
+          ) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: temporal
+          component: matching
+        annotations:
+          summary: "Temporal matching sync throttle is active in {{ $labels.namespace }}"
+          description: "Temporal matching is throttling {{ $labels.task_type }} work in namespace {{ $labels.namespace }}."
+      - alert: TemporalServerSystemOverloadThrottling
+        expr: |
+          sum by (namespace) (
+            rate(service_errors_resource_exhausted{
+              namespace!="",
+              resource_exhausted_cause=~"RESOURCE_EXHAUSTED_CAUSE_SYSTEM_OVERLOADED|RESOURCE_EXHAUSTED_CAUSE_CIRCUIT_BREAKER_OPEN"
+            }[5m])
+          ) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: temporal
+          component: frontend
+        annotations:
+          summary: "Temporal overload throttling is active in {{ $labels.namespace }}"
+          description: "Temporal is returning resource exhausted errors due to overload or an open circuit breaker in namespace {{ $labels.namespace }}."
+
+  - name: temporal-sdk-core
+    rules:
+      - alert: TemporalSdkWorkerTaskSlotsExhausted
+        expr: |
+          sum by (namespace, worker_type, task_queue) (
+            temporal_worker_task_slots_available{
+              namespace!=""
+            }
+          ) < 1
+        for: 2m
+        labels:
+          severity: critical
+          service: temporal-sdk
+          component: worker
+        annotations:
+          summary: "Temporal worker slots exhausted on {{ $labels.task_queue }}"
+          description: "All {{ $labels.worker_type }} slots are in use for task queue {{ $labels.task_queue }} in namespace {{ $labels.namespace }}."
+      - alert: TemporalSdkAllPollersDisconnected
+        expr: |
+          sum by (namespace, worker_type, task_queue) (
+            temporal_num_pollers{
+              namespace!=""
+            }
+          ) < 1
+        for: 5m
+        labels:
+          severity: critical
+          service: temporal-sdk
+          component: poller
+        annotations:
+          summary: "Temporal SDK pollers disconnected on {{ $labels.task_queue }}"
+          description: "No active {{ $labels.worker_type }} pollers are reporting for task queue {{ $labels.task_queue }} in namespace {{ $labels.namespace }}."
+      - alert: TemporalSdkWorkflowTaskScheduleToStartHigh
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum by (namespace, task_queue, le) (
+              rate(temporal_workflow_task_schedule_to_start_latency_bucket{
+                namespace!=""
+              }[5m])
+            )
+          ) > 5000
+        for: 5m
+        labels:
+          severity: critical
+          service: temporal-sdk
+          component: wft
+        annotations:
+          summary: "Temporal workflow task schedule-to-start is high on {{ $labels.task_queue }}"
+          description: "Workflow task schedule-to-start p99 is above 5 seconds on task queue {{ $labels.task_queue }} in namespace {{ $labels.namespace }}."
+      - alert: TemporalSdkActivityScheduleToStartSevere
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum by (namespace, activity_type, task_queue, le) (
+              rate(temporal_activity_schedule_to_start_latency_bucket{
+                namespace!=""
+              }[5m])
+            )
+          ) > 1800000
+        for: 5m
+        labels:
+          severity: critical
+          service: temporal-sdk
+          component: activity
+        annotations:
+          summary: "Temporal activity backlog is severe on {{ $labels.task_queue }}"
+          description: "Activity schedule-to-start p99 is above 30 minutes for {{ $labels.activity_type }} on task queue {{ $labels.task_queue }} in namespace {{ $labels.namespace }}."
+      - alert: TemporalSdkNonDeterminismError
+        expr: |
+          sum by (namespace, workflow_type, task_queue, failure_reason) (
+            rate(temporal_workflow_task_execution_failed{
+              namespace!="",
+              failure_reason="NonDeterminismError"
+            }[5m])
+          ) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: temporal-sdk
+          component: wft
+        annotations:
+          summary: "Temporal workflow non-determinism detected in {{ $labels.namespace }}"
+          description: "Workflow type {{ $labels.workflow_type }} is hitting NonDeterminismError on task queue {{ $labels.task_queue }} in namespace {{ $labels.namespace }}."
+      - alert: TemporalSdkActivityExecutionFailedRateElevated
+        expr: |
+          sum by (namespace, activity_type, task_queue) (
+            rate(temporal_activity_execution_failed{
+              namespace!=""
+            }[5m])
+          ) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: temporal-sdk
+          component: activity
+        annotations:
+          summary: "Temporal activity failure rate is elevated in {{ $labels.namespace }}"
+          description: "Activity {{ $labels.activity_type }} is failing at a sustained rate on task queue {{ $labels.task_queue }} in namespace {{ $labels.namespace }}."
