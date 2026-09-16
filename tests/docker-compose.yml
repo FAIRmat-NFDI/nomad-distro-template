@@ -132,7 +132,6 @@ services:
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
       NOMAD_TEMPORAL_HOST: temporal
-      NOMAD_LOGSTASH_HOST: logtransfer
     depends_on:
       rabbitmq:
         condition: service_healthy
