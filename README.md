@@ -262,7 +262,7 @@ Please see the [Jupyter image](#the-jupyter-image) section below for more inform
 
 If you already have an Oasis running you only need to change the image being pulled in
 your `docker-compose.yaml` with `ghcr.io/{{ image_name }}:main` for the services
-`worker`, `app`, `north`, and `logtransfer`.
+`worker`, `app` and `north`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out
 the inclusion of the `nomad.yaml` under the volumes key of those services in the

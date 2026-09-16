@@ -133,7 +133,6 @@ services:
       NOMAD_SERVICE: nomad_oasis_worker
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
-      NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_TEMPORAL_HOST: temporal
     env_file:
       - ./.env
@@ -186,7 +185,6 @@ services:
   #     NOMAD_SERVICE: nomad_oasis_gpu_worker
   #     NOMAD_ELASTIC_HOST: elastic
   #     NOMAD_MONGO_HOST: mongo
-  #     NOMAD_LOGSTASH_HOST: logtransfer
   #     NOMAD_TEMPORAL_HOST: temporal
   #   depends_on:
   #     elastic:
@@ -223,7 +221,6 @@ services:
   #     NOMAD_SERVICE: nomad_oasis_cpu_worker
   #     NOMAD_ELASTIC_HOST: elastic
   #     NOMAD_MONGO_HOST: mongo
-  #     NOMAD_LOGSTASH_HOST: logtransfer
   #     NOMAD_TEMPORAL_HOST: temporal
   #   deploy:
   #     replicas: 1
@@ -266,7 +263,6 @@ services:
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_MONGO_HOST: mongo
-      NOMAD_LOGSTASH_HOST: logtransfer
       NOMAD_NORTH_HUB_HOST: north
       NOMAD_TEMPORAL_HOST: temporal
     env_file:
@@ -326,30 +322,6 @@ services:
     depends_on:
       app:
         condition: service_healthy
-
-  # nomad logtransfer
-  # to enable the logtransfer service run "docker compose --profile with_logtransfer up"
-  logtransfer:
-    restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
-    platform: linux/amd64
-    container_name: nomad_oasis_logtransfer
-    environment:
-      NOMAD_SERVICE: nomad_oasis_logtransfer
-      NOMAD_ELASTIC_HOST: elastic
-      NOMAD_MONGO_HOST: mongo
-    env_file:
-      - ./.env
-    depends_on:
-      elastic:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
-    volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
-      - ./.volumes/fs:/app/.volumes/fs
-    command: python -m nomad.cli admin run logtransfer
-    profiles: ["with_logtransfer"]
 
   # nomad proxy (a reverse proxy for nomad)
   proxy:
