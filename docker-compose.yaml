@@ -397,9 +397,9 @@ services:
       - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=${MONITORING_KEYCLOAK_CLIENT_ID:-nomad_public}
       - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${MONITORING_KEYCLOAK_CLIENT_SECRET:-test}
       - GF_AUTH_GENERIC_OAUTH_SCOPES=openid profile email
-      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}/protocol/openid-connect/auth
-      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}/protocol/openid-connect/token
-      - GF_AUTH_GENERIC_OAUTH_API_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}/protocol/openid-connect/userinfo
+      - GF_AUTH_GENERIC_OAUTH_AUTH_URL=${MONITORING_KEYCLOAK_URL:-https://nomad-lab.eu/fairdi/keycloak/auth}/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}/protocol/openid-connect/auth
+      - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=${MONITORING_KEYCLOAK_URL:-https://nomad-lab.eu/fairdi/keycloak/auth}/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}/protocol/openid-connect/token
+      - GF_AUTH_GENERIC_OAUTH_API_URL=${MONITORING_KEYCLOAK_URL:-https://nomad-lab.eu/fairdi/keycloak/auth}/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}/protocol/openid-connect/userinfo
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
     env_file:
@@ -448,8 +448,8 @@ services:
       - TEMPORAL_AUTH_ENABLED=true
       - TEMPORAL_AUTH_TYPE=oidc
       - TEMPORAL_DISABLE_WRITE_ACTIONS=true
-      - TEMPORAL_AUTH_PROVIDER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}
-      - TEMPORAL_AUTH_ISSUER_URL=https://nomad-lab.eu/fairdi/keycloak/auth/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}
+      - TEMPORAL_AUTH_PROVIDER_URL=${MONITORING_KEYCLOAK_URL:-https://nomad-lab.eu/fairdi/keycloak/auth}/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}
+      - TEMPORAL_AUTH_ISSUER_URL=${MONITORING_KEYCLOAK_URL:-https://nomad-lab.eu/fairdi/keycloak/auth}/realms/${MONITORING_KEYCLOAK_REALM:-fairdi_nomad_prod}
       - TEMPORAL_AUTH_CLIENT_ID=${MONITORING_KEYCLOAK_CLIENT_ID:-nomad_public}
       - TEMPORAL_AUTH_SCOPES=openid,email,profile
     env_file:

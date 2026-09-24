@@ -609,14 +609,17 @@ All monitoring interfaces are secured and routed exclusively through the Nginx r
 
 The Keycloak SSO integration and external host callback parameters can be configured dynamically by defining host environment variables or setting them in your `.env` file:
 
+- `MONITORING_KEYCLOAK_URL` (default: `https://nomad-lab.eu/fairdi/keycloak/auth`): Keycloak base URL.
 - `MONITORING_KEYCLOAK_REALM` (default: `fairdi_nomad_prod`): Keycloak authentication realm.
 - `MONITORING_KEYCLOAK_CLIENT_ID` (default: `nomad_public`): Keycloak client ID.
 - `MONITORING_KEYCLOAK_CLIENT_SECRET` (default: `test`): Keycloak client secret.
 - `MONITORING_EXTERNAL_URL` (default: `http://localhost`): External base URL for CORS and auth redirects/callbacks (e.g., `https://my-oasis.org`).
 
-> [!IMPORTANT] > **External URL Configuration**: It is critical to change `MONITORING_EXTERNAL_URL` in production (e.g. to `https://my-oasis.org`). Leaving it as `http://localhost` will cause SSO login callbacks and CORS headers to fail for remote users.
+> [!IMPORTANT]
+> **External URL Configuration**: It is critical to change `MONITORING_EXTERNAL_URL` in production (e.g. to `https://my-oasis.org`). Leaving it as `http://localhost` will cause SSO login callbacks and CORS headers to fail for remote users.
 
-> [!NOTE] > **Access Control & Security**: By default, the monitoring stack connects to the public Keycloak realm (`fairdi_nomad_prod`). Any user with a NOMAD account can authenticate if they can reach your monitoring endpoints. If your Oasis is only reachable behind a VPN, it is fine to use the `fairdi_nomad_prod` realm because public users will not be able to reach your Oasis. If your Oasis is publicly reachable, we recommend setting up a dedicated Keycloak configuration for your Oasis administrators and restricting monitoring access to those administrators.
+> [!NOTE]
+> **Access Control & Security**: By default, the monitoring stack connects to the public Keycloak realm (`fairdi_nomad_prod`), meaning anyone with a NOMAD account who can reach your endpoints can authenticate. If you do not want monitoring to be public, create your own Keycloak for the admins of the Oasis and set the variables above accordingly.
 
 ## FAQ/Trouble shooting
 
