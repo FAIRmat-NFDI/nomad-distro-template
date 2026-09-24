@@ -576,10 +576,12 @@ Ideally all workflows should be triggered automatically but you might need to ru
 
 ## Migration steps
 
-Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version. Detailed guides for major migrations are available in the [`migrations/`](./migrations) folder:
+Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version.
 
-- **MongoDB (v5.0.6 to v8.x)**: Upgrading from MongoDB 5 to 8 requires a sequential version upgrade. See the [MongoDB Migration Guide](./migrations/mongo-5-to-8.md).
-- **Elasticsearch (v7.17 to v9.5)**: Upgrading from Elasticsearch 7 to 9. Two migration options are supported: reindexing between running ES7 and ES9 containers, or starting with a fresh ES9 container and reindexing uploads. See the [Elasticsearch Migration Guide](./migrations/elastic-7-to-9.md).
+For detailed migration instructions, please refer to the [NOMAD Oasis Migrations Guide](https://docs.nomad-lab.eu/howto/oasis/migrations.html), which includes detailed step-by-step guides for:
+
+- **MongoDB (5.x → 8.x)**: Sequential upgrade through major versions setting feature compatibility.
+- **Elasticsearch (7.x → 9.x)**: Migration options including reindexing between running ES7 and ES9 containers or starting with a fresh ES9 container and reindexing uploads.
 
 ## FAQ/Trouble shooting
 
