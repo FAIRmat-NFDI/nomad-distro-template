@@ -93,41 +93,32 @@ FROM builder AS docs
 
 WORKDIR /app
 
-ARG NOMAD_DOCS_REPO="https://github.com/FAIRmat-NFDI/nomad-docs.git"
+ARG NOMAD_DOCS_REPO=""
 ARG NOMAD_DOCS_REPO_REF=""
 
-# Clones the documentation repository, checks out the version matching nomad-lab
-# (unless a specific NOMAD_DOCS_REPO_REF is provided), installs it, and builds the documentation.
+# Builds custom documentation only if both NOMAD_DOCS_REPO and NOMAD_DOCS_REPO_REF
+# are provided. Otherwise /app/built_docs is left empty and the official docs at
+# https://docs.nomad-lab.eu are used instead.
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     set -ex && \
-    # Clone the documentation repository \
-    echo "Cloning from: ${NOMAD_DOCS_REPO}" && \
-    git clone "${NOMAD_DOCS_REPO}" docs_repo && cd docs_repo && \
-    # Determine which version to build \
-    if [ -n "${NOMAD_DOCS_REPO_REF}" ]; then \
-        # Use explicitly provided ref \
-        echo "Checking out provided ref: ${NOMAD_DOCS_REPO_REF}"; \
-        git checkout "${NOMAD_DOCS_REPO_REF}"; \
-    else \
-        # Match documentation version to nomad-lab version \
-        NOMAD_VERSION=$(uv tree --package nomad-lab | grep "^nomad-lab v" | sed 's/^nomad-lab //'); \
-        echo "Detected nomad-lab version: ${NOMAD_VERSION}"; \
-        if git rev-parse --verify "refs/tags/${NOMAD_VERSION}" >/dev/null 2>&1; then \
-            echo "Tag ${NOMAD_VERSION} found. Checking out."; \
-            git checkout "${NOMAD_VERSION}"; \
-        else \
-            echo "Tag ${NOMAD_VERSION} not found. Checking out main branch."; \
-            git checkout main; \
-        fi; \
-    fi && \
-    # Install and build documentation \
-    uv pip install . && \
-    PYTHONPATH=src uv run --no-sync mkdocs build && \
-    # Move built site to final destination \
     mkdir -p /app/built_docs && \
-    cp -r site/* /app/built_docs
+    if [ -n "${NOMAD_DOCS_REPO}" ] && [ -n "${NOMAD_DOCS_REPO_REF}" ]; then \
+        # Clone the documentation repository and check out the provided ref \
+        echo "Cloning from: ${NOMAD_DOCS_REPO}" && \
+        git clone "${NOMAD_DOCS_REPO}" docs_repo && cd docs_repo && \
+        echo "Checking out provided ref: ${NOMAD_DOCS_REPO_REF}" && \
+        git checkout "${NOMAD_DOCS_REPO_REF}" && \
+        # Install and build documentation \
+        uv pip install . && \
+        PYTHONPATH=src uv run --no-sync mkdocs build && \
+        # Move built site to final destination \
+        mkdir -p /app/built_docs/docs && \
+        cp -r site/. /app/built_docs/docs/; \
+    else \
+        echo "NOMAD_DOCS_REPO and NOMAD_DOCS_REPO_REF not both set. Skipping docs build."; \
+    fi
 
 FROM builder AS gpu_action_builder
 
@@ -154,7 +145,8 @@ ARG PYTHON_VERSION=3.12
 COPY --chown=nomad:${UID} --from=builder /opt/venv /opt/venv
 COPY configs/nomad.yaml nomad.yaml
 COPY pyproject.toml uv.lock /opt/
-COPY --chown=nomad:${UID} --from=docs /app/built_docs /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/app/static/docs
+# Copies the custom docs into static/docs, or nothing if the docs build was skipped
+COPY --chown=nomad:${UID} --from=docs /app/built_docs/ /opt/venv/lib/python${PYTHON_VERSION}/site-packages/nomad/app/static/
 
 RUN mkdir -p /app/.volumes/fs \
  && chown -R nomad:${UID} /app \
