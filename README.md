@@ -578,10 +578,7 @@ Ideally all workflows should be triggered automatically but you might need to ru
 
 Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version.
 
-For detailed migration instructions, please refer to the [NOMAD Oasis Migrations Guide](https://docs.nomad-lab.eu/howto/oasis/migrations.html), which includes detailed step-by-step guides for:
-
-- **MongoDB (5.x → 8.x)**: Sequential upgrade through major versions setting feature compatibility.
-- **Elasticsearch (7.x → 9.x)**: Migration options including reindexing between running ES7 and ES9 containers or starting with a fresh ES9 container and reindexing uploads.
+For detailed migration instructions, please refer to the [NOMAD Oasis Migration Guide](https://docs.nomad-lab.eu/howto/oasis/migrate.html).
 
 ## FAQ/Trouble shooting
 
