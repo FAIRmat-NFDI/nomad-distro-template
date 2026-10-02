@@ -2,11 +2,12 @@ services:
   # the search engine
   elastic:
     restart: unless-stopped
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
     container_name: nomad_oasis_elastic
     environment:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - discovery.type=single-node
+      - xpack.security.enabled=false
     volumes:
       - elastic:/usr/share/elasticsearch/data
     healthcheck:
@@ -132,6 +133,7 @@ services:
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
       NOMAD_ELASTIC_HOST: elastic
+      NOMAD_ELASTIC_VERSION: 9
       NOMAD_MONGO_HOST: mongo
       NOMAD_TEMPORAL_HOST: temporal
     env_file:
@@ -184,6 +186,7 @@ services:
   #   environment:
   #     NOMAD_SERVICE: nomad_oasis_gpu_worker
   #     NOMAD_ELASTIC_HOST: elastic
+  #     NOMAD_ELASTIC_VERSION: 9
   #     NOMAD_MONGO_HOST: mongo
   #     NOMAD_TEMPORAL_HOST: temporal
   #   depends_on:
@@ -220,6 +223,7 @@ services:
   #   environment:
   #     NOMAD_SERVICE: nomad_oasis_cpu_worker
   #     NOMAD_ELASTIC_HOST: elastic
+  #     NOMAD_ELASTIC_VERSION: 9
   #     NOMAD_MONGO_HOST: mongo
   #     NOMAD_TEMPORAL_HOST: temporal
   #   deploy:
@@ -262,6 +266,7 @@ services:
       NOMAD_SERVICES_API_PORT: 80
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
       NOMAD_ELASTIC_HOST: elastic
+      NOMAD_ELASTIC_VERSION: 9
       NOMAD_MONGO_HOST: mongo
       NOMAD_NORTH_HUB_HOST: north
       NOMAD_TEMPORAL_HOST: temporal
