@@ -3565,17 +3565,37 @@ jupyter = [
     { name = "jupyter-events" },
 ]
 plugins = [
+    { name = "nomad-gui" },
     { name = "nomad-north-jupyter" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
+    { name = "nomad-gui", marker = "extra == 'plugins'", specifier = ">=2.0.0b3" },
     { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = ">=1.4.4.dev238" },
     { name = "nomad-lab", extras = ["infrastructure"], specifier = ">=1.4.4.dev238" },
     { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.6" },
 ]
 provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
+
+[[package]]
+name = "nomad-gui"
+version = "2.0.0b4.dev763+g6e6fb986a"
+source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "fastapi" },
+    { name = "filelock" },
+    { name = "httpx" },
+    { name = "nomad-lab", extra = ["infrastructure"] },
+    { name = "plotly" },
+    { name = "starlette" },
+]
+sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/978d1fd16e90901a4fe19c723b95abdf755e144531f6722735545d07dd418307/nomad_gui-2.0.0b4.dev763+g6e6fb986a.tar.gz", hash = "sha256:978d1fd16e90901a4fe19c723b95abdf755e144531f6722735545d07dd418307" }
+wheels = [
+    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/a91b770bbd6608789e06644f3421dabeaa3dd90ea7df84c9685810979cc05f88/nomad_gui-2.0.0b4.dev763+g6e6fb986a-py3-none-any.whl", hash = "sha256:a91b770bbd6608789e06644f3421dabeaa3dd90ea7df84c9685810979cc05f88" },
+]
 
 [[package]]
 name = "nomad-lab"
