@@ -477,13 +477,28 @@ This automated process helps ensure that your dependencies stay up to date, impr
 
 ## Customizing Documentation
 
-By default, documentation is built using the [nomad-docs](https://github.com/FAIRmat-NFDI/nomad-docs) repository. However, if you'd like to customize the documentation for your Oasis instance, you can easily do so.
+By default, no documentation is built into the Oasis image. Instead, links to the official, versioned NOMAD documentation at [https://docs.nomad-lab.eu](https://docs.nomad-lab.eu) will be used. However, if you'd like to serve customized documentation from your Oasis instance, and change the GUI links to lead to them, you can follow these steps:
 
 1. First, [fork the nomad-docs repository](https://github.com/FAIRmat-NFDI/nomad-docs/fork).
 2. Make your desired changes in your fork.
-3. Update the `NOMAD_DOCS_REPO` variable in the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file to point to the URL of your forked repository.
+3. In the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file, set **both** of the following variables:
+   - `NOMAD_DOCS_REPO`: the URL of your forked repository.
+   - `NOMAD_DOCS_REPO_REF`: the branch, tag, or commit to build, e.g. the tag matching your `nomad-lab` version.
+4. In your `nomad.yaml`, change the documentation URL to point to the `/docs` subpath of your Oasis:
 
-This setup ensures that your custom documentation is used when building your Oasis.
+   ```yaml
+   documentation:
+     url: '<your-public-oasis-url>/docs`
+   ```
+
+The documentation is only built when both variables are set, and is then served under `/docs` on your Oasis. When building the image locally, you can pass the same values as build arguments:
+
+```sh
+docker build \
+  --build-arg NOMAD_DOCS_REPO=https://github.com/<your-org>/nomad-docs.git \
+  --build-arg NOMAD_DOCS_REPO_REF=<branch-tag-or-commit> \
+  .
+```
 
 ## Backing up the Oasis
 

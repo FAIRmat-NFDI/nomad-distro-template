@@ -16,8 +16,10 @@ env:
   UV_VERSION: 0.9
   PYTHON_VERSION: 3.12
   JUPYTER_VERSION: "2025-04-14"
-  # If you want to include custom documentation, create a fork of the repo below and link the forked repo here
-  NOMAD_DOCS_REPO: https://github.com/FAIRmat-NFDI/nomad-docs.git
+  # By default, no documentation is built and the official docs at https://docs.nomad-lab.eu are used.
+  # If you want to include custom documentation, create a fork of https://github.com/FAIRmat-NFDI/nomad-docs.git
+  # and set both the forked repo URL and the git ref (branch, tag, or commit) to build here.
+  NOMAD_DOCS_REPO: ""
   NOMAD_DOCS_REPO_REF: ""
   # If you want to skip the tests for some plugins, add them here as a single string where
   # each plugin is separated by a comma or a line break
