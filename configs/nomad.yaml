@@ -1,6 +1,6 @@
 services:
   api_host: "localhost"
-  api_base_path: "/nomad-oasis"
+  api_base_path: "/backend"
 
 oasis:
   is_oasis: true

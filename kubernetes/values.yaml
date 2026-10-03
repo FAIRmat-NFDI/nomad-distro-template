@@ -55,7 +55,7 @@ nomad:
   config:
     services:
       api_host: localhost
-      api_base_path: /nomad-oasis
+      api_base_path: /backend
       api_port: 80
       https: false
       upload_limit: 10
@@ -110,6 +110,12 @@ nomad:
 
   proxy:
     replicaCount: 1
+    # GUI is served from the root, the NOMAD backend from /backend. Old
+    # /nomad-oasis URLs are redirected. Requires a chart version whose proxy
+    # supports publicPath/legacyPath.
+    path: /backend
+    publicPath: /
+    legacyPath: /nomad-oasis
 
   app:
     replicaCount: 1
@@ -213,16 +219,16 @@ jupyterhub:
   enabled: true
   fullnameOverride: "nomad-oasis-jupyterhub"
   hub:
-    baseUrl: "/nomad-oasis/north"
+    baseUrl: "/backend/north"
     config:
       GenericOAuthenticator:
         client_id: nomad_public
-        oauth_callback_url: http://localhost/nomad-oasis/north/hub/oauth_callback
+        oauth_callback_url: http://localhost/backend/north/hub/oauth_callback
         authorize_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/auth
         token_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/token
         userdata_url: https://nomad-lab.eu/fairdi/keycloak/auth/realms/fairdi_nomad_prod/protocol/openid-connect/userinfo
     extraEnv:
-      NOMAD_OASIS_URL: "http://nomad-oasis-proxy/nomad-oasis"
+      NOMAD_OASIS_URL: "http://nomad-oasis-proxy/backend"
     db:
       type: sqlite-memory
   singleuser:

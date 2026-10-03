@@ -1,7 +1,16 @@
 # Shared nginx config for both HTTP and HTTPS
+#
+# URL layout:
+#   /             GUI v2 (with /select-gui and the nomad_gui_pref cookie)
+#   /gui/         GUI v1
+#   /backend/     NOMAD backend (API, north, docs, alive, ...)
+#   /nomad-oasis/ Former base path, redirected/rewritten to the layout above
 
 # Batch access-log writes instead of one synchronous write per request
 access_log /var/log/nginx/access.log main buffer=64k flush=5s;
+
+# Keep redirects relative so they do not depend on the listening port/scheme.
+absolute_redirect off;
 
 gzip_min_length     1000;
 gzip_buffers        4 8k;
@@ -19,26 +28,282 @@ gzip_types
     application/x-javascript
     application/json;
 
-location / {
-    proxy_pass http://nomad-app-backend;
+# The GUI owns the root path. NOMAD and all other backend services are
+# mounted below /backend.
+location = / {
+    error_page 418 = @serve_clean_root_v2;
+    if ($cookie_nomad_gui_pref = "v1") {
+        return 302 /gui/$is_args$args;
+    }
+    if ($cookie_nomad_gui_pref = "v2") {
+        return 418;
+    }
+    return 302 /select-gui$is_args$args;
 }
 
-location ~ /nomad-oasis\/?(gui)?$ {
-    rewrite ^ /nomad-oasis/gui/ permanent;
-}
-
-location /nomad-oasis/gui/ {
+location @serve_clean_root_v2 {
+    rewrite ^ /backend/gui/v2/ break;
     proxy_intercept_errors on;
-    error_page 404 = @redirect_to_index;
+    error_page 404 = @redirect_clean_root_to_v2_index;
     proxy_pass http://nomad-app-backend;
 }
 
-location @redirect_to_index {
-    rewrite ^ /nomad-oasis/gui/index.html break;
+# Explicit GUI paths never consult the preference cookie.
+location = /gui {
+    return 302 /gui/$is_args$args;
+}
+
+location = /gui/v2 {
+    return 302 /$is_args$args;
+}
+
+location /gui/v2/ {
+    rewrite ^/gui/v2/(.*)$ /$1 permanent;
+}
+
+# env.js is generated at runtime and intentionally keeps the backend appBase
+# (/backend). Do not apply the public GUI base substitution to it or the
+# classical GUI will call APIs below the public GUI route again.
+location = /gui/env.js {
+    rewrite ^/gui/env\.js$ /backend/gui/env.js break;
     proxy_pass http://nomad-app-backend;
 }
 
-location /nomad-oasis/docs/ {
+location = /gui/artifacts.js {
+    rewrite ^/gui/artifacts\.js$ /backend/gui/artifacts.js break;
+    proxy_pass http://nomad-app-backend;
+}
+
+# The classical GUI (v1) is prepared by NOMAD with the backend route prefix.
+# Replace only its frontend base in static responses so browser routing stays
+# below the public /gui path. Disable upstream compression while filtering;
+# nginx can gzip the substituted response afterwards.
+location ^~ /gui/ {
+    rewrite ^/gui/(.*)$ /backend/gui/$1 break;
+    proxy_set_header Accept-Encoding "";
+    sub_filter '/backend/gui' '/gui';
+    sub_filter_types text/css text/javascript application/javascript application/x-javascript application/json;
+    sub_filter_once off;
+    proxy_redirect ~^(?:https?://[^/]+)?/backend/gui/(.*)$ /gui/$1;
+    proxy_intercept_errors on;
+    error_page 404 = @redirect_public_v1_to_index;
+    proxy_pass http://nomad-app-backend;
+}
+
+location @redirect_public_v1_to_index {
+    rewrite ^ /backend/gui/index.html break;
+    proxy_set_header Accept-Encoding "";
+    sub_filter '/backend/gui' '/gui';
+    sub_filter_types text/css text/javascript application/javascript application/x-javascript application/json;
+    sub_filter_once off;
+    proxy_pass http://nomad-app-backend;
+}
+
+# One reserved subtree owns every backend URL. More-specific API regex
+# locations below still win for uploads and downloads.
+location = /backend {
+    proxy_pass http://nomad-app-backend;
+}
+
+location /backend/ {
+    proxy_pass http://nomad-app-backend;
+}
+
+location = /backend/north {
+    return 302 /backend/north/$is_args$args;
+}
+
+# Everything else below the root belongs to the GUI v2. This proxy-side
+# rewrite reaches the backend's v2 mount without re-running location matching.
+location / {
+    rewrite ^/(.*)$ /backend/gui/v2/$1 break;
+    proxy_intercept_errors on;
+    error_page 404 = @redirect_clean_root_to_v2_index;
+    proxy_pass http://nomad-app-backend;
+}
+
+location @redirect_clean_root_to_v2_index {
+    rewrite ^ /backend/gui/v2/index.html break;
+    proxy_pass http://nomad-app-backend;
+}
+
+# Former /nomad-oasis URLs. Old GUI links are redirected to the GUI chosen by
+# the preference cookie, or to the GUI selector. Old API/service URLs are
+# internally rewritten. `last` starts a new location search, retaining the
+# original method, request body and headers.
+location ~ ^/nomad-oasis/gui/search/entries/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/search/entries$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /apps/entries$is_args$args; }
+    return 302 /select-gui?destination=entries$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/search/(?<app_name>[^/]+)/entry/id/(?<entry_id>[^/?]+)(?<rest_path>.*)$ {
+    set $v2_entry_suffix '';
+    if ($rest_path = /data) { set $v2_entry_suffix /archive; }
+    if ($rest_path ~ ^/data/(.*)$) { set $v2_entry_suffix /archive/$1; }
+    if ($rest_path = /logs) { set $v2_entry_suffix /logs; }
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/search/$app_name/entry/id/$entry_id$rest_path$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /apps/$app_name/$entry_id$v2_entry_suffix$is_args$args; }
+    return 302 /select-gui?destination=entry&entryId=$entry_id&appId=$app_name$gui_selector_args$gui_selector_entry_fragment;
+}
+
+location ~ ^/nomad-oasis/gui/search/(?<app_name>[^/?]+)/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/search/$app_name$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /apps/$app_name$is_args$args; }
+    return 302 /select-gui?destination=app&appId=$app_name$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/search/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/search$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /apps/entries$is_args$args; }
+    return 302 /select-gui?destination=entries$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/entry/id/(?<entry_id>[^/?]+)(?<rest_path>.*)$ {
+    set $v2_entry_suffix '';
+    if ($rest_path = /data) { set $v2_entry_suffix /archive; }
+    if ($rest_path ~ ^/data/(.*)$) { set $v2_entry_suffix /archive/$1; }
+    if ($rest_path = /logs) { set $v2_entry_suffix /logs; }
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/entry/id/$entry_id$rest_path$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /apps/entries/$entry_id$v2_entry_suffix$is_args$args; }
+    return 302 /select-gui?destination=entry&entryId=$entry_id$gui_selector_args$gui_selector_entry_fragment;
+}
+
+location ~ ^/nomad-oasis/gui/user/uploads/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/uploads$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /projects$is_args$args; }
+    return 302 /select-gui?destination=projects$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/(?:user/uploads/upload/id|upload/id|user/search/upload/id)/(?<project_id>[^/]+)/files/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/uploads/upload/id/$project_id/files$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /projects/$project_id/files$is_args$args; }
+    return 302 /select-gui?destination=project-files&projectId=$project_id$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/(?:user/uploads/upload/id|upload/id|user/search/upload/id)/(?<project_id>[^/]+)/files/(?<file_path>.+)$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/uploads/upload/id/$project_id/files/$file_path$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /projects/$project_id/files/$file_path$is_args$args; }
+    return 302 /select-gui?destination=project-files&projectId=$project_id$gui_selector_args$gui_selector_file_fragment;
+}
+
+location ~ ^/nomad-oasis/gui/(?:user/uploads/upload/id|upload/id|user/search/upload/id)/(?<project_id>[^/]+)/entry/id/(?<entry_id>[^/?]+)(?<rest_path>.*)$ {
+    set $v2_entry_suffix '';
+    if ($rest_path = /data) { set $v2_entry_suffix /archive; }
+    if ($rest_path ~ ^/data/(.*)$) { set $v2_entry_suffix /archive/$1; }
+    if ($rest_path = /logs) { set $v2_entry_suffix /logs; }
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/uploads/upload/id/$project_id/entry/id/$entry_id$rest_path$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /projects/$project_id/entries/$entry_id$v2_entry_suffix$is_args$args; }
+    return 302 /select-gui?destination=project-entry&projectId=$project_id&entryId=$entry_id$gui_selector_args$gui_selector_entry_fragment;
+}
+
+location ~ ^/nomad-oasis/gui/(?:user/uploads/upload/id|upload/id|user/search/upload/id)/(?<project_id>[^/?]+)/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/uploads/upload/id/$project_id$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /projects/$project_id$is_args$args; }
+    return 302 /select-gui?destination=project&projectId=$project_id$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/(?:user/settings|settings)/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/settings$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /settings$is_args$args; }
+    return 302 /select-gui$is_args$args;
+}
+
+location ~ ^/nomad-oasis/gui/(?:user/profile|profile)/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/profile$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /settings/profile$is_args$args; }
+    return 302 /select-gui$is_args$args;
+}
+
+location ~ ^/nomad-oasis/gui/(?:user/groups|groups)/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/user/groups$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /groups$is_args$args; }
+    return 302 /select-gui$is_args$args;
+}
+
+location ~ ^/nomad-oasis/gui/(?<dataset_route_prefix>dataset|user/datasets/dataset|user/search/dataset)/id/(?<dataset_id>[^/?]+)/entry/id/(?<entry_id>[^/?]+)(?<rest_path>.*)$ {
+    set $v2_entry_suffix '';
+    if ($rest_path = /data) { set $v2_entry_suffix /archive; }
+    if ($rest_path ~ ^/data/(.*)$) { set $v2_entry_suffix /archive/$1; }
+    if ($rest_path = /logs) { set $v2_entry_suffix /logs; }
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/$dataset_route_prefix/id/$dataset_id/entry/id/$entry_id$rest_path$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /datasets/$dataset_id/$entry_id$v2_entry_suffix$is_args$args; }
+    return 302 /select-gui?destination=dataset-entry&datasetId=$dataset_id&entryId=$entry_id$gui_selector_args$gui_selector_entry_fragment;
+}
+
+location ~ ^/nomad-oasis/gui/(?<dataset_route_prefix>dataset|user/datasets/dataset|user/search/dataset)/id/(?<dataset_id>[^/?]+)/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/$dataset_route_prefix/id/$dataset_id$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /datasets/$dataset_id$is_args$args; }
+    return 302 /select-gui?destination=dataset&datasetId=$dataset_id$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/(?<dataset_doi_prefix>dataset|user/datasets/dataset|user/search/dataset)/doi/(?<doi>[^?]+)$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/$dataset_doi_prefix/doi/$doi$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /datasets/doi/$doi$is_args$args; }
+    return 302 /select-gui?destination=dataset-doi&doi=$doi$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/(?:dashboard/id|dashboards)/(?<dashboard_id>[^/?]+) {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/dashboard/id/$dashboard_id$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /dashboard/$dashboard_id$is_args$args; }
+    return 302 /select-gui?destination=dashboard&dashboardId=$dashboard_id$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/analyze/north/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/analyze/north$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /north$is_args$args; }
+    return 302 /select-gui?destination=north$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/analyze/apis/?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/analyze/apis$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /apis$is_args$args; }
+    return 302 /select-gui?destination=apis$gui_selector_args;
+}
+
+location ~ ^/nomad-oasis/gui/v2(?:/(?<v2_path>.*))?$ {
+    return 302 /$v2_path$is_args$args;
+}
+
+# Other old GUI routes retain their path for v1. Unknown v2 routes fall back
+# to the v2 home instead of claiming an unsafe arbitrary redirect.
+location ~ ^/nomad-oasis/gui(?:/(?<legacy_gui_path>.*))?$ {
+    if ($cookie_nomad_gui_pref = "v1") { return 302 /gui/$legacy_gui_path$is_args$args; }
+    if ($cookie_nomad_gui_pref = "v2") { return 302 /$is_args$args; }
+    return 302 /select-gui$is_args$args;
+}
+
+# This must be an anchored regex, and it must appear before the generic
+# /api/v1 regex locations below. A normal prefix location is insufficient:
+# those regexes also match the old path and would bypass the compatibility
+# rewrite for uploads and downloads.
+location ~ ^/nomad-oasis/(?:api|north|optimade|dcat|h5grove|dashboards|docs|metrics|alive|temporal)(?:/|$) {
+    rewrite ^/nomad-oasis/(.*)$ /backend/$1 last;
+}
+
+# All remaining non-GUI routes under the old base path belonged to the backend
+# (including arbitrary API entry-point prefixes).
+location = /nomad-oasis {
+    return 302 /$is_args$args;
+}
+
+location = /nomad-oasis/ {
+    return 302 /$is_args$args;
+}
+
+location /nomad-oasis/ {
+    rewrite ^/nomad-oasis/(.*)$ /backend/$1 last;
+}
+
+location = /docs {
+    return 302 /backend/docs/;
+}
+
+location /docs/ {
+    rewrite ^/docs/(.*)$ /backend/docs/$1 redirect;
+}
+
+location /backend/docs/ {
     # This is added to force a redirect (302) when 404 otherwise
     # the assets are not loaded correctly (a broken page rendered)
     proxy_intercept_errors on;
@@ -47,7 +312,7 @@ location /nomad-oasis/docs/ {
 }
 
 location @docs404redirect {
-    return 302 /nomad-oasis/docs/404.html;
+    return 302 /backend/docs/404.html;
 }
 
 location ~ \/gui\/(service-worker\.js|meta\.json)$ {
@@ -80,7 +345,7 @@ location ~ /api/v1/uploads(/?$|/import/?$|/[^/]+/raw(/|$)) {
     proxy_pass http://nomad-app-backend;
 }
 
-location /nomad-oasis/north/ {
+location /backend/north/ {
     client_max_body_size 500m;
     proxy_pass http://north:9000;
 
