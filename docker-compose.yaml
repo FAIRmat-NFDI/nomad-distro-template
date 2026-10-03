@@ -132,7 +132,7 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: nomad-distro-template:local  # TEMP: locally built image, revert before committing
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -262,7 +262,7 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: nomad-distro-template:local  # TEMP: locally built image, revert before committing
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:

@@ -43,6 +43,10 @@ location = / {
 
 location @serve_clean_root_v2 {
     rewrite ^ /backend/gui/v2/ break;
+    proxy_set_header Accept-Encoding "";
+    sub_filter '/backend/gui/v2' '';
+    sub_filter_types text/css text/javascript application/javascript application/x-javascript application/json;
+    sub_filter_once off;
     proxy_intercept_errors on;
     error_page 404 = @redirect_clean_root_to_v2_index;
     proxy_pass http://nomad-app-backend;
@@ -115,8 +119,19 @@ location = /backend/north {
 
 # Everything else below the root belongs to the GUI v2. This proxy-side
 # rewrite reaches the backend's v2 mount without re-running location matching.
+#
+# Unless the nomad_gui plugin is configured with `public_base_path: /`, the GUI
+# v2 is prepared with its backend mount (/backend/gui/v2) as base path. Strip
+# that base in static responses so assets and browser routing stay below the
+# public root, regardless of the plugin configuration. As for the classical
+# GUI, upstream compression is disabled while filtering.
 location / {
     rewrite ^/(.*)$ /backend/gui/v2/$1 break;
+    proxy_set_header Accept-Encoding "";
+    sub_filter '/backend/gui/v2' '';
+    sub_filter_types text/css text/javascript application/javascript application/x-javascript application/json;
+    sub_filter_once off;
+    proxy_redirect ~^(?:https?://[^/]+)?/backend/gui/v2/(.*)$ /$1;
     proxy_intercept_errors on;
     error_page 404 = @redirect_clean_root_to_v2_index;
     proxy_pass http://nomad-app-backend;
@@ -124,6 +139,10 @@ location / {
 
 location @redirect_clean_root_to_v2_index {
     rewrite ^ /backend/gui/v2/index.html break;
+    proxy_set_header Accept-Encoding "";
+    sub_filter '/backend/gui/v2' '';
+    sub_filter_types text/css text/javascript application/javascript application/x-javascript application/json;
+    sub_filter_once off;
     proxy_pass http://nomad-app-backend;
 }
 

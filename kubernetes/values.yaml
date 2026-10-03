@@ -108,6 +108,14 @@ nomad:
       is_oasis: true
       uses_central_user_management: true
 
+    plugins:
+      entry_points:
+        options:
+          # GUI v2 is mounted internally at /backend/gui/v2, while this is the
+          # public base embedded in its generated assets and router.
+          "nomad_gui.apis:gui_api":
+            public_base_path: /
+
   proxy:
     replicaCount: 1
     # GUI is served from the root, the NOMAD backend from /backend. Old
