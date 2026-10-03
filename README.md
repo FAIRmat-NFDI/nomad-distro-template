@@ -154,11 +154,11 @@ Before you can host your Oasis securely under a domain, you will have to go thro
      api_host: mydomainname
    ```
 
-   Note that if your Oasis uses a subdomain like `https://mydomainname/mysubdomain`, you need to include that subdomain as well:
+   Note that if your Oasis uses a subdomain like `https://oasis.mydomainname`, the full host name needs to be used:
 
    ```yaml
    services:
-     api_host: mydomainname/mysubdomain
+     api_host: oasis.mydomainname
    ```
 
 2. Configuring Secure HTTP and HTTPS Connections
