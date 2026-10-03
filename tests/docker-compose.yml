@@ -1,24 +1,5 @@
 name: nomad-distro-test
 services:
-  # broker for celery
-  rabbitmq:
-    restart: unless-stopped
-    image: rabbitmq:3.11.5
-    container_name: rabbitmq
-    environment:
-      - RABBITMQ_ERLANG_COOKIE=SWQOKODSQALRPCLNMEQG
-      - RABBITMQ_DEFAULT_USER=rabbitmq
-      - RABBITMQ_DEFAULT_PASS=rabbitmq
-      - RABBITMQ_DEFAULT_VHOST=/
-    volumes:
-      - rabbitmq:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "--silent", "--quiet", "ping"]
-      interval: 10s
-      timeout: 10s
-      retries: 30
-      start_period: 10s
-
   # the search engine
   elastic:
     restart: unless-stopped
@@ -129,14 +110,11 @@ services:
       NOMAD_SERVICES_MODE: development
       NOMAD_SERVICES_API_PORT: 8000
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_RABBITMQ_HOST: rabbitmq
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_ELASTIC_VERSION: 9
       NOMAD_MONGO_HOST: mongo
       NOMAD_TEMPORAL_HOST: temporal
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       elastic:
         condition: service_healthy
       mongo:
@@ -185,5 +163,3 @@ volumes:
     name: "mongo"
   elastic:
     name: "elastic"
-  rabbitmq:
-    name: "rabbitmq"
