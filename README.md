@@ -147,32 +147,41 @@ Before you can host your Oasis securely under a domain, you will have to go thro
 
    In production, your Oasis will be available under a domain name of your choice. This means that in some DNS server there is a record that points a domain name to your Oasis IP address.
 
-   Once this domain name is available, you also need to configure it in the NOMAD Oasis configuration. This can be done by adding the `services.api_host` field into your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`). If your Oasis is available under the address `https://mydomainname`, you need to set it up like this:
+   Once this domain name is available, it needs to be configured in a few places. The examples below assume that your Oasis is available under `oasis.example.org`:
 
-   ```yaml
-   services:
-     api_host: mydomainname
-   ```
+   1. In the NOMAD configuration, set the `services.api_host` field in `configs/nomad.yaml`. Use only the host name (including any subdomain), without `https://` or a path:
 
-   Note that if your Oasis uses a subdomain like `https://oasis.mydomainname`, the full host name needs to be used:
+      ```yaml
+      services:
+        api_host: oasis.example.org
+      ```
 
-   ```yaml
-   services:
-     api_host: oasis.mydomainname
-   ```
+      Note that `configs/nomad.yaml` is built into the NOMAD image. For the change to take effect, either commit and push it so that a new image is built, or mount your local file by uncommenting the `./configs/nomad.yaml:/app/nomad.yaml` volume lines in `docker-compose.yaml`.
+
+   2. In `docker-compose.yaml`, update the login callback URL of the `north` service:
+
+      ```yaml
+      OAUTH_CALLBACK_URL: "http://oasis.example.org/backend/north/hub/oauth_callback"
+      ```
+
+      Once you enable HTTPS (see the next step), this URL must use `https://` instead.
+
+   3. (Optional) Replace `server_name localhost` with your host name in the nginx configuration you use (`configs/nginx_http.conf` or `configs/nginx_https.conf`).
 
 2. Configuring Secure HTTP and HTTPS Connections
 
    By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server-including credentials and sensitive data-can be compromised.
 
-   The first step is to add a configuration to your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`) that makes sure that HTTPS protocol is by the links that the platform creates:
+   The first step is to add a configuration to your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`) that makes sure that HTTPS protocol is used by the links that the platform creates:
 
    ```yaml
    services:
      https: true
    ```
 
-   The second step is to setup a TLS certificate. This certificate also needs to be
+   Also change the `OAUTH_CALLBACK_URL` of the `north` service in `docker-compose.yaml` to use `https://`, e.g. `https://oasis.example.org/backend/north/hub/oauth_callback`.
+
+   The second step is to setup a TLS certificate. The certificate must be issued for your Oasis host name, and it also needs to be
    renewed periodically. Depending on your setup, you have several options:
 
    1. You already have a certificate.
@@ -195,6 +204,8 @@ Before you can host your Oasis securely under a domain, you will have to go thro
         -out ./tls/selfsigned.crt \
         -subj "/CN=localhost"
       ```
+
+      When testing under your own host name, replace `localhost` in the `CN` with it, e.g. `-subj "/CN=oasis.example.org"`.
 
    To start using a TLS certificate, update the `proxy` configuration in `docker-compose.yml`:
    ```diff
