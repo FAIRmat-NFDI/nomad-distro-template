@@ -306,7 +306,9 @@ services:
     platform: linux/amd64
     container_name: nomad_oasis_north
     environment:
-      NOMAD_API_URL: "http://app:8000/nomad-oasis/api/v1"
+      NOMAD_API_URL: "http://app:8000/backend/api/v1"
+      BASE_URL: "/backend/north/"
+      OAUTH_CALLBACK_URL: "http://localhost/backend/north/hub/oauth_callback"
       DOCKER_PREFIX: "nomad-oasis-north"
       DOCKER_NETWORK: "nomad_oasis_network"
     env_file:
@@ -323,7 +325,7 @@ services:
         - "curl"
         - "--fail"
         - "--silent"
-        - "http://localhost:8081/nomad-oasis/north/hub/health"
+        - "http://localhost:8081/backend/north/hub/health"
       interval: 10s
       timeout: 10s
       retries: 30
@@ -351,6 +353,7 @@ services:
     volumes:
       # Shared config
       - ./configs/nginx_base_conf:/etc/nginx/conf.d/nginx_base_conf:ro
+      - ./configs/nginx_maps_conf:/etc/nginx/conf.d/nginx_maps_conf:ro
       # HTTP
       - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
       # HTTPS (you need to have a TLS certificate)
