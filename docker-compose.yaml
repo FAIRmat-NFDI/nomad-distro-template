@@ -3,7 +3,7 @@ services:
   elastic:
     restart: unless-stopped
     image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
-    container_name: nomad_oasis_elastic
+    container_name: nomad_oasis_elastic_9
     environment:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - discovery.type=single-node
@@ -368,7 +368,7 @@ volumes:
   mongo:
     name: "nomad_oasis_mongo"
   elastic:
-    name: "nomad_oasis_elastic"
+    name: "nomad_oasis_elastic_9"
   keycloak:
     name: "nomad_oasis_keycloak"
   postgresql:
