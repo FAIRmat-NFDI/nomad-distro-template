@@ -25,7 +25,7 @@ services:
   # the user data db
   mongo:
     restart: unless-stopped
-    image: docker.io/mongo:8.0
+    image: docker.io/mongo:8.0.4
     container_name: nomad_oasis_mongo
     environment:
       - MONGO_DATA_DIR=/data/db
@@ -132,7 +132,7 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:develop
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -262,7 +262,7 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:develop
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
@@ -336,7 +336,7 @@ services:
 
   # one-off job for pulling the jupyterlab image
   jupyterlab_image:
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:develop
     platform: linux/amd64
     container_name: nomad_jupyter_image
     pull_policy: always
@@ -382,7 +382,6 @@ volumes:
     name: "nomad_oasis_postgresql"
   nomad_north:
     name: "nomad_oasis_north"
-
 
 networks:
   default:
