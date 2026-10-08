@@ -132,7 +132,7 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:develop
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:pr-305
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -262,7 +262,7 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:develop
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:pr-305
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
@@ -336,7 +336,7 @@ services:
 
   # one-off job for pulling the jupyterlab image
   jupyterlab_image:
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:develop
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:pr-305
     platform: linux/amd64
     container_name: nomad_jupyter_image
     pull_policy: always
