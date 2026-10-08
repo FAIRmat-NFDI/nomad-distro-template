@@ -21,8 +21,8 @@ env:
   # and set both the forked repo URL and the git ref (branch, tag, or commit) to build here.
   NOMAD_DOCS_REPO: ""
   NOMAD_DOCS_REPO_REF: ""
-  # If you want to skip the tests for additional plugins, add them here as a single string
-  # where each plugin is separated by a comma or a line break. nomad-gui is always skipped.
+  # If you want to skip the tests for some plugins, add them here as a single string where
+  # each plugin is separated by a comma or a line break
   PLUGIN_TESTS_PLUGINS_TO_SKIP: ""
 
 permissions:
@@ -96,10 +96,8 @@ jobs:
         env:
           PLUGIN_TESTS_CI_NODE_INDEX: ${{ matrix.group }}
         run: |
-          # Convert line-separated plugin names to the CLI's comma-separated format and
-          # always skip nomad-gui, independently of PLUGIN_TESTS_PLUGINS_TO_SKIP.
-          PLUGINS_STRING=$(printf '%s' "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
-          PLUGINS_STRING="${PLUGINS_STRING:+$PLUGINS_STRING,}nomad-gui"
+          # Convert line-separated plugin names to the CLI's comma-separated format.
+          PLUGINS_STRING=$(echo "$PLUGIN_TESTS_PLUGINS_TO_SKIP" | tr '\n' ',' | sed 's/,$//')
           uv run \
             --extra plugins \
             --with "nomad-plugin-tests" \
