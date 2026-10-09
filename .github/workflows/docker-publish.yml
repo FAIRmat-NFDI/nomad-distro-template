@@ -23,7 +23,7 @@ env:
   NOMAD_DOCS_REPO_REF: ""
   # If you want to skip the tests for some plugins, add them here as a single string where
   # each plugin is separated by a comma or a line break
-  PLUGIN_TESTS_PLUGINS_TO_SKIP: "nomad-gui"
+  PLUGIN_TESTS_PLUGINS_TO_SKIP: ""
 
 permissions:
   contents: write
