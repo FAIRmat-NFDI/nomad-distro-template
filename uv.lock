@@ -4530,7 +4530,7 @@ plugins = [
 [package.metadata]
 requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
-    { name = "nomad-gui", marker = "extra == 'plugins'", specifier = "==2.0.0rc1" },
+    { name = "nomad-gui", marker = "extra == 'plugins'", specifier = "==2.0.0b4.dev800+g1236bc42c" },
     { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = "==2.0.0rc1" },
     { name = "nomad-lab", extras = ["infrastructure"], specifier = "==2.0.0rc1" },
     { name = "nomad-normalizer-plugin-dos", specifier = ">=1.0" },
@@ -4548,7 +4548,7 @@ provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
 
 [[package]]
 name = "nomad-gui"
-version = "2.0.0rc1"
+version = "2.0.0b4.dev800+g1236bc42c"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "click" },
@@ -4559,9 +4559,9 @@ dependencies = [
     { name = "plotly" },
     { name = "starlette" },
 ]
-sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/dafa0b9e8d11da8c5fdad9e5a9ba09923bcacccc8fab10bb4d6b92f28fefbc5a/nomad_gui-2.0.0rc1.tar.gz", hash = "sha256:dafa0b9e8d11da8c5fdad9e5a9ba09923bcacccc8fab10bb4d6b92f28fefbc5a" }
+sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/f4f07dea71d8912b26876898e603dbb851c30922909f35add67169a85551e9c9/nomad_gui-2.0.0b4.dev800+g1236bc42c.tar.gz", hash = "sha256:f4f07dea71d8912b26876898e603dbb851c30922909f35add67169a85551e9c9" }
 wheels = [
-    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/24ac9a05a1294ea1c1ff20b4193f2f0bb2cbb814c62a6e75ab25f84af3d1b679/nomad_gui-2.0.0rc1-py3-none-any.whl", hash = "sha256:24ac9a05a1294ea1c1ff20b4193f2f0bb2cbb814c62a6e75ab25f84af3d1b679" },
+    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/e9626bfddeb5ce78ccb02cacb8e415f35df3ecc53d248b9b9a8bffccfd3d3870/nomad_gui-2.0.0b4.dev800+g1236bc42c-py3-none-any.whl", hash = "sha256:e9626bfddeb5ce78ccb02cacb8e415f35df3ecc53d248b9b9a8bffccfd3d3870" },
 ]
 
 [[package]]
