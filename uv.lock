@@ -4219,7 +4219,7 @@ plugins = [
 [package.metadata]
 requires-dist = [
     { name = "jupyter-events", marker = "extra == 'jupyter'" },
-    { name = "nomad-gui", marker = "extra == 'plugins'", specifier = "==2.0.0b4.dev796+ga3623a259" },
+    { name = "nomad-gui", marker = "extra == 'plugins'", specifier = "==2.0.0b4.dev800+g1236bc42c" },
     { name = "nomad-lab", extras = ["dev", "infrastructure"], marker = "extra == 'dev'", specifier = "==2.0.0rc1" },
     { name = "nomad-lab", extras = ["infrastructure"], specifier = "==2.0.0rc1" },
     { name = "nomad-north-jupyter", marker = "extra == 'plugins'", specifier = ">=0.2.6" },
@@ -4228,7 +4228,7 @@ provides-extras = ["plugins", "jupyter", "gpu-action", "cpu-action", "dev"]
 
 [[package]]
 name = "nomad-gui"
-version = "2.0.0b4.dev796+ga3623a259"
+version = "2.0.0b4.dev800+g1236bc42c"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "click" },
@@ -4239,9 +4239,9 @@ dependencies = [
     { name = "plotly" },
     { name = "starlette" },
 ]
-sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/e9fbede94f956403afd4a97b4b31c1156c44709078f3d8275b1d57f8a21d4d25/nomad_gui-2.0.0b4.dev796+ga3623a259.tar.gz", hash = "sha256:e9fbede94f956403afd4a97b4b31c1156c44709078f3d8275b1d57f8a21d4d25" }
+sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/f4f07dea71d8912b26876898e603dbb851c30922909f35add67169a85551e9c9/nomad_gui-2.0.0b4.dev800+g1236bc42c.tar.gz", hash = "sha256:f4f07dea71d8912b26876898e603dbb851c30922909f35add67169a85551e9c9" }
 wheels = [
-    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/ee87767e29b43c860de5052422e4453bd4da447c0298b50b99db4398c76d40e3/nomad_gui-2.0.0b4.dev796+ga3623a259-py3-none-any.whl", hash = "sha256:ee87767e29b43c860de5052422e4453bd4da447c0298b50b99db4398c76d40e3" },
+    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/e9626bfddeb5ce78ccb02cacb8e415f35df3ecc53d248b9b9a8bffccfd3d3870/nomad_gui-2.0.0b4.dev800+g1236bc42c-py3-none-any.whl", hash = "sha256:e9626bfddeb5ce78ccb02cacb8e415f35df3ecc53d248b9b9a8bffccfd3d3870" },
 ]
 
 [[package]]
