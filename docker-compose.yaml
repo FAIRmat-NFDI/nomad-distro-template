@@ -25,7 +25,7 @@ services:
   # the user data db
   mongo:
     restart: unless-stopped
-    image: docker.io/mongo:8.0
+    image: docker.io/mongo:8.0.4
     container_name: nomad_oasis_mongo
     environment:
       - MONGO_DATA_DIR=/data/db
@@ -132,7 +132,7 @@ services:
   # nomad worker (processing)
   worker:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:pr-305
     platform: linux/amd64
     environment:
       NOMAD_SERVICE: nomad_oasis_worker
@@ -150,7 +150,7 @@ services:
       mongo:
         condition: service_healthy
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
+      - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run action-internal-worker
     healthcheck:
@@ -262,12 +262,12 @@ services:
   # nomad app (api + proxy)
   app:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template:pr-305
     platform: linux/amd64
     container_name: nomad_oasis_app
     environment:
       NOMAD_SERVICE: nomad_oasis_app
-      NOMAD_SERVICES_API_PORT: 80
+      NOMAD_SERVICES_API_PORT: 443
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
       NOMAD_ELASTIC_HOST: elastic
       NOMAD_ELASTIC_VERSION: 9
@@ -284,7 +284,7 @@ services:
       mongo:
         condition: service_healthy
     volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
+      - ./configs/nomad.yaml:/app/nomad.yaml
       - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 --workers 2
     healthcheck:
@@ -308,7 +308,7 @@ services:
     environment:
       NOMAD_API_URL: "http://app:8000/backend/api/v1"
       BASE_URL: "/backend/north/"
-      OAUTH_CALLBACK_URL: "http://localhost/backend/north/hub/oauth_callback"
+      OAUTH_CALLBACK_URL: "https://yang-pc.tailf23a08.ts.net/backend/north/hub/oauth_callback"
       DOCKER_PREFIX: "nomad-oasis-north"
       DOCKER_NETWORK: "nomad_oasis_network"
     env_file:
@@ -336,7 +336,7 @@ services:
 
   # one-off job for pulling the jupyterlab image
   jupyterlab_image:
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:pr-305
     platform: linux/amd64
     container_name: nomad_jupyter_image
     pull_policy: always
@@ -368,8 +368,7 @@ services:
       north:
         condition: service_healthy
     ports:
-      - 80:80
-      - 443:443
+      - "127.0.0.1:80:80"
 
 volumes:
   mongo:
@@ -382,7 +381,6 @@ volumes:
     name: "nomad_oasis_postgresql"
   nomad_north:
     name: "nomad_oasis_north"
-
 
 networks:
   default:
