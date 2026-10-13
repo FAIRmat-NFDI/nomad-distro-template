@@ -1,3 +1,76 @@
+# ---------------------------------------------------------------------------
+# Common Configuration & YAML Anchors
+# ---------------------------------------------------------------------------
+
+# Reusable image definitions with environment variable overrides
+x-images:
+  nomad:      &nomad-image      ${APP_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template:${IMAGE_TAG:-main}}
+  jupyter:    &jupyter-image    ${JUPYTER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:${IMAGE_TAG:-main}}
+  cpu-worker: &cpu-worker-image ${NOMAD_CPU_WORKER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-action:${IMAGE_TAG:-main}}
+  gpu-worker: &gpu-worker-image ${NOMAD_GPU_WORKER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:${IMAGE_TAG:-main}}
+  north:      &north-image      ${NOMAD_NORTH_IMAGE:-ghcr.io/fairmat-nfdi/nomad-north:v2.0.0rc1}
+
+  temporal-admin:  &temporal-admin-image  docker.io/temporalio/admin-tools:${TEMPORAL_VERSION:-1.31}
+  temporal-server: &temporal-server-image docker.io/temporalio/server:${TEMPORAL_VERSION:-1.31}
+
+# Common environment variables shared across NOMAD app and internal/cpu/gpu workers
+x-nomad-environment: &nomad-environment
+  NOMAD_ELASTIC_HOST: ${NOMAD_ELASTIC_HOST:-elastic}
+  NOMAD_ELASTIC_VERSION: ${NOMAD_ELASTIC_VERSION:-9}
+  NOMAD_MONGO_HOST: ${NOMAD_MONGO_HOST:-mongo}
+  NOMAD_TEMPORAL_HOST: ${NOMAD_TEMPORAL_HOST:-temporal}
+
+# Base configuration shared across NOMAD app and internal/cpu/gpu workers
+x-nomad-base: &nomad-base
+  restart: unless-stopped
+  platform: linux/amd64
+  env_file:
+    - ./.env
+  depends_on:
+    temporal:
+      condition: service_healthy
+    elastic:
+      condition: service_healthy
+    mongo:
+      condition: service_healthy
+  volumes:
+    # Uncomment the following line to mount a local nomad.yaml into all NOMAD services:
+    # - ./configs/nomad.yaml:/app/nomad.yaml
+    - ./.volumes/fs:/app/.volumes/fs
+
+# Base configuration for standard NOMAD services using the default nomad image (app and internal worker)
+x-nomad-service: &nomad-service
+  <<: *nomad-base
+  image: *nomad-image
+
+# Common healthcheck for NOMAD internal/cpu/gpu workers
+x-worker-healthcheck: &worker-healthcheck
+  test:
+    - "CMD"
+    - "curl"
+    - "--fail"
+    - "--silent"
+    - "http://localhost:8080/health"
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 15s
+
+# Common database environment variables for Temporal
+x-temporal-db-env: &temporal-db-env
+  DB: postgres12
+  DB_PORT: 5432
+  POSTGRES_USER: ${POSTGRES_USER:-temporal}
+  POSTGRES_PWD: ${POSTGRES_PASSWORD:-temporal}
+  POSTGRES_SEEDS: postgresql
+
+# Base configuration for Temporal admin tools tasks
+x-temporal-admin: &temporal-admin
+  image: *temporal-admin-image
+  volumes:
+    - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
+  entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+
 services:
   # the search engine
   elastic:
@@ -52,13 +125,13 @@ services:
     restart: unless-stopped
     container_name: nomad_oasis_postgresql
     environment:
-      POSTGRES_PASSWORD: temporal
-      POSTGRES_USER: temporal
+      POSTGRES_USER: ${POSTGRES_USER:-temporal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-temporal}
     image: docker.io/postgres:16
     volumes:
       - postgresql:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-temporal}"]
       interval: 5s
       timeout: 5s
       retries: 60
@@ -66,44 +139,34 @@ services:
 
   # one-off job that creates the temporal db schema
   temporal-setup-db:
-    image: docker.io/temporalio/admin-tools:1.31
+    <<: *temporal-admin
     container_name: temporal-setup-db
     restart: on-failure:6
     depends_on:
       postgresql:
         condition: service_healthy
     environment:
-      - DB=postgres12
-      - DB_PORT=5432
-      - POSTGRES_USER=temporal
-      - POSTGRES_PWD=temporal
-      - POSTGRES_SEEDS=postgresql
-      - SQL_PASSWORD=temporal
-    volumes:
-      - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
-    entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+      <<: *temporal-db-env
+      SQL_PASSWORD: ${POSTGRES_PASSWORD:-temporal}
     command: ["setup_db"]
 
   # one-off job that registers the default temporal namespace
   temporal-create-namespace:
-    image: docker.io/temporalio/admin-tools:1.31
+    <<: *temporal-admin
     container_name: temporal-create-namespace
     restart: on-failure:5
     depends_on:
       temporal:
         condition: service_healthy
     environment:
-      - TEMPORAL_ADDRESS=temporal:7233
-      - DEFAULT_NAMESPACE=default
-    volumes:
-      - ./scripts/_setup_temporal.sh:/scripts/_setup_temporal.sh
-    entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
+      TEMPORAL_ADDRESS: temporal:7233
+      DEFAULT_NAMESPACE: default
     command: ["create_namespace"]
 
   # the workflow orchestration server
   temporal:
     restart: unless-stopped
-    image: docker.io/temporalio/server:1.31
+    image: *temporal-server-image
     container_name: nomad_oasis_temporal
     depends_on:
       postgresql:
@@ -111,15 +174,11 @@ services:
       temporal-setup-db:
         condition: service_completed_successfully
     environment:
-      - DB=postgres12
-      - DB_PORT=5432
-      - POSTGRES_USER=temporal
-      - POSTGRES_PWD=temporal
-      - POSTGRES_SEEDS=postgresql
-      - TEMPORAL_ADDRESS=temporal:7233
-      - TEMPORAL_CLI_ADDRESS=temporal:7233
-      - BIND_ON_IP=0.0.0.0
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      <<: *temporal-db-env
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+      BIND_ON_IP: 0.0.0.0
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
     volumes:
       - ./configs/_temporal-sql.yaml:/etc/temporal/config/dynamicconfig/development-sql.yaml
     healthcheck:
@@ -131,39 +190,12 @@ services:
 
   # nomad worker (processing)
   worker:
-    restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
-    platform: linux/amd64
+    <<: *nomad-service
     environment:
+      <<: *nomad-environment
       NOMAD_SERVICE: nomad_oasis_worker
-      NOMAD_ELASTIC_HOST: elastic
-      NOMAD_ELASTIC_VERSION: 9
-      NOMAD_MONGO_HOST: mongo
-      NOMAD_TEMPORAL_HOST: temporal
-    env_file:
-      - ./.env
-    depends_on:
-      temporal:
-        condition: service_healthy
-      elastic:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
-    volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
-      - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run action-internal-worker
-    healthcheck:
-      test:
-        - "CMD"
-        - "curl"
-        - "--fail"
-        - "--silent"
-        - "http://localhost:8080/health"
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
+    healthcheck: *worker-healthcheck
     deploy:
       replicas: 4
       resources:
@@ -173,12 +205,14 @@ services:
 
   # nomad gpu worker (actions)
   # gpu_worker:
-  #   restart: unless-stopped
-  #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:main
-  #   platform: linux/amd64
+  #   <<: *nomad-base
+  #   image: *gpu-worker-image
   #   container_name: nomad_oasis_gpu_worker
-  #   env_file:
-  #     - ./.env
+  #   environment:
+  #     <<: *nomad-environment
+  #     NOMAD_SERVICE: nomad_oasis_gpu_worker
+  #   command: python -m nomad.cli admin run action-gpu-worker
+  #   healthcheck: *worker-healthcheck
   #   deploy:
   #     replicas: 1
   #     resources:
@@ -187,105 +221,34 @@ services:
   #           - driver: nvidia
   #             count: all # Use all available GPUs
   #             capabilities: [gpu]
-  #   environment:
-  #     NOMAD_SERVICE: nomad_oasis_gpu_worker
-  #     NOMAD_ELASTIC_HOST: elastic
-  #     NOMAD_ELASTIC_VERSION: 9
-  #     NOMAD_MONGO_HOST: mongo
-  #     NOMAD_TEMPORAL_HOST: temporal
-  #   depends_on:
-  #     elastic:
-  #       condition: service_healthy
-  #     mongo:
-  #       condition: service_healthy
-  #     temporal:
-  #       condition: service_healthy
-  #   volumes:
-  #     # - ./configs/nomad.yaml:/app/nomad.yaml
-  #     - ./.volumes/fs:/app/.volumes/fs
-  #   command: python -m nomad.cli admin run action-gpu-worker
-  #   healthcheck:
-  #     test:
-  #       - "CMD"
-  #       - "curl"
-  #       - "--fail"
-  #       - "--silent"
-  #       - "http://localhost:8080/health"
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 15s
 
-  # # nomad cpu worker (actions)
+  # nomad cpu worker (actions)
   # cpu_worker:
-  #   restart: unless-stopped
-  #   image: ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-action:main
-  #   platform: linux/amd64
+  #   <<: *nomad-base
+  #   image: *cpu-worker-image
   #   container_name: nomad_oasis_cpu_worker
-  #   env_file:
-  #     - ./.env
   #   environment:
+  #     <<: *nomad-environment
   #     NOMAD_SERVICE: nomad_oasis_cpu_worker
-  #     NOMAD_ELASTIC_HOST: elastic
-  #     NOMAD_ELASTIC_VERSION: 9
-  #     NOMAD_MONGO_HOST: mongo
-  #     NOMAD_TEMPORAL_HOST: temporal
+  #   command: python -m nomad.cli admin run action-cpu-worker
+  #   healthcheck: *worker-healthcheck
   #   deploy:
   #     replicas: 1
   #     resources:
   #       limits:
   #         cpus: "2.0" # Maximum 2 CPU cores
   #         memory: 8G # Maximum 8GB RAM
-  #   depends_on:
-  #     elastic:
-  #       condition: service_healthy
-  #     mongo:
-  #       condition: service_healthy
-  #     temporal:
-  #       condition: service_healthy
-  #   volumes:
-  #     # - ./configs/nomad.yaml:/app/nomad.yaml
-  #     - ./.volumes/fs:/app/.volumes/fs
-  #   command: python -m nomad.cli admin run action-cpu-worker
-  #   healthcheck:
-  #     test:
-  #       - "CMD"
-  #       - "curl"
-  #       - "--fail"
-  #       - "--silent"
-  #       - "http://localhost:8080/health"
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 15s
 
   # nomad app (api + proxy)
   app:
-    restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template:main
-    platform: linux/amd64
+    <<: *nomad-service
     container_name: nomad_oasis_app
     environment:
+      <<: *nomad-environment
       NOMAD_SERVICE: nomad_oasis_app
       NOMAD_SERVICES_API_PORT: 80
       NOMAD_FS_EXTERNAL_WORKING_DIRECTORY: "$PWD"
-      NOMAD_ELASTIC_HOST: elastic
-      NOMAD_ELASTIC_VERSION: 9
-      NOMAD_MONGO_HOST: mongo
       NOMAD_NORTH_HUB_HOST: north
-      NOMAD_TEMPORAL_HOST: temporal
-    env_file:
-      - ./.env
-    depends_on:
-      temporal:
-        condition: service_healthy
-      elastic:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
-    volumes:
-      # - ./configs/nomad.yaml:/app/nomad.yaml
-      - ./.volumes/fs:/app/.volumes/fs
     command: python -m nomad.cli admin run app --with-gui --gunicorn --host 0.0.0.0 --workers 2
     healthcheck:
       test:
@@ -302,7 +265,7 @@ services:
   # nomad remote tools hub (JupyterHUB)
   north:
     restart: unless-stopped
-    image: ghcr.io/fairmat-nfdi/nomad-north:v2.0.0rc1
+    image: *north-image
     platform: linux/amd64
     container_name: nomad_oasis_north
     environment:
@@ -336,7 +299,7 @@ services:
 
   # one-off job for pulling the jupyterlab image
   jupyterlab_image:
-    image: ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:main
+    image: *jupyter-image
     platform: linux/amd64
     container_name: nomad_jupyter_image
     pull_policy: always
