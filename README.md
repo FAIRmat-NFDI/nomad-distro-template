@@ -156,7 +156,7 @@ Before you can host your Oasis securely under a domain, you will have to go thro
         api_host: oasis.example.org
       ```
 
-      Note that `configs/nomad.yaml` is built into the NOMAD image. For the change to take effect, either commit and push it so that a new image is built, or mount your local file by uncommenting the `./configs/nomad.yaml:/app/nomad.yaml` volume lines in `docker-compose.yaml`.
+      Note that `configs/nomad.yaml` is built into the NOMAD image. For the change to take effect, either commit and push it so that a new image is built, or mount your local file into every running NOMAD service by uncommenting the `./configs/nomad.yaml:/app/nomad.yaml` line under both `services.app.volumes` and `services.worker.volumes` in `docker-compose.yaml`.
 
    2. In `docker-compose.yaml`, update the login callback URL of the `north` service:
 
