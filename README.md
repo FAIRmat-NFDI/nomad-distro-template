@@ -166,8 +166,6 @@ Before you can host your Oasis securely under a domain, you will have to go thro
 
       Once you enable HTTPS (see the next step), this URL must use `https://` instead.
 
-   3. (Optional) Replace `server_name localhost` with your host name in the nginx configuration you use (`configs/nginx_http.conf` or `configs/nginx_https.conf`).
-
 2. Configuring Secure HTTP and HTTPS Connections
 
    By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server-including credentials and sensitive data-can be compromised.
