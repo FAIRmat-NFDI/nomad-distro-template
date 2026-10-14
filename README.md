@@ -156,7 +156,7 @@ Before you can host your Oasis securely under a domain, you will have to go thro
         api_host: oasis.example.org
       ```
 
-      Note that `configs/nomad.yaml` is built into the NOMAD image. For the change to take effect, either commit and push it so that a new image is built, or mount your local file into every running NOMAD service by uncommenting the `./configs/nomad.yaml:/app/nomad.yaml` line under both `services.app.volumes` and `services.worker.volumes` in `docker-compose.yaml`.
+      Note that `configs/nomad.yaml` is built into the NOMAD image. For the change to take effect, either commit and push it so that a new image is built, or mount your local file into every running NOMAD service by uncommenting the `./configs/nomad.yaml:/app/nomad.yaml` line under `x-nomad-base.volumes` in `docker-compose.yaml`.
 
    2. In `docker-compose.yaml`, update the login callback URL of the `north` service:
 
@@ -271,12 +271,11 @@ Please see the [Jupyter image](#the-jupyter-image) section below for more inform
 
 ### For an existing Oasis
 
-If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/{{ image_name }}:main` for the services
-`worker`, `app` and `north`.
+If you already have an Oasis running you only need to change the image in
+`docker-compose.yaml` (either by setting `APP_IMAGE` in your `.env` or updating `x-images.nomad` in `docker-compose.yaml`) with `ghcr.io/{{ image_name }}:main`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out
-the inclusion of the `nomad.yaml` under the volumes key of those services in the
+the inclusion of the `nomad.yaml` under the volumes key of `x-nomad-base` in
 `docker-compose.yaml`.
 
 ```yaml
