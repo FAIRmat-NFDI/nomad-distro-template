@@ -37,7 +37,7 @@ fi
 # Create the .env file and check for errors
 if ! cat > "$ENV_FILE.north" << EOF
 # OAuth2 settings for authentication with Keycloak
-KEYCLOAK_URL="https://nomad-lab.eu/fairdi/keycloak"
+KEYCLOAK_URL="https://nomad-lab.eu/fairdi/keycloak/auth"
 KEYCLOAK_REALM="fairdi_nomad_prod"
 OAUTH_CLIENT_ID="nomad_public"
 OAUTH_CLIENT_SECRET=""

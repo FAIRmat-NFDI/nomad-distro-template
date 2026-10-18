@@ -1,0 +1,22 @@
+# Shared http-level maps for both HTTP and HTTPS
+
+# Search selector redirects already contain query parameters. Append the
+# original search arguments with '&' so they remain separate parameters.
+map $args $gui_selector_args {
+    ''      '';
+    default '&$args';
+}
+
+# `$request_uri` retains the client's percent encoding. Use it for the
+# selector handoff so reserved characters in nested paths do not become
+# selector query delimiters before the UI can reconstruct the target URL.
+# The handoff values live in the fragment because fragments are not parsed
+# as query parameters (`&` is therefore safe inside a path value).
+map $request_uri $gui_selector_entry_fragment {
+    default '';
+    ~^/nomad-oasis/gui/(?:search/[^/]+/entry/id|entry/id|(?:user/uploads/upload/id|upload/id|user/search/upload/id)/[^/]+/entry/id|(?:dataset|user/datasets/dataset|user/search/dataset)/id/[^/]+/entry/id)/[^/?]+(?<raw_gui_entry_path>/[^?]+)(?:\?.*)?$ "#nomad-entry-path=$raw_gui_entry_path";
+}
+map $request_uri $gui_selector_file_fragment {
+    default '';
+    ~^/nomad-oasis/gui/(?:user/uploads/upload/id|upload/id|user/search/upload/id)/[^/]+/files/(?<raw_gui_file_path>[^?]+)(?:\?.*)?$ "#nomad-file-path=$raw_gui_file_path";
+}
