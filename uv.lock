@@ -3754,14 +3754,15 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
     { name = "rfc3161ng" },
+    { name = "s3fs" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "unidecode" },
     { name = "xarray" },
 ]
-sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/2225db0ef1673232b7c3e7de380bc1655c9d9a25e56e82e6387946c02f1b5af5/nomad_lab-2.0.0.tar.gz", hash = "sha256:2225db0ef1673232b7c3e7de380bc1655c9d9a25e56e82e6387946c02f1b5af5" }
+sdist = { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/d61c08bac59f614d31db63c5a537a23e7e30b081d30ed822501b09809eae844e/nomad_lab-2.0.0.tar.gz", hash = "sha256:d61c08bac59f614d31db63c5a537a23e7e30b081d30ed822501b09809eae844e" }
 wheels = [
-    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/3588b261629ec7144f368169bb4b64454c45b1c25123527edca16f3e145fd096/nomad_lab-2.0.0-py3-none-any.whl", hash = "sha256:3588b261629ec7144f368169bb4b64454c45b1c25123527edca16f3e145fd096" },
+    { url = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/files/ae63264bd7714b175bbaca3569319dd98416c75fb95735e6a4b67bc83964a48e/nomad_lab-2.0.0-py3-none-any.whl", hash = "sha256:ae63264bd7714b175bbaca3569319dd98416c75fb95735e6a4b67bc83964a48e" },
 ]
 
 [package.optional-dependencies]
