@@ -210,7 +210,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     # Use no-install-project to skip installing the current project (`nomad-distribution`)
     uv sync --extra plugins --extra jupyter --no-install-project --inexact
 
-RUN python -c "import zmq; print(zmq.__version__, zmq.__file__)"
+# Print metadata before importing so the version is visible even if import fails.
+RUN python -u -c "from importlib.metadata import version; print('Builder pyzmq:', version('pyzmq')); import zmq; print('Loaded zmq:', zmq.__version__, zmq.__file__)"
 
 FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
@@ -242,6 +243,9 @@ WORKDIR "${HOME}"
 
 COPY --from=uv_image /uv /bin/uv
 COPY --from=jupyter_builder /opt/conda /opt/conda
+
+# Check the merged final environment, not just the builder environment.
+RUN python -u -c "from importlib.metadata import version; print('Final pyzmq:', version('pyzmq')); import zmq; print('Loaded zmq:', zmq.__version__, zmq.__file__)"
 
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
