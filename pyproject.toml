@@ -32,7 +32,6 @@ repository = "https://github.com/FAIRmat-NFDI/nomad-distro-template"
 plugins = [
   "nomad-north-jupyter>=0.2.6",
   "nomad-gui==2.0.0rc2",
-  "voila"
 ]
 jupyter = ["jupyter-events"]
 gpu-action = []
