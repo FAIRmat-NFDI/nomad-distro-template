@@ -210,6 +210,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     # Use no-install-project to skip installing the current project (`nomad-distribution`)
     uv sync --extra plugins --extra jupyter --no-install-project --inexact
 
+RUN python -c "import zmq; print(zmq.__version__, zmq.__file__)"
 
 FROM quay.io/jupyter/base-notebook:${JUPYTER_VERSION} AS jupyter
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
