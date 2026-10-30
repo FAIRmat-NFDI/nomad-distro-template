@@ -242,9 +242,14 @@ USER ${NB_UID}
 WORKDIR "${HOME}"
 
 COPY --from=uv_image /uv /bin/uv
-COPY --from=jupyter_builder /opt/conda /opt/conda
 
-# Check the merged final environment, not just the builder environment.
+# Replace rather than merge environments to avoid retaining obsolete package files.
+USER root
+RUN rm -rf /opt/conda
+COPY --from=jupyter_builder /opt/conda /opt/conda
+USER ${NB_UID}
+
+# Check the final environment, not just the builder environment.
 RUN python -u -c "from importlib.metadata import version; print('Final pyzmq:', version('pyzmq')); import zmq; print('Loaded zmq:', zmq.__version__, zmq.__file__)"
 
 
