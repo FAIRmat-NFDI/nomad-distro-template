@@ -31,6 +31,9 @@ services:
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
+      # CI runner kernels may trigger the TCMalloc RSEQ incompatibility (issue #245).
+      # Use per-thread caching instead; accepts a performance trade-off in CI only.
+      - GLIBC_TUNABLES=glibc.pthread.rseq=1
     volumes:
       - mongo:/data/db
       - ./.volumes/mongo:/backup
