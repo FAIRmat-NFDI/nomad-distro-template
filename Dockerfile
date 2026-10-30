@@ -240,8 +240,12 @@ USER ${NB_UID}
 WORKDIR "${HOME}"
 
 COPY --from=uv_image /uv /bin/uv
-COPY --from=jupyter_builder /opt/conda /opt/conda
 
+# Replace rather than merge environments to avoid retaining obsolete package files.
+USER root
+RUN rm -rf /opt/conda
+COPY --from=jupyter_builder /opt/conda /opt/conda
+USER ${NB_UID}
 
 # Get rid ot the following message when you open a terminal in jupyterlab:
 # groups: cannot find name for group ID 11320
