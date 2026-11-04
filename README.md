@@ -607,7 +607,8 @@ For detailed migration instructions, please refer to the [NOMAD Oasis Migration 
 
 ## FAQ/Trouble shooting
 
-### MongoDB refuses to start on newer Linux kernels
+<details>
+<summary>MongoDB refuses to start on newer Linux kernels</summary>
 
 If the `mongo` container fails to start, check its logs:
 
@@ -669,6 +670,8 @@ patch is not a confirmed fix for this issue. Check the upstream
 [MongoDB issue](https://jira.mongodb.org/browse/SERVER-121912) and
 [template issue #245](https://github.com/FAIRmat-NFDI/nomad-distro-template/issues/245)
 for updates before removing a workaround or changing MongoDB major versions.
+
+</details>
 
 ### Pulling the distribution image
 
