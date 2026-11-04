@@ -607,6 +607,71 @@ For detailed migration instructions, please refer to the [NOMAD Oasis Migration 
 
 ## FAQ/Trouble shooting
 
+### MongoDB refuses to start on newer Linux kernels
+
+If the `mongo` container fails to start, check its logs:
+
+```sh
+docker compose logs mongo
+```
+
+The following message indicates a known incompatibility between MongoDB's
+TCMalloc allocator and newer Linux kernels:
+
+```text
+MongoDB cannot start: Linux kernel versions 6.19 and newer has a known incompatibility with this version of MongoDB.
+```
+
+Containers use the kernel of their Linux host (or the Linux VM provided by your
+container runtime on macOS/Windows). Changing the NOMAD image does not change
+that kernel. The Oasis administrator must apply the appropriate workaround:
+
+1. **Prefer updating the host or container-runtime VM kernel.** According to
+   [MongoDB's platform support notes](https://www.mongodb.com/docs/manual/administration/production-notes/#platform-support-notes),
+   the kernel incompatibility affects versions 6.19 through 7.0.13 and is resolved
+   in 7.0.14 and later. However, some MongoDB versions may still reject newer
+   kernels: [issue #245](https://github.com/FAIRmat-NFDI/nomad-distro-template/issues/245)
+   reports MongoDB 8.0.28 refusing to start on kernel 7.1.5. If this happens, try
+   the environment-variable workaround below.
+
+2. **If updating the kernel is not possible or MongoDB still refuses to start,**
+   add this entry to the existing `mongo.environment` list in `docker-compose.yaml`,
+   keeping the other entries:
+
+   ```yaml
+   services:
+     mongo:
+       environment:
+         - MONGO_DATA_DIR=/data/db
+         - MONGO_LOG_DIR=/dev/null
+         - GLIBC_TUNABLES=glibc.pthread.rseq=1
+   ```
+
+   This [reported workaround](https://miliucci.org/post/mongodb-tcmalloc-rseq/)
+   may reduce performance. Recreate the container to apply it, then check the logs:
+
+   ```sh
+   docker compose up -d --force-recreate mongo
+   docker compose logs mongo
+   ```
+
+> [!WARNING]
+> **Development-only fallback:** MongoDB `docker.io/mongo:8.0.4` has also been
+> reported to start on affected kernels, but this old version has known security
+> vulnerabilities (see the [8.0.5 release notes](https://www.mongodb.com/docs/v8.0/release-notes/8.0/#8.0.5---feb-20--2025)).
+> Do not use it in production or downgrade an existing Oasis database in place.
+> If needed for a disposable local test, change only the `mongo` service's `image`
+> to `docker.io/mongo:8.0.4` and use a separate, empty data volume.
+
+The template already uses the floating `docker.io/mongo:8.0` tag. Pulling it with
+`docker compose pull mongo` obtains the latest available 8.0 patch, but a newer
+patch is not a confirmed fix for this issue. Check the upstream
+[MongoDB issue](https://jira.mongodb.org/browse/SERVER-121912) and
+[template issue #245](https://github.com/FAIRmat-NFDI/nomad-distro-template/issues/245)
+for updates before removing a workaround or changing MongoDB major versions.
+
+### Pulling the distribution image
+
 - _I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized` _when trying to pull my docker image._
 
    Most likely you have not made the package public or provided a personal access token (PAT).
