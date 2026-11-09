@@ -81,6 +81,8 @@ services:
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - discovery.type=single-node
       - xpack.security.enabled=false
+      # Enable only during ES7 migration; empty by default (no remote sources allowed).
+      - reindex.remote.whitelist=${ELASTIC_REINDEX_REMOTE_WHITELIST:-}
     volumes:
       - elastic:/usr/share/elasticsearch/data
     healthcheck:
