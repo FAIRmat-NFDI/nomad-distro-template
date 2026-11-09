@@ -605,6 +605,12 @@ Sometimes there are significant changes in these distribution templates, and you
 
 For detailed migration instructions, please refer to the [NOMAD Oasis Migration Guide](https://docs.nomad-lab.eu/howto/oasis/migrate.html).
 
+For the migration from NOMAD 1.4.3 to 2.0, `docker-compose.es7.yaml` provides a temporary
+Elasticsearch 7 service alongside the Elasticsearch 9 service in `docker-compose.yaml`.
+Use both files only during direct index migration, following the
+[NOMAD 2.0 migration guide](https://docs.nomad-lab.eu/howto/oasis/migrate/v2.0.html).
+Rebuilding the search index from MongoDB and archive files does not require this overlay.
+
 ## FAQ/Trouble shooting
 
 <details>
