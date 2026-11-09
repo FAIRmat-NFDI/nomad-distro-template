@@ -1,0 +1,57 @@
+# Temporary, standalone ES7 -> ES9 index-copy environment. Not an app deployment.
+# Stop the old stack first (without -v); never mount a volume in two ES instances.
+# See the NOMAD 2.0 migration guide for backups, copying, verification, and cutover:
+# https://docs.nomad-lab.eu/develop/howto/oasis/migrate/v2.0.html
+#
+# export ES7_VOLUME=<actual old Docker volume name>
+# docker compose -p nomad-es-migration -f docker-compose.es-migration.yaml up -d --wait
+# After verifying the copy, stop this environment WITHOUT deleting its volumes:
+# docker compose -p nomad-es-migration -f docker-compose.es-migration.yaml down
+# Then use the normal docker-compose.yaml to start NOMAD 2.0 with the ES9 volume.
+
+services:
+  elastic:
+    restart: "no"
+    image: ${ES7_IMAGE:-docker.elastic.co/elasticsearch/elasticsearch:7.17.28}
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - elastic_7:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=2s"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+  elastic_migration:
+    restart: "no"
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.flood_stage=1gb
+      - cluster.routing.allocation.disk.watermark.low=4gb
+      - cluster.routing.allocation.disk.watermark.high=2gb
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - reindex.remote.whitelist=elastic:9200
+    ports:
+      - "127.0.0.1:9201:9200"
+    volumes:
+      - elastic_9:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=2s"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+volumes:
+  elastic_7:
+    external: true
+    name: ${ES7_VOLUME:?Set ES7_VOLUME to the existing ES7 Docker volume name}
+  elastic_9:
+    name: nomad_oasis_elastic_9

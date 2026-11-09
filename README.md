@@ -568,6 +568,14 @@ To enable NOMAD Actions, you need to decide whether you need a CPU worker, a GPU
 
 ## Updating the distribution from the template
 
+> [!WARNING]
+> **Upgrading from 1.4.3 to 2.0.x also changes Elasticsearch from 7 to 9.**
+> Merging the template does not migrate your existing search index. Before updating
+> or restarting the deployment, follow the [NOMAD 2.0 migration guide](https://docs.nomad-lab.eu/develop/howto/oasis/migrate/v2.0.html).
+> The temporary [`docker-compose.es-migration.yaml`](docker-compose.es-migration.yaml)
+> runs only ES7 and ES9 so you can copy the index without manually editing the main
+> Compose file. Stop the old stack first and keep NOMAD services stopped during the copy.
+
 In order to update an existing distribution with any potential changes in the template you can add a new `git remote` for the template and merge with that one while allowing for unrelated histories:
 
 ```sh
@@ -604,6 +612,41 @@ Ideally all workflows should be triggered automatically but you might need to ru
 Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version.
 
 For detailed migration instructions, please refer to the [NOMAD Oasis Migration Guide](https://docs.nomad-lab.eu/howto/oasis/migrate.html).
+
+### Temporary Elasticsearch migration environment
+
+For the recommended ES7 → ES9 index-copy migration, use the standalone
+[`docker-compose.es-migration.yaml`](docker-compose.es-migration.yaml). It is **not**
+a Compose override or a permanent ES7 deployment configuration, and it does not
+copy data automatically. Complete the backup and configuration checks in the
+[migration guide](https://docs.nomad-lab.eu/develop/howto/oasis/migrate/v2.0.html)
+first, then stop your old deployment with `docker compose down` (never `down -v`).
+
+From your deployment directory, in Bash:
+
+```sh
+export ES7_VOLUME=nomad_oasis_elastic # Use the actual old volume name recorded before stopping.
+# Set ES7_IMAGE as well if your old deployment uses another ES7 image version.
+docker compose -p nomad-es-migration -f docker-compose.es-migration.yaml up -d --wait --wait-timeout 180
+```
+
+This starts ES7 with the existing volume (which must already exist) and ES9 with
+`nomad_oasis_elastic_9`. The ES9 destination must be unused or empty and distinct
+from the ES7 source. ES9 is exposed only at `127.0.0.1:9201`; ES7 is available only
+inside the migration network. For a bind-mounted ES7 data directory, adapt the
+migration file to retain your original bind mount instead of its `elastic_7` volume.
+
+Follow the guide to copy the entries index and verify it. Then stop the temporary
+containers **without deleting volumes**:
+
+```sh
+docker compose -p nomad-es-migration -f docker-compose.es-migration.yaml down
+```
+
+Only after verification and updating your distribution to NOMAD 2.0.x, start the
+normal deployment using `docker compose up -d`. Do not pass the migration file;
+the normal Compose file uses ES9 and the migrated `nomad_oasis_elastic_9` volume.
+Retain the ES7 volume and backups until rollback is no longer needed.
 
 ## FAQ/Trouble shooting
 
