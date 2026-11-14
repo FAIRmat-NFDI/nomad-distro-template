@@ -1,6 +1,7 @@
 services:
   api_host: "localhost"
-  api_base_path: "/nomad-oasis"
+  api_port: 80
+  api_base_path: "/backend"
 
 oasis:
   is_oasis: true
@@ -15,7 +16,6 @@ plugins:
 
 meta:
   deployment: "oasis"
-  deployment_url: "https://my-oasis.org/api"
   maintainer_email: "me@my-oasis.org"
 
 logstash:
@@ -29,7 +29,6 @@ mongo:
 
 elastic:
   entries_index: nomad_oasis_entries_v1
-  materials_index: nomad_oasis_materials_v1
 
 north:
   enabled: true
