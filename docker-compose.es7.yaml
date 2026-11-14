@@ -1,0 +1,34 @@
+# Temporary overlay for migrating a NOMAD 1.4.3 Elasticsearch index to 2.0.
+# Use with: docker compose -f docker-compose.yaml -f docker-compose.es7.yaml ...
+# See https://docs.nomad-lab.eu/howto/oasis/migrate/v2.0.html
+services:
+  elastic:
+    environment:
+      - reindex.remote.whitelist=elastic7:9200
+
+  elastic7:
+    restart: "no"
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - elastic7:/usr/share/elasticsearch/data
+    healthcheck:
+      test:
+        - "CMD"
+        - "curl"
+        - "--fail"
+        - "--silent"
+        - "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=2s"
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+volumes:
+  # Require the existing ES7 volume rather than creating an empty one.
+  elastic7:
+    external: true
+    name: "nomad_oasis_elastic"
