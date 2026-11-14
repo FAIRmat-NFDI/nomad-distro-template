@@ -4,13 +4,13 @@
 
 # Reusable image definitions with environment variable overrides
 x-images:
-  nomad: &nomad-image ${APP_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template:${IMAGE_TAG:-main}}
-  jupyter: &jupyter-image ${JUPYTER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:${IMAGE_TAG:-main}}
+  nomad:      &nomad-image      ${APP_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template:${IMAGE_TAG:-main}}
+  jupyter:    &jupyter-image    ${JUPYTER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/jupyter:${IMAGE_TAG:-main}}
   cpu-worker: &cpu-worker-image ${NOMAD_CPU_WORKER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/cpu-action:${IMAGE_TAG:-main}}
   gpu-worker: &gpu-worker-image ${NOMAD_GPU_WORKER_IMAGE:-ghcr.io/fairmat-nfdi/nomad-distro-template/gpu-action:${IMAGE_TAG:-main}}
-  north: &north-image ${NOMAD_NORTH_IMAGE:-ghcr.io/fairmat-nfdi/nomad-north:2.0.1}
+  north:      &north-image      ${NOMAD_NORTH_IMAGE:-ghcr.io/fairmat-nfdi/nomad-north:2.0.1}
 
-  temporal-admin: &temporal-admin-image docker.io/temporalio/admin-tools:${TEMPORAL_VERSION:-1.31}
+  temporal-admin:  &temporal-admin-image  docker.io/temporalio/admin-tools:${TEMPORAL_VERSION:-1.31}
   temporal-server: &temporal-server-image docker.io/temporalio/server:${TEMPORAL_VERSION:-1.31}
 
 # Common environment variables shared across NOMAD app and internal/cpu/gpu workers
@@ -340,6 +340,8 @@ services:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"
 
+# Keep services outside a shared pod so per-service user namespaces work.
+# Used by podman-compose; ignored by Docker Compose.
 x-podman:
   in_pod: false
 
