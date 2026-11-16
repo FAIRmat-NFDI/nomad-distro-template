@@ -139,6 +139,62 @@ This section covers the minimal steps for getting an Oasis running locally. Note
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here: [https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
 
 
+<details>
+<summary>Running with rootless Docker or rootless Podman</summary>
+
+The same `docker-compose.yaml` accepts runtime settings from `.env` or the shell.
+With no overrides, it retains the Docker socket and ports 80/443.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `DOCKER_SOCKET` | `/var/run/docker.sock` | Host socket mounted into NORTH |
+| `HTTP_PORT` | `80` | Published HTTP port |
+| `HTTPS_PORT` | `443` | Published HTTPS port; TLS still requires the configuration below |
+| `NOMAD_USERNS_MODE` | Empty (runtime default) | User namespace mode for app and all NOMAD workers |
+| `NOMAD_SERVICES_API_PORT` | Value of `HTTP_PORT` | Public API port, which can differ when using an external reverse proxy |
+| `NORTH_OAUTH_CALLBACK_URL` | `http://localhost/backend/north/hub/oauth_callback` | Public NORTH login callback |
+
+For local HTTP access on port 8080 with rootless Podman, add these settings to
+the `.env` file created above:
+
+```dotenv
+HTTP_PORT=8080
+HTTPS_PORT=8443
+NOMAD_USERNS_MODE=keep-id:uid=1000,gid=1000
+NORTH_OAUTH_CALLBACK_URL=http://localhost:8080/backend/north/hub/oauth_callback
+```
+
+On Linux, enable the user API socket and select it before starting Compose:
+
+```sh
+systemctl --user enable --now podman.socket
+export DOCKER_SOCKET="$XDG_RUNTIME_DIR/podman/podman.sock"
+podman compose up -d
+```
+
+The bind-mounted `.volumes/fs` directory must be writable by the user running
+Podman. The Docker-specific `sudo chown -R 1000 .volumes` step above is not the
+ownership rule for this mode: `keep-id` maps the invoking user to container UID
+1000. On SELinux hosts, bind mounts and socket access also require appropriate
+label configuration; see the [Podman socket documentation](https://docs.podman.io/en/latest/markdown/podman-system-service.1.html).
+
+For rootless Docker, leave `NOMAD_USERNS_MODE` unset and select
+`$XDG_RUNTIME_DIR/docker.sock`. Its bind-mount ownership needs separate
+preparation because container UID 1000 maps to a subordinate host UID; see
+[Docker UID mapping](https://docs.docker.com/engine/security/rootless/uid-gid-mapping/).
+
+The optional `cpu_worker` and `gpu_worker` services remain commented out. When
+enabled, both inherit the namespace setting and filesystem mount from
+`x-nomad-base`. GPU device access must also be configured for the selected runtime;
+the included NVIDIA reservation is the Docker configuration.
+
+When changing the public hostname or enabling HTTPS, update the NOMAD public
+API settings and `NORTH_OAUTH_CALLBACK_URL` together. For a nonstandard HTTPS
+port, also update the HTTP-to-HTTPS redirect in `configs/nginx_https.conf`,
+which otherwise targets port 443.
+
+</details>
+
 ### Steps before entering production
 
 Before you can host your Oasis securely under a domain, you will have to go through a few additional steps
