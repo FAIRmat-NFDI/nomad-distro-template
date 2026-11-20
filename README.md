@@ -268,6 +268,24 @@ Any pushes to the main branch of this repository, such as when [adding a plugin]
 
 Please see the [Jupyter image](#the-jupyter-image) section below for more information on the jupyter NORTH image being generated in this repository.
 
+NORTH and its tool containers use `nomad_oasis_north_network`. The NOMAD app and
+Nginx are on both networks so notebooks can use the NOMAD API and Nginx can proxy
+tool sessions. Elasticsearch, MongoDB, Temporal, and the workers use the backend
+network only.
+
+When upgrading an Oasis where NORTH tools still share `nomad_oasis_network` with
+the backend, follow these steps to move tool sessions to `nomad_oasis_north_network`.
+
+1. Ask users to save their changes in the tool's `work` folder and move any files
+   they want to keep from other container-local folders into `work`. NORTH mounts
+   `work` from the host, so saved files there will be available after relaunch.
+2. Stop the running NORTH tool servers in JupyterHub before applying the updated
+   Compose file. DockerSpawner removes each tool container when it stops and
+   creates a new container on `nomad_oasis_north_network` at the next launch.
+3. After the update, check that `nomad_oasis_network` has no leftover NORTH tool
+   containers. Launch a fresh notebook, verify that a NOMAD API request succeeds,
+   and confirm that the notebook cannot connect directly to Elasticsearch or MongoDB.
+
 
 ### For an existing Oasis
 
