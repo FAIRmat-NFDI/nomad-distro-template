@@ -78,7 +78,8 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
     container_name: nomad_oasis_elastic_9
     environment:
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      # Mitigate CVE-2026-114938 until the bundled JDK is patched.
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m -XX:-UseBASE64Intrinsics
       - discovery.type=single-node
       - xpack.security.enabled=false
     volumes:

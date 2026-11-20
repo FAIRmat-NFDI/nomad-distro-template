@@ -10,7 +10,8 @@ services:
     restart: "no"
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
     environment:
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      # Mitigate CVE-2026-114938 in the migration container too.
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m -XX:-UseBASE64Intrinsics
       - discovery.type=single-node
       - xpack.security.enabled=false
     volumes:

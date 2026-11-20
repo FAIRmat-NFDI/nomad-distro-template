@@ -273,13 +273,18 @@ Nginx are on both networks so notebooks can use the NOMAD API and Nginx can prox
 tool sessions. Elasticsearch, MongoDB, Temporal, and the workers use the backend
 network only.
 
-When upgrading an existing deployment to this network layout, ask users to save
-their work to persistent storage and stop existing tool servers in JupyterHub
-before applying the updated Compose file. DockerSpawner removes those containers
-on stop and creates new ones on the NORTH network at the next launch. After the
-update, check that the backend network has no leftover NORTH tool containers.
-Launch a fresh notebook, verify that a NOMAD API request succeeds, and confirm
-that the notebook cannot connect directly to Elasticsearch or MongoDB.
+When upgrading an Oasis where NORTH tools still share `nomad_oasis_network` with
+the backend, follow these steps to move tool sessions to `nomad_oasis_north_network`.
+
+1. Ask users to save their changes in the tool's `work` folder and move any files
+   they want to keep from other container-local folders into `work`. NORTH mounts
+   `work` from the host, so saved files there will be available after relaunch.
+2. Stop the running NORTH tool servers in JupyterHub before applying the updated
+   Compose file. DockerSpawner removes each tool container when it stops and
+   creates a new container on `nomad_oasis_north_network` at the next launch.
+3. After the update, check that `nomad_oasis_network` has no leftover NORTH tool
+   containers. Launch a fresh notebook, verify that a NOMAD API request succeeds,
+   and confirm that the notebook cannot connect directly to Elasticsearch or MongoDB.
 
 
 ### For an existing Oasis
