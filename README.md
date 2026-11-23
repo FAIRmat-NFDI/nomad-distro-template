@@ -138,9 +138,10 @@ This section covers the minimal steps for getting an Oasis running locally. Note
 
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here: [https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
 
+### Running with rootless Docker or rootless Podman
 
 <details>
-<summary>Running with rootless Docker or rootless Podman</summary>
+<summary>Show setup instructions</summary>
 
 The same `docker-compose.yaml` accepts runtime settings from `.env` or the shell.
 With no overrides, it retains the Docker socket and ports 80/443.
@@ -172,8 +173,7 @@ export DOCKER_SOCKET="$XDG_RUNTIME_DIR/podman/podman.sock"
 podman compose up -d
 ```
 
-Note: If you're using podman-compose, v1.6 or higher is required to support nested interpolation syntax used in this docker-compose file.
-
+**Note:** If you're using podman-compose, v1.6 or higher is required to support nested interpolation syntax used in this docker-compose file.
 
 The bind-mounted `.volumes/fs` directory must be writable by the user running
 Podman. The Docker-specific `sudo chown -R 1000 .volumes` step above is not the
