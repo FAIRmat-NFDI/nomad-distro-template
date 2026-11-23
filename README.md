@@ -172,6 +172,9 @@ export DOCKER_SOCKET="$XDG_RUNTIME_DIR/podman/podman.sock"
 podman compose up -d
 ```
 
+Note: If you're using podman-compose, v1.6 or higher is required to support nested interpolation syntax used in this docker-compose file.
+
+
 The bind-mounted `.volumes/fs` directory must be writable by the user running
 Podman. The Docker-specific `sudo chown -R 1000 .volumes` step above is not the
 ownership rule for this mode: `keep-id` maps the invoking user to container UID
